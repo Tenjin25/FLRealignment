@@ -1603,7 +1603,10 @@ body {
     function applyContest(contestKey) {
       if (!contestKey) return setStatus('Select a contest');
       
-      const [contestType, year] = contestKey.split('_');
+      // Split contest key properly - year is always the last part after final underscore
+      const lastUnderscoreIndex = contestKey.lastIndexOf('_');
+      const contestType = contestKey.substring(0, lastUnderscoreIndex);
+      const year = contestKey.substring(lastUnderscoreIndex + 1);
       
       if (currentView === 'counties') {
         applyCountyContest(contestType, year);
