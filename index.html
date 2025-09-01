@@ -1613,7 +1613,7 @@ body {
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
         
-        expr.push(['==', ['get', 'COUNTYNAME'], countyName]);
+        expr.push(['==', ['get', 'County'], countyName]);
         expr.push(color);
       });
       
