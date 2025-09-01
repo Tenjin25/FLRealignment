@@ -823,21 +823,83 @@ body {
         return;
       }
       
-      // Find county results
-      const countyResults = currentElectionResults[countyName];
+      // Find county results for current contest
+      const countyData = currentElectionResults[countyName];
       
-      if (!countyResults) {
+      if (!countyData) {
         contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
         detailsDiv.style.display = 'block';
         return;
       }
-      
-      // This function needs to be rewritten to work with our current contest data
-      // For now, just show basic county info
+
+      // Get the current contest type and year from the dropdown
+      const contestSelect = document.getElementById('contestSelect');
+      const contestKey = contestSelect.value;
+      if (!contestKey) {
+        contentEl.innerHTML = '<p>Select a contest to see detailed results.</p>';
+        detailsDiv.style.display = 'block';
+        return;
+      }
+
+      // Parse contest info
+      const lastUnderscoreIndex = contestKey.lastIndexOf('_');
+      const contestType = contestKey.substring(0, lastUnderscoreIndex);
+      const year = contestKey.substring(lastUnderscoreIndex + 1);
+
+      // Get vote data for this contest
+      const demVotes = countyData[`${contestType}_dem`] || 0;
+      const repVotes = countyData[`${contestType}_rep`] || 0;
+      const totalVotes = countyData[`${contestType}_total`] || 0;
+
+      if (totalVotes === 0) {
+        contentEl.innerHTML = `<p>No ${formatContestName(contestType, year)} data available for ${countyName} County in ${year}.</p>`;
+        detailsDiv.style.display = 'block';
+        return;
+      }
+
+      // Calculate percentages
+      const demPct = (demVotes / totalVotes * 100);
+      const repPct = (repVotes / totalVotes * 100);
+      const marginPct = Math.abs(demPct - repPct);
+      const winner = repPct > demPct ? 'Republican' : 'Democratic';
+
+      // Determine competitiveness category
+      let competitiveness;
+      if (marginPct >= 40) {
+        competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+      } else if (marginPct >= 30) {
+        competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+      } else if (marginPct >= 20) {
+        competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+      } else if (marginPct >= 10) {
+        competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+      } else if (marginPct >= 5.5) {
+        competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+      } else if (marginPct >= 1) {
+        competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+      } else if (marginPct >= 0.5) {
+        competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+      } else {
+        competitiveness = `Tossup (${winner} win)`;
+      }
+
+      // Generate detailed results HTML
       contentEl.innerHTML = `
-        <p><strong>${countyName} County</strong></p>
-        <p>County data loaded. Detailed results functionality will be implemented.</p>
-        <p>Click on a contest from the dropdown to see voting patterns.</p>
+        <div class="county-results">
+          <h5>${formatContestName(contestType, year)} (${year})</h5>
+          <div class="results-summary">
+            <p><strong>Winner:</strong> ${winner}</p>
+            <p><strong>Margin:</strong> ${marginPct.toFixed(1)} points</p>
+            <p><strong>Competitiveness:</strong> ${competitiveness}</p>
+          </div>
+          <div class="vote-breakdown">
+            <p><span style="color: #2563eb; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+            <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+            <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+              Total Votes: ${totalVotes.toLocaleString()}
+            </p>
+          </div>
+        </div>
       `;
       
       detailsDiv.style.display = 'block';
