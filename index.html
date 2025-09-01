@@ -1579,8 +1579,12 @@ body {
       
       if (currentView === 'counties') {
         applyCountyContest(contestType, year);
-      } else {
+      } else if (currentView === 'districts' && contestType === 'us_house') {
+        // US House races use district-specific data
         applyDistrictContest(contestType, year);
+      } else {
+        // All other contests (statewide) aggregate county data by district
+        applyStatewideContestToDistricts(contestType, year);
       }
     }
 
@@ -1658,6 +1662,54 @@ body {
       map.setPaintProperty('district-fill', 'fill-color', expr);
       document.getElementById('statewide').textContent = `FL US House (${year})`;
       setStatus(`Applied contest: FL US House ${year}`);
+    }
+
+    function applyStatewideContestToDistricts(contestType, year) {
+      // For statewide contests in district views, we need to aggregate county data by district
+      const contestData = electionData.filter(row => row.year == year);
+      
+      if (contestData.length === 0) {
+        return setStatus('No data found for this contest');
+      }
+
+      // We need county-to-district mapping - this is a simplified approach
+      // In a full implementation, you'd need actual county-to-district mapping data
+      
+      // For now, we'll apply the statewide contest to districts using a placeholder approach
+      // Each district will show the statewide result (this could be enhanced with actual mapping)
+      
+      // Calculate statewide totals for this contest
+      let totalDem = 0;
+      let totalRep = 0;
+      let totalVotes = 0;
+      
+      contestData.forEach(row => {
+        const demVotes = parseInt(row[`${contestType}_dem`]) || 0;
+        const repVotes = parseInt(row[`${contestType}_rep`]) || 0;
+        totalDem += demVotes;
+        totalRep += repVotes;
+        totalVotes += demVotes + repVotes;
+      });
+      
+      if (totalVotes === 0) {
+        return setStatus(`No data found for ${contestType} in ${year}`);
+      }
+      
+      const demPct = (totalDem / totalVotes) * 100;
+      const repPct = (totalRep / totalVotes) * 100;
+      const winner = repPct > demPct ? 'R' : 'D';
+      const marginPct = Math.abs(repPct - demPct);
+      const color = categoryColorForMargin(marginPct, winner);
+      
+      // Apply uniform color to all districts (showing statewide result)
+      // This is a simplified approach - ideally you'd aggregate by actual district boundaries
+      const layerName = currentView === 'districts' ? 'district-fill' : 
+                       currentView === 'state_house' ? 'state-house-fill' : 'state-senate-fill';
+      
+      map.setPaintProperty(layerName, 'fill-color', color);
+      
+      document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
+      setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
 
     window.onload = init;
