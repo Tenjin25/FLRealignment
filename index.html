@@ -789,6 +789,26 @@ body {
       }
     }
 
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarContent = document.querySelector('.sidebar-content');
+      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      
+      if (sidebar.classList.contains('minimized')) {
+        // Expand sidebar
+        sidebar.classList.remove('minimized');
+        sidebarContent.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize sidebar';
+      } else {
+        // Minimize sidebar
+        sidebar.classList.add('minimized');
+        sidebarContent.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand sidebar';
+      }
+    }
+
     function showCountyDetails(countyName) {
       const detailsDiv = document.getElementById('county-details');
       const nameEl = document.getElementById('county-name');
