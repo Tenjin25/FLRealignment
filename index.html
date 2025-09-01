@@ -574,6 +574,9 @@ body {
         'president': 'FL President',
         'governor': 'FL Governor', 
         'us_senate': 'FL US Senate',
+        'attorney_general': 'FL Attorney General',
+        'cfo': 'FL Chief Financial Officer',
+        'agriculture_commissioner': 'FL Agriculture Commissioner',
         'us_house': 'FL US House',
         'state_senate': 'FL State Senate',
         'state_house': 'FL State House',
@@ -620,8 +623,8 @@ body {
     function populateContestSelectFromCSV(csvData) {
       const sel = document.getElementById('contestSelect');
       const years = [...new Set(csvData.map(row => row.year))].sort();
-      // Focus on non-gerrymandered statewide contests only
-      const contestTypes = ['president', 'governor', 'us_senate'];
+      // Focus on non-gerrymandered statewide contests only (Cabinet offices + federal)
+      const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
       
       years.forEach(year => {
         contestTypes.forEach(contestType => {

@@ -95,6 +95,12 @@ def process_election_data_to_csv():
                     congressional_results[district][office_type]['total'] += votes
             elif 'Governor' in office_desc:
                 office_type = 'governor'
+            elif 'Attorney General' in office_desc:
+                office_type = 'attorney_general'
+            elif 'Chief Financial Officer' in office_desc:
+                office_type = 'cfo'
+            elif 'Commissioner of Agriculture' in office_desc:
+                office_type = 'agriculture_commissioner'
             elif 'State Representative' in office_desc:
                 office_type = 'state_house'
             elif 'State Senator' in office_desc:
@@ -122,6 +128,15 @@ def process_election_data_to_csv():
                 'us_senate_dem': offices['us_senate']['dem'],
                 'us_senate_rep': offices['us_senate']['rep'],
                 'us_senate_total': offices['us_senate']['total'],
+                'attorney_general_dem': offices['attorney_general']['dem'],
+                'attorney_general_rep': offices['attorney_general']['rep'],
+                'attorney_general_total': offices['attorney_general']['total'],
+                'cfo_dem': offices['cfo']['dem'],
+                'cfo_rep': offices['cfo']['rep'],
+                'cfo_total': offices['cfo']['total'],
+                'agriculture_commissioner_dem': offices['agriculture_commissioner']['dem'],
+                'agriculture_commissioner_rep': offices['agriculture_commissioner']['rep'],
+                'agriculture_commissioner_total': offices['agriculture_commissioner']['total'],
                 'us_house_dem': offices['us_house']['dem'],
                 'us_house_rep': offices['us_house']['rep'],
                 'us_house_total': offices['us_house']['total'],
