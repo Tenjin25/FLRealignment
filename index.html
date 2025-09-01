@@ -613,21 +613,15 @@ body {
       const sel = document.getElementById('contestSelect');
       sel.innerHTML = '<option value="">Select a contest...</option>';
       
-      if (currentView === 'counties') {
-        populateContestSelectFromCSV(electionData);
-      } else if (currentView === 'districts') {
-        populateContestSelectFromCongressionalCSV(congressionalData);
-      } else if (currentView === 'state_house') {
-        populateContestSelectForStateHouse(electionData);
-      } else if (currentView === 'state_senate') {
-        populateContestSelectForStateSenate(electionData);
-      }
+      // Use only non-gerrymandered statewide contests for all views
+      populateContestSelectFromCSV(electionData);
     }
 
     function populateContestSelectFromCSV(csvData) {
       const sel = document.getElementById('contestSelect');
       const years = [...new Set(csvData.map(row => row.year))].sort();
-      const contestTypes = ['president', 'governor', 'us_senate', 'us_house', 'state_senate', 'state_house'];
+      // Focus on non-gerrymandered statewide contests only
+      const contestTypes = ['president', 'governor', 'us_senate'];
       
       years.forEach(year => {
         contestTypes.forEach(contestType => {
