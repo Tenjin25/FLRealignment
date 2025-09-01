@@ -498,7 +498,6 @@ body {
         districts: './data/fl_congressional_districts.geojson',
         state_house: './data/fl_state_house_districts.geojson',
         state_senate: './data/fl_state_senate_districts.geojson',
-        precincts: './data/fl_vtd.geojson',
         election: './data/fl_county_election_results.csv',
         congressional: './data/fl_congressional_election_results.csv',
         districts_info: './data/fl_congressional_districts.csv',
@@ -1483,10 +1482,13 @@ body {
     async function init() {
       try {
         setStatus('Loading counties...');
+        console.log('Loading counties from:', CONFIG.paths.counties);
         const counties = await loadJSON(CONFIG.paths.counties);
+        console.log('Counties loaded successfully:', counties.features?.length, 'features');
         map.addSource('counties', { type: 'geojson', data: counties });
         
         countyNameMap = buildCountyNameMapFromGeoJSON(counties);
+        console.log('County name map built:', Object.keys(countyNameMap).length, 'counties');
         
         // Add initial county layers
         addCountyLayers();
@@ -1494,6 +1496,7 @@ body {
         setStatus('Counties loaded');
 
         setStatus('Loading election data...');
+        console.log('Loading election data from:', CONFIG.paths.election);
         const electionCSV = await loadCSV(CONFIG.paths.election);
         electionData = parseCSV(electionCSV);
         setStatus('Election data loaded');
