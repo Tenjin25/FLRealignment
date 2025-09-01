@@ -883,48 +883,6 @@ body {
         competitiveness = `Tossup (${winner} win)`;
       }
 
-      // Generate detailed results HTML
-      contentEl.innerHTML = `
-        <div class="county-results">
-          <h5>${formatContestName(contestType, year)} (${year})</h5>
-          <div class="results-summary">
-            <p><strong>Winner:</strong> ${winner}</p>
-            <p><strong>Margin:</strong> ${marginPct.toFixed(1)} points</p>
-            <p><strong>Competitiveness:</strong> ${competitiveness}</p>
-          </div>
-          <div class="vote-breakdown">
-            <p><span style="color: #2563eb; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-            <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-            <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
-              Total Votes: ${totalVotes.toLocaleString()}
-            </p>
-          </div>
-        </div>
-      `;
-      
-      detailsDiv.style.display = 'block';
-      const winner = demPct > repPct ? 'Democratic' : 'Republican';
-      
-      // Use exact NC competitiveness categories
-      let competitiveness;
-      if (marginPct >= 40) {
-        competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
-      } else if (marginPct >= 30) {
-        competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
-      } else if (marginPct >= 20) {
-        competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
-      } else if (marginPct >= 10) {
-        competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
-      } else if (marginPct >= 5.5) {
-        competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
-      } else if (marginPct >= 1) {
-        competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
-      } else if (marginPct >= 0.5) {
-        competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
-      } else {
-        competitiveness = `Tossup (${winner} win)`;
-      }
-      
       // Color coding for competitiveness
       let compColor = '#6b7280';
       if (competitiveness.includes('Rep')) {
@@ -945,6 +903,7 @@ body {
         else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       
+      // Generate detailed results HTML
       contentEl.innerHTML = `
         <div style="margin-bottom: 16px;">
           <h5>🎯 Competitiveness</h5>
@@ -958,13 +917,15 @@ body {
         </div>
         <div style="margin-bottom: 16px;">
           <h5>🗳️ Vote Breakdown</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">${demCandidate || 'Democratic'}: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color: #dc2626; font-weight: bold;">${repCandidate || 'Republican'}: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+          <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+          <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
           <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
             Total Votes: ${totalVotes.toLocaleString()}
           </p>
         </div>
       `;
+      
+      detailsDiv.style.display = 'block';
       
       detailsDiv.style.display = 'block';
     }
@@ -1383,14 +1344,42 @@ body {
             const winner = demPct > repPct ? 'Democratic' : 'Republican';
             
             // Determine competitiveness
-            const competitiveness = getCompetitiveness(marginPct);
-            let compColor = '#666';
-            if (competitiveness.includes('Annihilation')) compColor = winner === 'Republican' ? '#991b1b' : '#1e3a8a';
-            else if (competitiveness.includes('Dominant')) compColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
-            else if (competitiveness.includes('Safe')) compColor = '#6baed6';
-            else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
-            else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
-            else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+            let competitiveness;
+            if (marginPct >= 40) {
+              competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+            } else if (marginPct >= 30) {
+              competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+            } else if (marginPct >= 20) {
+              competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+            } else if (marginPct >= 10) {
+              competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+            } else if (marginPct >= 5.5) {
+              competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+            } else if (marginPct >= 1) {
+              competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+            } else if (marginPct >= 0.5) {
+              competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+            } else {
+              competitiveness = `Tossup (${winner} win)`;
+            }
+            let compColor = '#6b7280';
+            if (competitiveness.includes('Rep')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+              else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+              else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+              else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+              else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+              else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+              else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
+            } else if (competitiveness.includes('Dem')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+              else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+              else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+              else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+              else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+              else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+              else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+            }
             
             electionInfo = `
               <div style="margin-bottom: 16px;">
