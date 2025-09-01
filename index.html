@@ -918,7 +918,7 @@ body {
         // Add click handler for counties with full trends popup
         map.on('click', 'county-fill', (e) => {
           if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.COUNTYNAME;
+            const countyName = e.features[0].properties.County;
             if (countyName) {
               // Show full historical trends popup on click
               const trends = getHistoricalTrends(countyName, false, null);
@@ -939,7 +939,7 @@ body {
         
         map.on('mousemove', 'county-fill', (e) => {
           if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.COUNTYNAME;
+            const countyName = e.features[0].properties.County;
             if (countyName) {
               const quickInfo = getQuickCountyInfo(countyName);
               showHoverTooltip(e.point.x, e.point.y, quickInfo);
