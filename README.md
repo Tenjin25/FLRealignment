@@ -35,7 +35,7 @@ An interactive web-based political analysis tool for Florida, visualizing electi
 2. **Open the map**
    ```bash
    # Simply open in your browser
-   open ultimate_fl_political_map.html
+   open index.html
    ```
 
 3. **Explore the data**
@@ -61,7 +61,7 @@ An interactive web-based political analysis tool for Florida, visualizing electi
 
 ```
 FLRealignments/
-├── ultimate_fl_political_map.html    # Main interactive map
+├── index.html                        # Main interactive map
 ├── data/                             # Processed data files
 │   ├── fl_county_election_results.csv
 │   ├── fl_congressional_election_results.csv
@@ -149,6 +149,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Live Demo**: [Add your GitHub Pages URL here]
-**Contact**: [Your contact information]
-**Last Updated**: September 2025
+**🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
+**📧 Contact**: [Your contact information]
+**📅 Last Updated**: September 2025
