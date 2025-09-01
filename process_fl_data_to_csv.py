@@ -73,6 +73,13 @@ def process_election_data_to_csv():
         
         for _, row in df.iterrows():
             county = row['CountyName']
+            
+            # Map county names to match GeoJSON naming
+            county_name_mapping = {
+                'Desoto': 'DeSoto'  # Fix capitalization mismatch
+            }
+            county = county_name_mapping.get(county, county)
+            
             office_desc = row['OfficeDesc']
             party = row['PartyCode']
             votes = int(row['CanVotes']) if pd.notna(row['CanVotes']) else 0
