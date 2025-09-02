@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <meta charset='utf-8'>
     <title>FL Political Realignment Map (2008-2024)</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
@@ -615,31 +616,49 @@ body {
     }
 
     async function loadCSV(path) {
-      const r = await fetch(path);
-      if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
-      return r.text();
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
+  return r.text();
     }
 
     function parseCSV(csvText) {
-      const lines = csvText.trim().split('\n');
-      const headers = lines[0].split(',');
-      const data = [];
-      
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',');
-        const row = {};
-        headers.forEach((header, index) => {
-          let value = values[index] || '';
-          // Try to parse numbers
-          if (value && !isNaN(value)) {
-            value = parseFloat(value);
-          }
-          row[header] = value;
+      try {
+        const result = Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true
         });
-        data.push(row);
+        if (result.errors.length) {
+          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+          console.error(result.errors);
+        }
+        return result.data;
+      } catch (err) {
+        setStatus('CSV Parse Exception: ' + err.message);
+        console.error(err);
+        return [];
       }
-      
-      return data;
+// Merge JSONs (e.g., boundaries + election results)
+function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
+  // Returns a new GeoJSON with election results merged into feature properties
+  if (!boundaryGeoJSON || !boundaryGeoJSON.features || !electionData) return boundaryGeoJSON;
+  const electionMap = {};
+  electionData.forEach(row => {
+    // Normalize county names for matching
+    let name = (row[countyNameKey] || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    electionMap[name.toUpperCase()] = row;
+  });
+  boundaryGeoJSON.features.forEach(f => {
+    const p = f.properties || {};
+    let name = (p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    const electionRow = electionMap[name.toUpperCase()];
+    if (electionRow) {
+      // Merge election data into properties
+      Object.assign(f.properties, electionRow);
+    }
+  });
+  return boundaryGeoJSON;
+}
     }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
@@ -713,12 +732,15 @@ body {
       
       years.forEach(year => {
         contestTypes.forEach(contestType => {
+          // Exclude Governor 2020 from dropdown
+          if (contestType === 'governor' && year == 2020) return;
           // Check if this contest type has data for this year
-          const hasData = csvData.some(row => 
-            row.year == year && 
-            (row[`${contestType}_total`] > 0)
-          );
-          
+          const hasData = csvData.some(row => {
+            // Normalize county names for St Lucie and St Johns
+            if (row.county === 'St. Lucie') row.county = 'St Lucie';
+            if (row.county === 'St. Johns') row.county = 'St Johns';
+            return row.year == year && (row[`${contestType}_total`] > 0);
+          });
           if (hasData) {
             const opt = document.createElement('option');
             opt.value = `${contestType}_${year}`;
