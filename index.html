@@ -1136,6 +1136,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Generate detailed results HTML
       contentEl.innerHTML = `
         <div style="margin-bottom: 16px;">
+          <h5>🗳️ Candidates</h5>
+          <p><span style="color: #1e40af; font-weight: bold;">${result.dem_candidate ? result.dem_candidate + ' (D)' : 'Democratic'}</span></p>
+          <p><span style="color: #dc2626; font-weight: bold;">${result.rep_candidate ? result.rep_candidate + ' (R)' : 'Republican'}</span></p>
+        </div>
+        <div style="margin-bottom: 16px;">
           <h5>🎯 Competitiveness</h5>
           <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
         </div>
