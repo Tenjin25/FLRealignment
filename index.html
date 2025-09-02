@@ -34,6 +34,11 @@ body {
   height: 100vh;
   width: 100%;
   background: #f0f4f8;
+  transition: width 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+#map.sidebar-minimized {
+  width: 100vw !important;
 }
 
 /* Hover Tooltip */
@@ -98,8 +103,13 @@ body {
   min-width: 0 !important;
   max-width: 0 !important;
   overflow: hidden !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 .sidebar.minimized .sidebar-content {
+  display: none;
+}
+.sidebar.minimized .sidebar-header {
   display: none;
 }
 .sidebar-header {
@@ -172,7 +182,7 @@ body {
   font-size: 16px;
 }
 .controls-content {
-  /* No additional padding needed since main-controls has it */
+  position: relative;
 }
 .analysis-mode {
   display: flex;
@@ -388,20 +398,30 @@ body {
 .floating-expand-btn {
   display: none;
   position: fixed;
-  top: 20px;
+  top: 50%;
   right: 20px;
+  transform: translateY(-50%);
   z-index: 10001;
-  width: 56px;
-  height: 56px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  font-size: 32px;
+  font-size: 24px;
+  font-weight: bold;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+.floating-expand-btn:hover {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+  color: #2563eb;
+  transform: translateY(-50%) scale(1.05);
 }
 .sidebar.minimized ~ .floating-expand-btn {
   display: flex !important;
@@ -558,7 +578,7 @@ body {
     </div>
 
     <!-- Floating expand button (shown when sidebar is minimized) -->
-    <button class="floating-expand-btn" id="sidebar-float-toggle">+</button>
+    <button class="floating-expand-btn" id="sidebar-float-toggle" onclick="toggleSidebar()">+</button>
 
     <!-- Status panel -->
     <div class="status-panel" id="status" style="display:none;">
@@ -919,16 +939,19 @@ body {
       const sidebar = document.getElementById('sidebar');
       const sidebarContent = document.querySelector('.sidebar-content');
       const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const mapElement = document.getElementById('map');
       
       if (sidebar.classList.contains('minimized')) {
         // Expand sidebar
         sidebar.classList.remove('minimized');
+        mapElement.classList.remove('sidebar-minimized');
         sidebarContent.style.display = 'block';
         minimizeBtn.textContent = '−';
         minimizeBtn.title = 'Minimize sidebar';
       } else {
         // Minimize sidebar
         sidebar.classList.add('minimized');
+        mapElement.classList.add('sidebar-minimized');
         sidebarContent.style.display = 'none';
         minimizeBtn.textContent = '+';
         minimizeBtn.title = 'Expand sidebar';
