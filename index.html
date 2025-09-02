@@ -317,6 +317,36 @@ body {
   margin: 0 0 12px 0;
   color: #0369a1;
 }
+
+/* Statewide Results */
+.statewide-results {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+.statewide-results h4 {
+  margin: 0 0 15px 0;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+.statewide-margin {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+}
+.margin-text {
+  font-weight: 600;
+  font-size: 16px;
+}
+.margin-details {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 5px;
+}
+
 .findings-section {
   margin-bottom: 20px;
 }
@@ -756,6 +786,46 @@ body {
       
       // Could add different analysis modes here (e.g., demographic analysis vs electoral analysis)
       console.log(`Analysis mode set to: ${mode}`);
+    }
+
+    function updateStatewideResults(contestType, year, demVotes, repVotes, totalVotes) {
+      const statewideContent = document.getElementById('statewide-content');
+      
+      if (totalVotes === 0) {
+        statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
+        return;
+      }
+      
+      const demPct = (demVotes / totalVotes) * 100;
+      const repPct = (repVotes / totalVotes) * 100;
+      const marginPct = Math.abs(demPct - repPct);
+      const winner = demPct > repPct ? 'Democratic' : 'Republican';
+      const loser = demPct > repPct ? 'Republican' : 'Democratic';
+      
+      // Get candidate names based on contest type and year
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      
+      if (contestType === 'president') {
+        if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
+        else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
+        else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
+        else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
+        else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+      }
+      
+      statewideContent.innerHTML = `
+        <div class="statewide-margin">
+          <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'};">
+            ${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%
+          </div>
+          <div class="margin-details">
+            ${demCandidate}: ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
+            ${repCandidate}: ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
+            Total Votes: ${totalVotes.toLocaleString()}
+          </div>
+        </div>
+      `;
     }
 
     function setMapView(view) {
@@ -1738,6 +1808,22 @@ body {
       contestData.forEach(row => {
         currentElectionResults[row.county] = row;
       });
+
+      // Calculate statewide totals
+      let statewidedemVotes = 0;
+      let statewidrepVotes = 0;
+      let statewidTotalVotes = 0;
+      
+      contestData.forEach(row => {
+        const demVotes = row[`${contestType}_dem`] || 0;
+        const repVotes = row[`${contestType}_rep`] || 0;
+        statewidedemVotes += demVotes;
+        statewidrepVotes += repVotes;
+        statewidTotalVotes += demVotes + repVotes;
+      });
+      
+      // Update statewide results display
+      updateStatewideResults(contestType, year, statewidedemVotes, statewidrepVotes, statewidTotalVotes);
 
       // Build expression for county coloring
       const expr = ['case'];
