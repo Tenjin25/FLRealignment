@@ -469,6 +469,10 @@ body {
                     <div class="mode-toggle" id="state-house-view" onclick="setMapView('state_house')">State House</div>
                     <div class="mode-toggle" id="state-senate-view" onclick="setMapView('state_senate')">State Senate</div>
                 </div>
+                <!-- 2000 VTDs option (hidden until data is loaded) -->
+                <div class="view-toggle" style="margin-top: 8px; display: none;" id="vtds-2000-section">
+                    <div class="mode-toggle" id="vtds-2000-view" onclick="setMapView('vtds_2000')">2000 Precincts</div>
+                </div>
             </div>
             <div class="control-group">
                 <label>📊 Contest Type:</label>
@@ -841,18 +845,25 @@ body {
       document.getElementById('state-house-view').classList.toggle('active', view === 'state_house');
       document.getElementById('state-senate-view').classList.toggle('active', view === 'state_senate');
       
+      // Update 2000 VTDs button if available
+      const vtds2000Button = document.getElementById('vtds-2000-view');
+      if (vtds2000Button) {
+        vtds2000Button.classList.toggle('active', view === 'vtds_2000');
+      }
+      
       // Update sidebar title
       const sidebarTitle = document.querySelector('.sidebar-header h3');
       const titles = {
         'counties': '📊 County Analysis',
         'districts': '📊 Congressional District Analysis', 
         'state_house': '📊 State House District Analysis',
-        'state_senate': '📊 State Senate District Analysis'
+        'state_senate': '📊 State Senate District Analysis',
+        'vtds_2000': '📊 2000 Precinct Analysis'
       };
       sidebarTitle.textContent = titles[view];
       
       // Clear all map layers
-      const layerTypes = ['county', 'district', 'state-house', 'state-senate'];
+      const layerTypes = ['county', 'district', 'state-house', 'state-senate', 'vtds-2000'];
       layerTypes.forEach(type => {
         if (map.getLayer(`${type}-fill`)) {
           map.removeLayer(`${type}-fill`);
@@ -869,6 +880,8 @@ body {
         addStateHouseLayers();
       } else if (view === 'state_senate') {
         addStateSenatelayers();
+      } else if (view === 'vtds_2000') {
+        add2000VTDLayers();
       }
       
       // Repopulate contest selector
@@ -877,6 +890,62 @@ body {
       // Clear current selection
       document.getElementById('contestSelect').value = '';
       clearCountyDetails();
+    }
+
+    // Placeholder function for 2000 VTD layers (will be implemented when data is available)
+    function add2000VTDLayers() {
+      if (typeof window.vtds2000Data === 'undefined') {
+        setStatus('2000 VTD data not loaded. Please load VTD shapefiles and election data.');
+        // Switch back to counties view
+        setMapView('counties');
+        return;
+      }
+      
+      if (!map.getLayer('vtds-2000-fill')) {
+        map.addLayer({ 
+          id: 'vtds-2000-fill', 
+          type: 'fill', 
+          source: 'vtds-2000', 
+          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.3 } 
+        });
+        map.addLayer({ 
+          id: 'vtds-2000-stroke', 
+          type: 'line', 
+          source: 'vtds-2000', 
+          paint: { 'line-color': '#666', 'line-width': 0.5 } 
+        });
+        
+        // Add click handler for VTDs
+        map.on('click', 'vtds-2000-fill', (e) => {
+          if (e.features && e.features[0] && e.features[0].properties) {
+            const vtdProps = e.features[0].properties;
+            const vtdId = vtdProps.VTD || vtdProps.VTDST || vtdProps.NAME || 'Unknown';
+            
+            // Show VTD details
+            showVTDDetails(vtdId, vtdProps);
+          }
+        });
+        
+        setStatus('2000 VTD layer loaded');
+      }
+    }
+    
+    // Function to show VTD details (placeholder)
+    function showVTDDetails(vtdId, vtdProps) {
+      const detailsDiv = document.getElementById('area-details');
+      detailsDiv.innerHTML = `
+        <h4>2000 Precinct ${vtdId}</h4>
+        <div class="data-row">
+          <span class="label">VTD ID:</span>
+          <span class="value">${vtdId}</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Properties:</span>
+          <span class="value">${Object.keys(vtdProps).length} attributes</span>
+        </div>
+        <p><em>Election results will be displayed when precinct-level data is loaded.</em></p>
+      `;
+      detailsDiv.style.display = 'block';
     }
 
     function toggleLegend() {
