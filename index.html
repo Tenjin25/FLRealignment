@@ -643,17 +643,24 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   // Returns a new GeoJSON with election results merged into feature properties
   if (!boundaryGeoJSON || !boundaryGeoJSON.features || !electionData) return boundaryGeoJSON;
   const electionMap = {};
+  function normalizeCountyName(name) {
+    if (!name) return '';
+    return name
+      .replace(/St[\.]?\s*Lucie/i, 'St Lucie')
+      .replace(/St[\.]?\s*Johns/i, 'St Johns')
+      .replace(/\./g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
   electionData.forEach(row => {
-    // Normalize county names for matching
-    let name = (row[countyNameKey] || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    let name = normalizeCountyName(row[countyNameKey] || '');
     electionMap[name.toUpperCase()] = row;
   });
   boundaryGeoJSON.features.forEach(f => {
     const p = f.properties || {};
-    let name = (p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    let name = normalizeCountyName(p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '');
     const electionRow = electionMap[name.toUpperCase()];
     if (electionRow) {
-      // Merge election data into properties
       Object.assign(f.properties, electionRow);
     }
   });
