@@ -1,3 +1,4 @@
+![Florida Political Map](https://img.shields.io/badge/Status-Active-brightgreen) ![Data Years](https://img.shields.io/badge/Data-2008--2024-blue) ![Districts](https://img.shields.io/badge/Districts-4%20Types-orange)
 
 # Florida Political Realignment Map: A Case Study
 
@@ -46,7 +47,6 @@ From 2008 to 2016, Florida was the nation's ultimate battleground, with razor-th
 
 This map visualizes the data behind this transformation, allowing users to explore county, congressional, and legislative trends in detail.
 
-![Florida Political Map](https://img.shields.io/badge/Status-Active-brightgreen) ![Data Years](https://img.shields.io/badge/Data-2008--2024-blue) ![Districts](https://img.shields.io/badge/Districts-4%20Types-orange)
 
 ## 🗺️ Features
 
@@ -196,4 +196,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
 **📧 Contact**: [Your contact information]
 **📅 Last Updated**: September 2025
+
 
