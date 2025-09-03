@@ -14,45 +14,26 @@
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
 html, body {
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-#map {
-  flex: 1 1 auto;
-  position: relative;
-  min-height: 0;
-  height: 100vh;
-  width: 100%;
-  background: #f0f4f8;
-  transition: width 0.3s cubic-bezier(.4,0,.2,1);
-}
-
-#map.sidebar-minimized {
-  width: 100vw !important;
-}
-
-/* Hover Tooltip */
-.hover-tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 1000;
+  .sidebar {
+    position: relative;
+    width: 400px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    border-left: 1px solid #e5e7eb;
+    overflow-y: auto;
+    z-index: 1002;
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  .sidebar.minimized {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .sidebar.minimized .sidebar-content {
+    display: none;
+  }
   max-width: 300px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: none;
@@ -110,6 +91,9 @@ body {
   backdrop-filter: none !important;
   padding: 0 !important;
   margin: 0 !important;
+}
+body.sidebar-minimized {
+  background: #f0f4f8 !important;
 }
 .sidebar.minimized .sidebar-content {
   display: none !important;
@@ -187,6 +171,17 @@ body {
 }
 .main-controls.minimized .controls-content {
   display: none;
+}
+#contestSelect {
+  display: block !important;
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #222;
 }
 .controls-header {
   display: flex;
@@ -488,7 +483,7 @@ body {
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header" id="sidebar-header">
       <h3>📊 County Analysis</h3>
-      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
+  <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
     </div>
     <div class="sidebar-content">
       <div class="county-details" id="county-details" style="display: none;">
@@ -550,6 +545,18 @@ body {
     </div>
 
     <script>
+    // Toggle sidebar minimize/expand (header +/- button)
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-minimize-btn');
+      if (sidebar.classList.contains('minimized')) {
+        sidebar.classList.remove('minimized');
+        btn.textContent = '−';
+      } else {
+        sidebar.classList.add('minimized');
+        btn.textContent = '+';
+      }
+    }
     // --- CONFIG ---
     const CONFIG = {
       mapboxToken: 'pk.eyJ1Ijoic2hhbWFyZGF2aXMiLCJhIjoiY21kcW8yeDB2MDhvbTJzb29qeGp1aDZmZCJ9.Zw_i6U-dL7_bEKRHTUh7yg',
@@ -1054,24 +1061,38 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       let demCandidate = 'Democratic';
       let repCandidate = 'Republican';
       if (contestType === 'president') {
-        if (year == 2024) { demCandidate = 'Harris (D)'; repCandidate = 'Trump (R)'; }
-        else if (year == 2020) { demCandidate = 'Biden (D)'; repCandidate = 'Trump (R)'; }
-        else if (year == 2016) { demCandidate = 'Clinton (D)'; repCandidate = 'Trump (R)'; }
-        else if (year == 2012) { demCandidate = 'Obama (D)'; repCandidate = 'Romney (R)'; }
-        else if (year == 2008) { demCandidate = 'Obama (D)'; repCandidate = 'McCain (R)'; }
+        if (year == 2024) { demCandidate = 'Kamala Harris (D)'; repCandidate = 'Donald Trump (R)'; }
+        else if (year == 2020) { demCandidate = 'Joe Biden (D)'; repCandidate = 'Donald Trump (R)'; }
+        else if (year == 2016) { demCandidate = 'Hillary Clinton (D)'; repCandidate = 'Donald Trump (R)'; }
+        else if (year == 2012) { demCandidate = 'Barack Obama (D)'; repCandidate = 'Mitt Romney (R)'; }
+        else if (year == 2008) { demCandidate = 'Barack Obama (D)'; repCandidate = 'John McCain (R)'; }
       } else if (contestType === 'governor') {
-        if (year == 2024) { demCandidate = 'Crist (D)'; repCandidate = 'DeSantis (R)'; }
-        else if (year == 2022) { demCandidate = 'Crist (D)'; repCandidate = 'DeSantis (R)'; }
-        else if (year == 2018) { demCandidate = 'Gillum (D)'; repCandidate = 'DeSantis (R)'; }
-        else if (year == 2014) { demCandidate = 'Crist (D)'; repCandidate = 'Scott (R)'; }
-        else if (year == 2010) { demCandidate = 'Sink (D)'; repCandidate = 'Scott (R)'; }
+        if (year == 2022) { demCandidate = 'Charlie Crist (D)'; repCandidate = 'Ron DeSantis (R)'; }
+        else if (year == 2018) { demCandidate = 'Andrew Gillum (D)'; repCandidate = 'Ron DeSantis (R)'; }
+        else if (year == 2014) { demCandidate = 'Charlie Crist (D)'; repCandidate = 'Rick Scott (R)'; }
+        else if (year == 2010) { demCandidate = 'Alex Sink (D)'; repCandidate = 'Rick Scott (R)'; }
       } else if (contestType === 'us_senate') {
-        if (year == 2024) { demCandidate = 'TBD (D)'; repCandidate = 'Scott (R)'; }
-        else if (year == 2022) { demCandidate = 'Demings (D)'; repCandidate = 'Rubio (R)'; }
-        else if (year == 2018) { demCandidate = 'Nelson (D)'; repCandidate = 'Scott (R)'; }
-        else if (year == 2016) { demCandidate = 'Murphy (D)'; repCandidate = 'Rubio (R)'; }
-        else if (year == 2012) { demCandidate = 'Nelson (D)'; repCandidate = 'Mack (R)'; }
-        else if (year == 2010) { demCandidate = 'Meek (D)'; repCandidate = 'Rubio (R)'; }
+        if (year == 2024) { demCandidate = 'Mucarsel-Powell (D)'; repCandidate = 'Rick Scott (R)'; }
+        else if (year == 2022) { demCandidate = 'Val Demings (D)'; repCandidate = 'Marco Rubio (R)'; }
+        else if (year == 2018) { demCandidate = 'Bill Nelson (D)'; repCandidate = 'Rick Scott (R)'; }
+        else if (year == 2016) { demCandidate = 'Patrick Murphy (D)'; repCandidate = 'Marco Rubio (R)'; }
+        else if (year == 2012) { demCandidate = 'Bill Nelson (D)'; repCandidate = 'Connie Mack (R)'; }
+        else if (year == 2010) { demCandidate = 'Kendrick Meek (D)'; repCandidate = 'Marco Rubio (R)'; }
+      } else if (contestType === 'cfo') {
+        if (year == 2022) { demCandidate = 'Adam Hattersley (D)'; repCandidate = 'Jimmy Patronis (R)'; }
+        else if (year == 2018) { demCandidate = 'Jeremy Ring (D)'; repCandidate = 'Jimmy Patronis (R)'; }
+        else if (year == 2014) { demCandidate = 'Will Rankin (D)'; repCandidate = 'Jeff Atwater (R)'; }
+        else if (year == 2010) { demCandidate = 'Loranne Ausley (D)'; repCandidate = 'Jeff Atwater (R)'; }
+      } else if (contestType === 'agriculture_commissioner') {
+        if (year == 2022) { demCandidate = 'Naomi Blemur (D)'; repCandidate = 'Wilton Simpson (R)'; }
+        else if (year == 2018) { demCandidate = 'Nikki Fried (D)'; repCandidate = 'Matt Caldwell (R)'; }
+        else if (year == 2014) { demCandidate = 'Thad Hamilton (D)'; repCandidate = 'Adam Putnam (R)'; }
+        else if (year == 2010) { demCandidate = 'Scott Maddox (D)'; repCandidate = 'Adam Putnam (R)'; }
+      } else if (contestType === 'attorney_general') {
+        if (year == 2022) { demCandidate = 'Aramis Ayala (D)'; repCandidate = 'Ashley Moody (R)'; }
+        else if (year == 2018) { demCandidate = 'Sean Shaw (D)'; repCandidate = 'Ashley Moody (R)'; }
+        else if (year == 2014) { demCandidate = 'George Sheldon (D)'; repCandidate = 'Pam Bondi (R)'; }
+        else if (year == 2010) { demCandidate = 'Dan Gelber (D)'; repCandidate = 'Pam Bondi (R)'; }
       }
 
       if (totalVotes === 0) {
