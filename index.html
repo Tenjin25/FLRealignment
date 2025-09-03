@@ -14,26 +14,45 @@
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
 html, body {
-  .sidebar {
-    position: relative;
-    width: 400px;
-    height: 100vh;
-    background: #fff;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    border-left: 1px solid #e5e7eb;
-    overflow-y: auto;
-    z-index: 1002;
-    transition: width 0.3s cubic-bezier(.4,0,.2,1);
-  }
-  .sidebar.minimized {
-    width: 0 !important;
-    min-width: 0 !important;
-    max-width: 0 !important;
-    overflow: hidden !important;
-  }
-  .sidebar.minimized .sidebar-content {
-    display: none;
-  }
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+#map {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 0;
+  height: 100vh;
+  width: 100%;
+  background: #f0f4f8;
+  transition: width 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+#map.sidebar-minimized {
+  width: 100vw !important;
+}
+
+/* Hover Tooltip */
+.hover-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
   max-width: 300px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: none;
@@ -81,19 +100,16 @@ html, body {
   transition: width 0.3s cubic-bezier(.4,0,.2,1);
 }
 .sidebar.minimized {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  overflow: hidden !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  overflow: visible !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
   padding: 0 !important;
   margin: 0 !important;
-}
-body.sidebar-minimized {
-  background: #f0f4f8 !important;
 }
 .sidebar.minimized .sidebar-content {
   display: none !important;
@@ -171,17 +187,6 @@ body.sidebar-minimized {
 }
 .main-controls.minimized .controls-content {
   display: none;
-}
-#contestSelect {
-  display: block !important;
-  width: 100%;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: #222;
 }
 .controls-header {
   display: flex;
@@ -480,39 +485,64 @@ body.sidebar-minimized {
     </div>
 
     <!-- Sidebar for County Details and Analysis -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header" id="sidebar-header">
-      <h3>📊 County Analysis</h3>
-  <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header" id="sidebar-header">
+            <h3>📊 County Analysis</h3>
+            <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
+        </div>
+        <div class="sidebar-content">
+            <!-- County Details -->
+            <div class="county-details" id="county-details" style="display: none;">
+                <h4 id="county-name">Select a County</h4>
+                <div id="county-info-content">
+                    Click on any county to see detailed election results and analysis.
+                </div>
+            </div>
+            
+            <!-- County Search -->
+            <div style="margin-bottom: 16px;">
+                <label for="county-search" style="font-weight:600;">Search County:</label>
+                <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
+            </div>
+            
+            <!-- Statewide Results -->
+            <div class="statewide-results" id="statewide-results">
+                <h4 id="statewide">🏛️ Florida Statewide</h4>
+                <div id="statewide-content">
+                    <p>Select a contest to see statewide results and margin.</p>
+                </div>
+            </div>
+            
+            <!-- Research Findings -->
+            <div class="findings-section">
+                <h4>🔍 Research Findings</h4>
+                <div class="finding-card">
+                    <h5>Miami-Dade County - Historic Republican Flip</h5>
+                    <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
+                    <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> → <span class="metric">2024: R+11.4%</span></p>
+                    <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
+                    <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+                </div>
+                <div class="finding-card">
+                    <h5>Orange County - Suburban Evolution</h5>
+                    <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
+                    <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
+                    <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> → <span class="metric">2024: D+6.4%</span></p>
+                    <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
+                </div>
+                <div class="finding-card">
+                    <h5>Statewide Patterns & I-4 Corridor</h5>
+                    <p><strong>Rural-Urban Divide:</strong> Growing polarization between urban coastal counties and rural interior counties.</p>
+                    <p><strong>I-4 Corridor:</strong> Tampa-Orlando corridor remains the key battleground determining statewide outcomes. <span class="metric">Hillsborough</span>, <span class="metric">Orange</span>, <span class="metric">Seminole</span> counties pivotal.</p>
+                    <p><strong>Registration Trends:</strong> Unaffiliated voter growth creating volatile election dynamics across swing counties.</p>
+                    <p><strong>Demographics:</strong> Hispanic population growth in Central Florida reshaping electoral map.</p>
+                </div>
+            </div>
+        </div>
+        <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+            Created by Shamar Davis
+        </div>
     </div>
-    <div class="sidebar-content">
-      <div class="county-details" id="county-details" style="display: none;">
-        <h4 id="county-name">Select a County</h4>
-        <div id="county-info-content"></div>
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label for="county-search" style="font-weight:600;">Search County:</label>
-        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;" />
-      </div>
-      <div class="statewide-results" id="statewide-results">
-        <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div id="statewide-content"></div>
-      </div>
-      <div class="findings-section">
-        <h4>🔍 Research Findings</h4>
-        <div class="finding-card"></div>
-        <div class="finding-card"></div>
-        <div class="finding-card"></div>
-      </div>
-    </div>
-    <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-      Created by Shamar Davis
-    </div>
-    <div class="status-panel" id="status" style="display:none;">
-      <button id="status-exit" title="Close" style="position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:6px;border:none;background:#eee;cursor:pointer;font-weight:bold;font-size:18px;">×</button>
-      <strong>Status:</strong> Loading map and data...
-    </div>
-  </div>
 
     <!-- Legend -->
     <div class="legend" id="legend">
@@ -545,18 +575,6 @@ body.sidebar-minimized {
     </div>
 
     <script>
-    // Toggle sidebar minimize/expand (header +/- button)
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const btn = document.getElementById('sidebar-minimize-btn');
-      if (sidebar.classList.contains('minimized')) {
-        sidebar.classList.remove('minimized');
-        btn.textContent = '−';
-      } else {
-        sidebar.classList.add('minimized');
-        btn.textContent = '+';
-      }
-    }
     // --- CONFIG ---
     const CONFIG = {
       mapboxToken: 'pk.eyJ1Ijoic2hhbWFyZGF2aXMiLCJhIjoiY21kcW8yeDB2MDhvbTJzb29qeGp1aDZmZCJ9.Zw_i6U-dL7_bEKRHTUh7yg',
@@ -603,25 +621,23 @@ body.sidebar-minimized {
   return r.text();
     }
 
-function parseCSV(csvText) {
-  try {
-    const result = Papa.parse(csvText, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true
-    });
-    if (result.errors.length) {
-      setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
-      console.error(result.errors);
-    }
-    return result.data;
-  } catch (err) {
-    setStatus('CSV Parse Exception: ' + err.message);
-    console.error(err);
-    return [];
-  }
-}
-
+    function parseCSV(csvText) {
+      try {
+        const result = Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true
+        });
+        if (result.errors.length) {
+          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+          console.error(result.errors);
+        }
+        return result.data;
+      } catch (err) {
+        setStatus('CSV Parse Exception: ' + err.message);
+        console.error(err);
+        return [];
+      }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -643,6 +659,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
+    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -1021,7 +1038,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
       
-  nameEl.textContent = countyName ? `${countyName} County` : 'Select a County';
+      nameEl.textContent = `${countyName} County`;
       
       if (!currentElectionResults) {
         contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
@@ -1056,44 +1073,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const demVotes = countyData[`${contestType}_dem`] || 0;
       const repVotes = countyData[`${contestType}_rep`] || 0;
       const totalVotes = countyData[`${contestType}_total`] || 0;
-
-      // Candidate names for major contests
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      if (contestType === 'president') {
-        if (year == 2024) { demCandidate = 'Kamala Harris (D)'; repCandidate = 'Donald Trump (R)'; }
-        else if (year == 2020) { demCandidate = 'Joe Biden (D)'; repCandidate = 'Donald Trump (R)'; }
-        else if (year == 2016) { demCandidate = 'Hillary Clinton (D)'; repCandidate = 'Donald Trump (R)'; }
-        else if (year == 2012) { demCandidate = 'Barack Obama (D)'; repCandidate = 'Mitt Romney (R)'; }
-        else if (year == 2008) { demCandidate = 'Barack Obama (D)'; repCandidate = 'John McCain (R)'; }
-      } else if (contestType === 'governor') {
-        if (year == 2022) { demCandidate = 'Charlie Crist (D)'; repCandidate = 'Ron DeSantis (R)'; }
-        else if (year == 2018) { demCandidate = 'Andrew Gillum (D)'; repCandidate = 'Ron DeSantis (R)'; }
-        else if (year == 2014) { demCandidate = 'Charlie Crist (D)'; repCandidate = 'Rick Scott (R)'; }
-        else if (year == 2010) { demCandidate = 'Alex Sink (D)'; repCandidate = 'Rick Scott (R)'; }
-      } else if (contestType === 'us_senate') {
-        if (year == 2024) { demCandidate = 'Mucarsel-Powell (D)'; repCandidate = 'Rick Scott (R)'; }
-        else if (year == 2022) { demCandidate = 'Val Demings (D)'; repCandidate = 'Marco Rubio (R)'; }
-        else if (year == 2018) { demCandidate = 'Bill Nelson (D)'; repCandidate = 'Rick Scott (R)'; }
-        else if (year == 2016) { demCandidate = 'Patrick Murphy (D)'; repCandidate = 'Marco Rubio (R)'; }
-        else if (year == 2012) { demCandidate = 'Bill Nelson (D)'; repCandidate = 'Connie Mack (R)'; }
-        else if (year == 2010) { demCandidate = 'Kendrick Meek (D)'; repCandidate = 'Marco Rubio (R)'; }
-      } else if (contestType === 'cfo') {
-        if (year == 2022) { demCandidate = 'Adam Hattersley (D)'; repCandidate = 'Jimmy Patronis (R)'; }
-        else if (year == 2018) { demCandidate = 'Jeremy Ring (D)'; repCandidate = 'Jimmy Patronis (R)'; }
-        else if (year == 2014) { demCandidate = 'Will Rankin (D)'; repCandidate = 'Jeff Atwater (R)'; }
-        else if (year == 2010) { demCandidate = 'Loranne Ausley (D)'; repCandidate = 'Jeff Atwater (R)'; }
-      } else if (contestType === 'agriculture_commissioner') {
-        if (year == 2022) { demCandidate = 'Naomi Blemur (D)'; repCandidate = 'Wilton Simpson (R)'; }
-        else if (year == 2018) { demCandidate = 'Nikki Fried (D)'; repCandidate = 'Matt Caldwell (R)'; }
-        else if (year == 2014) { demCandidate = 'Thad Hamilton (D)'; repCandidate = 'Adam Putnam (R)'; }
-        else if (year == 2010) { demCandidate = 'Scott Maddox (D)'; repCandidate = 'Adam Putnam (R)'; }
-      } else if (contestType === 'attorney_general') {
-        if (year == 2022) { demCandidate = 'Aramis Ayala (D)'; repCandidate = 'Ashley Moody (R)'; }
-        else if (year == 2018) { demCandidate = 'Sean Shaw (D)'; repCandidate = 'Ashley Moody (R)'; }
-        else if (year == 2014) { demCandidate = 'George Sheldon (D)'; repCandidate = 'Pam Bondi (R)'; }
-        else if (year == 2010) { demCandidate = 'Dan Gelber (D)'; repCandidate = 'Pam Bondi (R)'; }
-      }
 
       if (totalVotes === 0) {
         contentEl.innerHTML = `<p>No ${formatContestName(contestType, year)} data available for ${countyName} County in ${year}.</p>`;
@@ -1147,24 +1126,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       
-      // Generate detailed results HTML with candidate names
+      // Generate detailed results HTML
       contentEl.innerHTML = `
-        <div style="margin-bottom: 18px;">
-          <span style="display:block;font-size:20px;font-weight:700;color:#1e293b;">${countyName} County</span>
+        <div style="margin-bottom: 16px;">
+          <h5>🎯 Competitiveness</h5>
+          <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
         </div>
-        <div class="result-summary" style="margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
-          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">🎯 Competitiveness</h5>
-          <p style="color:${compColor};font-weight:bold;font-size:16px;">${competitiveness}</p>
+        <div style="margin-bottom: 16px;">
+          <h5>📈 Margin</h5>
+          <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
+            ${winner} +${marginPct.toFixed(1)}%
+          </p>
         </div>
-        <div class="margin-section" style="margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
-          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">📈 Margin</h5>
-          <p style="color:${winner === 'Republican' ? '#dc2626' : '#1e40af'};font-weight:bold;font-size:18px;">${winner} +${marginPct.toFixed(1)}%</p>
-        </div>
-        <div class="vote-breakdown" style="margin-bottom:18px;">
-          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">🗳️ Vote Breakdown</h5>
-          <p><span style="color:#1e40af;font-weight:bold;">${demCandidate}: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color:#dc2626;font-weight:bold;">${repCandidate}: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-          <p style="font-weight:600;border-top:1px solid #e5e7eb;padding-top:8px;margin-top:8px;">Total Votes: ${totalVotes.toLocaleString()}</p>
+        <div style="margin-bottom: 16px;">
+          <h5>🗳️ Vote Breakdown</h5>
+          <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+          <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+          <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+            Total Votes: ${totalVotes.toLocaleString()}
+          </p>
         </div>
       `;
       
