@@ -14,29 +14,30 @@
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
 html, body {
-  line-height: 1.4;
-}
-
-/* Move these selectors outside of html, body */
-.sidebar {
-  position: relative;
-  width: 400px;
-  height: 100vh;
-  background: #fff;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-  border-left: 1px solid #e5e7eb;
-  overflow-y: auto;
-  z-index: 1002;
-  transition: width 0.3s cubic-bezier(.4,0,.2,1);
-}
-.sidebar.minimized {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  overflow: hidden !important;
-}
-.sidebar.minimized .sidebar-content {
+  .sidebar {
+    position: relative;
+    width: 400px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    border-left: 1px solid #e5e7eb;
+    overflow-y: auto;
+    z-index: 1002;
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  .sidebar.minimized {
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .sidebar.minimized .sidebar-content {
+    display: none;
+  }
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: none;
+  line-height: 1.4;
 }
 
 .hover-tooltip .tooltip-title {
@@ -110,34 +111,35 @@ body.sidebar-minimized {
   color: white;
   border: 1px solid #1d4ed8;
 }
-.sidebar.minimized {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  overflow: visible !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
 }
-.sidebar.minimized .sidebar-content {
-  display: none !important;
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #374151;
 }
-.sidebar.minimized .sidebar-header {
-.sidebar .minimize-btn {
-  display: flex !important;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  transform: none;
+.sidebar-content {
+  padding: 20px;
+}
+.minimize-btn {
   background: #2563eb;
-  color: white;
   border: 1px solid #1d4ed8;
-  z-index: 1003;
-  transition: all 0.2s ease;
-}
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
   transition: all 0.2s ease;
 }
 .minimize-btn:hover {
@@ -474,69 +476,33 @@ body.sidebar-minimized {
                     <option value="">Select a Contest...</option>
                 </select>
             </div>
-            <div class="control-group">
-              <label>🔄 Swing Visualization:</label>
-              <select id="swingSelect">
-                <option value="">None</option>
-                <option value="president_2016_2020">Presidential Swing 2016→2020</option>
-                <option value="governor_2014_2018">Governor Swing 2014→2018</option>
-                <option value="us_senate_2016_2018">US Senate Swing 2016→2018</option>
-                <!-- Add more swing options as needed -->
-              </select>
-            </div>
         </div>
     </div>
 
     <!-- Sidebar for County Details and Analysis -->
-  <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:56px;height:56px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:none;align-items:center;justify-content:center;cursor:pointer;">+</button>
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header" id="sidebar-header">
       <h3>📊 County Analysis</h3>
-    </div>
   <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
+    </div>
     <div class="sidebar-content">
-      <!-- County Details (top, like NC map) -->
       <div class="county-details" id="county-details" style="display: none;">
         <h4 id="county-name">Select a County</h4>
-        <div id="county-info-content">Click on any county to see detailed election results and competitiveness analysis.</div>
+        <div id="county-info-content"></div>
       </div>
-      <!-- County Search -->
       <div style="margin-bottom: 16px;">
         <label for="county-search" style="font-weight:600;">Search County:</label>
         <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;" />
       </div>
-      <!-- Statewide Results (middle, like NC map) -->
       <div class="statewide-results" id="statewide-results">
         <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div id="statewide-content"><p>Select a contest to see statewide results and margin.</p></div>
+        <div id="statewide-content"></div>
       </div>
-      <!-- Research Findings (bottom, like NC map) -->
       <div class="findings-section">
         <h4>🔍 Research Findings</h4>
-        <div class="finding-card">
-          <h5>Pinellas County – Suburban Shift</h5>
-          <p><strong>Competitive Trend:</strong> Pinellas has become a true swing county, with margins narrowing each cycle. <span class="metric">2016: R+1.1%</span> → <span class="metric">2020: D+0.1%</span> → <span class="metric">2024: R+0.5%</span></p>
-          <p><strong>2020 Breakthrough:</strong> Biden narrowly won Pinellas, the first Democrat since Obama in 2008.</p>
-          <p><strong>2024 Continuation:</strong> Trump 49.8% vs Harris 49.3%, nearly a statistical tie.</p>
-          <p><strong>Demographics:</strong> Aging population, influx of younger professionals, and growing diversity.</p>
-          <p><strong>Geography:</strong> St. Petersburg, Clearwater, and beach communities drive competitive trends.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Duval County – Urban Realignment</h5>
-          <p><strong>Competitive Trend:</strong> Duval flipped Democratic in 2020 and 2024 after decades of Republican dominance. <span class="metric">2016: R+1.6%</span> → <span class="metric">2020: D+3.2%</span> → <span class="metric">2024: D+2.8%</span></p>
-          <p><strong>2020 Results:</strong> Biden 51.1% vs Trump 47.9% – first Democratic win since Jimmy Carter.</p>
-          <p><strong>2024 Consistency:</strong> Harris 50.8% vs Trump 48.0% – Democrats hold gains.</p>
-          <p><strong>Growth Centers:</strong> Jacksonville urban core, Riverside, and Southside.</p>
-          <p><strong>Key Insight:</strong> Urbanization and demographic change drive realignment.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Regional Transformation</h5>
-          <p><strong>Suburban Realignment:</strong> Pinellas and Duval exemplify the transformation of formerly safe Republican areas into competitive battlegrounds.</p>
-          <p><strong>Unaffiliated Surge:</strong> Unaffiliated and independent voters now outnumber Democrats and Republicans in key counties.</p>
-          <p><strong>Geographic Advantage:</strong> Proximity to Tampa Bay and Jacksonville drives population growth and political moderation.</p>
-          <p><strong>Turnout Impact:</strong> Rising voter registration and turnout make these counties pivotal to statewide margins.</p>
-          <p><strong>National Pattern:</strong> These trends mirror broader suburban realignment across the United States.</p>
-        </div>
+        <div class="finding-card"></div>
+        <div class="finding-card"></div>
+        <div class="finding-card"></div>
       </div>
     </div>
     <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
@@ -579,41 +545,6 @@ body.sidebar-minimized {
     </div>
 
     <script>
-    // Floating expand button logic
-    function updateFloatBtnVisibility() {
-      const sidebar = document.getElementById('sidebar');
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      if (sidebar.classList.contains('minimized')) {
-        floatBtn.style.display = 'flex';
-      } else {
-        floatBtn.style.display = 'none';
-      }
-    }
-    document.getElementById('sidebar-float-toggle').onclick = function() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.remove('minimized');
-      document.getElementById('sidebar-minimize-btn').textContent = '−';
-      updateFloatBtnVisibility();
-    };
-    // Update button visibility on sidebar toggle
-    const origToggleSidebar = window.toggleSidebar;
-    window.toggleSidebar = function() {
-      if (typeof origToggleSidebar === 'function') origToggleSidebar();
-      updateFloatBtnVisibility();
-    };
-    document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
-    // Toggle sidebar minimize/expand (header +/- button)
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const btn = document.getElementById('sidebar-minimize-btn');
-      if (sidebar.classList.contains('minimized')) {
-        sidebar.classList.remove('minimized');
-        btn.textContent = '−';
-      } else {
-        sidebar.classList.add('minimized');
-        btn.textContent = '+';
-      }
-    }
     // Toggle sidebar minimize/expand (header +/- button)
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -1246,7 +1177,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           id: 'county-fill', 
           type: 'fill', 
           source: 'counties', 
-          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.38 } 
+          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.6 } 
         });
         map.addLayer({ 
           id: 'county-stroke', 
@@ -1611,10 +1542,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function showDistrictDetails(districtNum) {
       const detailsDiv = document.getElementById('county-details');
-
-
-
-
       const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
       
@@ -2135,84 +2062,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
-
-    async function drawRealSwingLayer(contest, year1, year2) {
-      const canvas = document.getElementById('swingLayer');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Load county GeoJSON and election data
-      const countiesGeoJSON = await fetch('./Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson').then(r => r.json());
-      const electionCSV = await fetch('./data/fl_county_election_results.csv').then(r => r.text());
-      const electionData = Papa.parse(electionCSV, { header: true, dynamicTyping: true }).data;
-
-      function getMargin(row, contest) {
-        let dem = 0, rep = 0;
-        if (contest === 'president') {
-          dem = row.president_dem || 0;
-          rep = row.president_rep || 0;
-        } else if (contest === 'governor') {
-          dem = row.governor_dem || 0;
-          rep = row.governor_rep || 0;
-        } else if (contest === 'us_senate') {
-          dem = row.us_senate_dem || 0;
-          rep = row.us_senate_rep || 0;
-        }
-        const total = dem + rep;
-        if (total === 0) return null;
-        return ((dem - rep) / total) * 100;
-      }
-
-      countiesGeoJSON.features.forEach(f => {
-        const county = f.properties.COUNTYNAME || f.properties.County || f.properties.name;
-        if (!county) return;
-        const row1 = electionData.find(r => r.county === county && r.year == year1);
-        const row2 = electionData.find(r => r.county === county && r.year == year2);
-        if (!row1 || !row2) return;
-        const margin1 = getMargin(row1, contest);
-        const margin2 = getMargin(row2, contest);
-        if (margin1 === null || margin2 === null) return;
-        const swing = margin2 - margin1;
-        const centroid = turf.centroid(f).geometry.coordinates;
-        const pixel = map.project({ lng: centroid[0], lat: centroid[1] });
-
-        // Scale arrow length and thickness by swing magnitude
-        const baseLength = 20; // minimum arrow length
-        const maxLength = 80;  // maximum arrow length
-        const absSwing = Math.abs(swing);
-        const length = baseLength + Math.min(maxLength, absSwing * 8); // scale factor
-        const thickness = 2 + Math.min(12, absSwing * 1.2); // scale factor
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(pixel.x, pixel.y);
-        ctx.lineTo(pixel.x + length * Math.sign(swing), pixel.y);
-        ctx.strokeStyle = swing > 0 ? '#2563eb' : '#cb181d';
-        ctx.lineWidth = thickness;
-        ctx.stroke();
-        // Arrowhead
-        ctx.beginPath();
-        ctx.moveTo(pixel.x + length * Math.sign(swing), pixel.y);
-        ctx.lineTo(pixel.x + length * Math.sign(swing) - 8 * Math.sign(swing), pixel.y - 8);
-        ctx.lineTo(pixel.x + length * Math.sign(swing) - 8 * Math.sign(swing), pixel.y + 8);
-        ctx.closePath();
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.fill();
-        ctx.restore();
-      });
-    }
-
-    document.getElementById('swingSelect').addEventListener('change', function() {
-      const val = this.value;
-      if (!val) {
-        clearSwingLayer();
-        return;
-      }
-      // Parse contest and years from value
-      const [contest, year1, year2] = val.split('_');
-      drawRealSwingLayer(contest, year1, year2);
-    });
 
     window.onload = init;
   </script>
