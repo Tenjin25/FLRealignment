@@ -67,21 +67,22 @@ body {
 }
 .minimize-btn.sidebar-toggle-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   background: #2563eb;
   color: #fff;
   border: none;
-  font-size: 32px;
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  font-size: 40px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 1003;
+  transition: background 0.2s;
 }
 .minimize-btn.sidebar-toggle-btn:hover {
   background: #1d4ed8;
@@ -564,16 +565,25 @@ body {
     <div class="findings-section">
       <h4>🔍 Research Findings</h4>
       <div class="finding-card">
-        <h5>Finding 1</h5>
-        <p>Florida's swing counties have shifted significantly since 2012, with notable changes in the I-4 corridor.</p>
+        <h5>Miami-Dade County - Historic Republican Flip</h5>
+        <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
+        <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> &rarr; <span class="metric">2024: R+11.4%</span></p>
+        <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
+        <p><strong>Impact:</strong> Massive <span class="metric">18.7-point</span> swing represents one of the largest county-level political realignments in recent Florida history.</p>
       </div>
       <div class="finding-card">
-        <h5>Finding 2</h5>
-        <p>Miami-Dade and Duval counties show increasing Democratic margins, while Pasco and Polk trend Republican.</p>
+        <h5>Orange County - Suburban Evolution</h5>
+        <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
+        <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
+        <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> &rarr; <span class="metric">2024: D+6.4%</span></p>
+        <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
       </div>
       <div class="finding-card">
-        <h5>Finding 3</h5>
-        <p>Statewide margins have narrowed in recent cycles, reflecting greater competitiveness in key districts.</p>
+        <h5>Statewide Patterns &amp; I-4 Corridor</h5>
+        <p><strong>Rural-Urban Divide:</strong> Growing polarization between urban coastal counties and rural interior counties.</p>
+        <p><strong>I-4 Corridor:</strong> Tampa-Orlando corridor remains the key battleground determining statewide outcomes. <span class="metric">Hillsborough</span>, <span class="metric">Orange</span>, <span class="metric">Seminole</span> counties pivotal.</p>
+        <p><strong>Registration Trends:</strong> Unaffiliated voter growth creating volatile election dynamics across swing counties.</p>
+        <p><strong>Demographics:</strong> Hispanic population growth in Central Florida reshaping electoral map.</p>
       </div>
     </div>
   </div>
@@ -1003,12 +1013,14 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
 
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-minimize-btn');
       sidebar.classList.toggle('minimized');
+      btn.textContent = sidebar.classList.contains('minimized') ? '+' : '−';
       setTimeout(() => {
         if (window.map && typeof window.map.resize === 'function') {
           window.map.resize();
         }
-      }, 350); // Wait for CSS transition
+      }, 350);
     }
 
     function showCountyDetails(countyName) {
@@ -1715,7 +1727,6 @@ map.on('load', function() {
             } else if (marginPct >= 10) {
               competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
             } else if (marginPct >= 5.5) {
-             
               competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
             } else if (marginPct >= 1) {
               competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
