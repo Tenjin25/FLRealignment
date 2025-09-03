@@ -39,7 +39,7 @@ Florida was the nation’s ultimate swing state from 2008–2016, with razor-thi
 
 | County        | 2016 Margin (Clinton vs Trump) | 2020 Margin (Biden vs Trump) | 2024 Margin (Harris vs Trump) | Shift      |
 |--------------|-------------------------------|-----------------------------|-------------------------------|------------|
-| Miami-Dade   | +30.4% (Clinton 47.8% / Trump 49.0%) | +7.4% (Biden) | -11.5% (Harris 43.0% / Trump 56.1%) | -41.9 pts  |
+| Miami-Dade   | +30.4% (Clinton) | +7.4% (Biden) | -11.5% (Harris 43.0% / Trump 56.1%) | -41.9 pts  |
 | Broward      | +35.2% (Clinton)              | +29.9% (Biden)              | +17.0% (Harris)                | -18.2 pts  |
 | Palm Beach   | +27.0% (Clinton)              | +13.9% (Biden)              | +0.8% (Harris)                | -26.2 pts  |
 | Hillsborough | +7.1% (Clinton)               | +7.0% (Biden)               | -3.1% (Trump)                 | -10.2 pts  |
@@ -209,5 +209,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
 **📧 Contact**: [Your contact information]
 **📅 Last Updated**: September 2025
+
 
 
