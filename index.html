@@ -1127,7 +1127,7 @@ map.on('load', function() {
   if (!map.getSource('counties')) {
     map.addSource('counties', {
       type: 'geojson',
-      data: 'data/fl_counties.geojson'
+      data: 'Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson'
     });
   }
   // Add county name labels layer
@@ -1715,6 +1715,7 @@ map.on('load', function() {
             } else if (marginPct >= 10) {
               competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
             } else if (marginPct >= 5.5) {
+             
               competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
             } else if (marginPct >= 1) {
               competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
