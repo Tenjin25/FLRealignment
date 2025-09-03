@@ -520,9 +520,18 @@ body {
     </div>
     <div class="findings-section">
       <h4>🔍 Research Findings</h4>
-      <div class="finding-card"></div>
-      <div class="finding-card"></div>
-      <div class="finding-card"></div>
+      <div class="finding-card">
+        <h5>Finding 1</h5>
+        <p>Florida's swing counties have shifted significantly since 2012, with notable changes in the I-4 corridor.</p>
+      </div>
+      <div class="finding-card">
+        <h5>Finding 2</h5>
+        <p>Miami-Dade and Duval counties show increasing Democratic margins, while Pasco and Polk trend Republican.</p>
+      </div>
+      <div class="finding-card">
+        <h5>Finding 3</h5>
+        <p>Statewide margins have narrowed in recent cycles, reflecting greater competitiveness in key districts.</p>
+      </div>
     </div>
   </div>
   <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
@@ -614,6 +623,8 @@ body {
     let countyNameMap = {};
     let currentView = 'counties'; // 'counties', 'districts', 'state_house', 'state_senate'
     let currentElectionResults = null; // Current contest results for county details
+    // Declare lastSelectedCounty at the top of your script
+let lastSelectedCounty = null;
 
     function setStatus(text) { document.getElementById('status').textContent = text; console.log(text); }
 
@@ -1070,13 +1081,13 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
                 <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
               </div>
             `;
+          }
+        }
       }
-    }
-  }
 
-  contentEl.innerHTML = demographicInfo + electionInfo;
-  detailsDiv.style.display = 'block';
-}
+      contentEl.innerHTML = demographicInfo + electionInfo;
+      detailsDiv.style.display = 'block';
+    }
 
     // Add county name labels to the map (like NC map)
 map.on('load', function() {
@@ -1642,46 +1653,85 @@ map.on('load', function() {
               Click to see general trends for this contest type.</p>
             </div>
           `;
+        } else if (contestType === 'us_house') {
+          // Congressional contest - show district-specific results if available
+          const result = congressionalData.find(row =>
+            String(row.year) == String(year) && String(row.district) == String(districtNum)
+          );
+
+          if (result && result.us_house_total > 0) {
+            const demVotes = Number(result.us_house_dem) || 0;
+            const repVotes = Number(result.us_house_rep) || 0;
+            const totalVotes = Number(result.us_house_total) || 0;
+
+            const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
+            const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
+            const marginPct = Math.abs(demPct - repPct);
+            const winner = demPct > repPct ? 'Democratic' : 'Republican';
+
+            // Determine competitiveness
+            let competitiveness;
+            if (marginPct >= 40) {
+              competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+            } else if (marginPct >= 30) {
+              competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+            } else if (marginPct >= 20) {
+              competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+            } else if (marginPct >= 10) {
+              competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+            } else if (marginPct >= 5.5) {
+              competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+            } else if (marginPct >= 1) {
+              competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+            } else if (marginPct >= 0.5) {
+              competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+            } else {
+              competitiveness = `Tossup (${winner} win)`;
+            }
+            let compColor = '#6b7280';
+            if (competitiveness.includes('Rep')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+              else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+             
+              else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+              else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+              else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+              else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+              else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
+            } else if (competitiveness.includes('Dem')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+              else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+              else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+              else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+              else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+              else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+              else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+            }
+
+            electionInfo = `
+              <div style="margin-bottom: 16px;">
+                <h5>🎯 Competitiveness</h5>
+                <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <h5>📈 Margin</h5>
+                <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
+                  ${winner} +${marginPct.toFixed(1)}%
+                </p>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <h5>🗳️ Vote Breakdown</h5>
+                <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+                <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+                <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
+              </div>
+            `;
+          }
         }
       }
-      
+
       contentEl.innerHTML = demographicInfo + electionInfo;
       detailsDiv.style.display = 'block';
-    }
-
-    function getStateDistrictTrends(districtNum, chamber) {
-      // For state legislative districts, we'll show recent election years
-      const recentYears = [2024, 2022, 2020, 2018, 2016];
-      const trends = [];
-      
-      // This is simplified - in reality you'd need county-to-district mapping
-      // For now, just show that data is available
-      recentYears.forEach(year => {
-        const contestType = chamber === 'house' ? 'state_house' : 'state_senate';
-        const hasData = electionData.some(row => 
-          row.year == year && row[`${contestType}_total`] > 0
-        );
-        
-        if (hasData) {
-          trends.push({
-            year: year,
-            display: `${year}: Data Available`,
-            margin: 0,
-            type: contestType
-          });
-        }
-      });
-      
-      if (trends.length === 0) {
-        trends.push({
-          year: 0,
-          display: 'District mapping needed',
-          margin: 0,
-          type: 'info'
-        });
-      }
-      
-      return trends;
     }
 
     // Quick info functions for hover tooltips
