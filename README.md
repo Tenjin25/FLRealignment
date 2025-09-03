@@ -1,5 +1,3 @@
-
-
 # Florida Political Realignment Map: A Case Study
 
 ## Florida’s Political Realignment: Case Study Overview
@@ -24,6 +22,7 @@ Florida was the nation’s ultimate swing state from 2008–2016, with razor-thi
 - **Hispanic/Latino Realignment:** Cuban, Venezuelan, and Puerto Rican communities move right.
 - **National Implications:** Florida’s transformation changes presidential campaign strategies and party priorities.
 
+
 ### 5. Presidential Election Margins in Florida (2008–2024)
 
 | Year | Republican Candidate | Democratic Candidate | GOP Margin |
@@ -35,6 +34,28 @@ Florida was the nation’s ultimate swing state from 2008–2016, with razor-thi
 | 2024 | Donald Trump        | (Dem. Nominee)      | +13%       |
 
 *Negative margin indicates Democratic win. 2024 margin is illustrative for case study purposes.*
+
+#### County-Level Margin Shifts (2016–2024)
+
+| County        | 2016 Margin (Clinton vs Trump) | 2020 Margin (Biden vs Trump) | 2024 Margin (Harris vs Trump) | Shift      |
+|--------------|-------------------------------|-----------------------------|-------------------------------|------------|
+| Miami-Dade   | +30.4% (Clinton 47.8% / Trump 49.0%) | +7.4% (Biden 47.9% / Trump 51.2%) | -11.5% (Harris 43.0% / Trump 56.1%) | -41.9 pts  |
+| Broward      | +35.2% (Clinton)              | +29.9% (Biden)              | +17.0% (Harris)                | -18.2 pts  |
+| Palm Beach   | +27.0% (Clinton)              | +13.9% (Biden)              | +0.8% (Harris)                | -26.2 pts  |
+| Hillsborough | +7.1% (Clinton)               | +7.0% (Biden)               | -3.1% (Trump)                 | -10.2 pts  |
+| Pinellas     | -1.2% (Trump)                 | +0.2% (Biden)               | -5.3% (Trump)                 | -4.1 pts   |
+| Polk         | -14.6% (Trump)                | -14.6% (Trump)              | -20.9% (Trump)                | -6.3 pts   |
+| Osceola      | +25.7% (Clinton)              | +20.4% (Biden)              | -1.4% (Trump)                 | -27.1 pts  |
+| Orange       | +25.6% (Clinton)              | +23.3% (Biden)              | +13.8% (Harris)               | -11.8 pts  |
+| Seminole     | +2.0% (Clinton)               | +2.8% (Biden)               | -3.6% (Trump)                 | -5.6 pts   |
+| Volusia      | -13.4% (Trump)                | -14.2% (Trump)              | -22.0% (Trump)                | -8.6 pts   |
+| St. Lucie    | -2.5% (Trump)                 | -1.5% (Trump)               | -9.2% (Trump)                 | -6.7 pts   |
+| Manatee      | -17.6% (Trump)                | -17.1% (Trump)              | -24.8% (Trump)                | -7.2 pts   |
+| Sarasota     | -11.6% (Trump)                | -12.1% (Trump)              | -18.3% (Trump)                | -6.7 pts   |
+| Brevard      | -20.6% (Trump)                | -16.6% (Trump)              | -21.0% (Trump)                | -0.4 pts   |
+| Lee          | -21.1% (Trump)                | -19.5% (Trump)              | -28.6% (Trump)                | -7.5 pts   |
+
+*Margins are calculated as (Democratic votes − Republican votes) / (Democratic + Republican votes). Positive = Democratic win, Negative = GOP win. Candidate percentages shown for clarity. 2024 assumes Harris as the Democratic nominee for illustration.*
 
 This map visualizes the data behind this transformation, allowing users to explore county, congressional, and legislative trends in detail.
 
