@@ -993,11 +993,17 @@ function toggleLegend() {
 }
 
 // Share button (NC map style)
-document.getElementById('share-container').innerHTML = '<button id="share-btn" style="padding:8px 16px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;">Share Map</button>';
-document.getElementById('share-btn').onclick = function() {
-  navigator.clipboard.writeText(window.location.href);
-  alert('Map link copied to clipboard!');
-};
+var shareContainer = document.getElementById('share-container');
+if (shareContainer) {
+  shareContainer.innerHTML = '<button id="share-btn" style="padding:8px 16px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;">Share Map</button>';
+  var shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.onclick = function() {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Map link copied to clipboard!');
+    };
+  }
+}
 
     function toggleMainControls() {
       const controls = document.getElementById('main-controls');
