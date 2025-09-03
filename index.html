@@ -61,102 +61,6 @@ body {
 .sidebar.minimized .sidebar-content {
   display: none !important;
 }
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-.sidebar-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-}
-.sidebar-header .minimize-btn {
-  color: #fff;
-  background: #2563eb;
-  border: none;
-  font-size: 32px;
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Hover Tooltip */
-.hover-tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 1000;
-  max-width: 300px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  display: none;
-  line-height: 1.4;
-}
-
-.hover-tooltip .tooltip-title {
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #ffffff;
-  border-bottom: 1px solid #444;
-  padding-bottom: 6px;
-}
-
-.hover-tooltip .tooltip-trends {
-  font-family: monospace;
-  font-size: 12px;
-}
-
-.quick-tooltip {
-  background: rgba(40, 40, 40, 0.95);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  line-height: 1.3;
-}
-
-.quick-tooltip strong {
-  color: #fff;
-  font-weight: 600;
-}
-
-.sidebar {
-  position: relative;
-  width: 400px;
-  height: 100vh;
-  background: #fff;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-  border-left: 1px solid #e5e7eb;
-  overflow-y: auto;
-  z-index: 1002;
-  transition: width 0.3s cubic-bezier(.4,0,.2,1);
-}
-.sidebar.minimized {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  overflow: hidden !important;
-}
-.sidebar.minimized .sidebar-content {
-  display: none !important;
-}
 .sidebar.minimized .sidebar-header {
   display: none !important;
 }
@@ -552,19 +456,20 @@ body {
 .sidebar.minimized ~ #sidebar-float-toggle {
   display: flex !important;
 }
+/* Floating expand button for sidebar (top right, even smaller, shows + when minimized) */
 #sidebar-float-toggle {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 18px;
+  right: 18px;
   z-index: 10001;
-  width: 56px;
-  height: 56px;
+  width: 24px;
+  height: 24px;
   background: #2563eb;
   color: #fff;
   border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  font-size: 32px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 16px;
   display: none;
   align-items: center;
   justify-content: center;
@@ -672,11 +577,8 @@ body {
     Created by Shamar Davis
   </div>
 </div>
-    <!-- Floating sidebar expand button (fixed bug: only one display:none) -->
-    <div id="sidebar-float-toggle"
-  style="position:fixed;top:50%;left:10px;z-index:2000;background:#2563eb;color:#fff;border-radius:50%;width:40px;height:40px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;font-size:24px;display:none;">
-  &#9776;
-</div>
+    <!-- Floating expand button for sidebar (top right, even smaller) -->
+    <button id="sidebar-float-toggle" style="position:fixed;top:18px;right:18px;z-index:10001;width:24px;height:24px;background:#2563eb;color:#fff;border:none;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:16px;display:none;align-items:center;justify-content:center;cursor:pointer;">+</button>
 
     <!-- Modern legend block (NC map style) -->
     <div class="legend" id="legend">
@@ -1088,6 +990,7 @@ function updateFloatBtnVisibility() {
 document.addEventListener('DOMContentLoaded', function() {
   var floatBtn = document.getElementById('sidebar-float-toggle');
   if (floatBtn) {
+    floatBtn.innerHTML = '+';
     floatBtn.onclick = function() {
       toggleSidebar();
     };
@@ -1106,7 +1009,10 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
       } else {
         sidebar.classList.add('minimized');
         btn.textContent = '+';
-        if (floatBtn) floatBtn.style.display = 'flex';
+        if (floatBtn) {
+          floatBtn.style.display = 'flex';
+          floatBtn.innerHTML = '+';
+        }
       }
       setTimeout(() => {
         if (window.map && typeof window.map.resize === 'function') {
@@ -1239,7 +1145,10 @@ function toggleSidebar() {
   } else {
     sidebar.classList.add('minimized');
     btn.textContent = '+';
-    if (floatBtn) floatBtn.style.display = 'flex';
+    if (floatBtn) {
+      floatBtn.style.display = 'flex';
+      floatBtn.innerHTML = '+';
+    }
   }
   setTimeout(() => {
     if (window.map && typeof window.map.resize === 'function') {
@@ -1860,8 +1769,70 @@ function showCountyDetails(countyName) {
       }
     }
   }
-
   contentEl.innerHTML = demographicInfo + electionInfo;
+  detailsDiv.style.display = 'block';
+}
+
+// --- County Analysis Sidebar: NC-style calculations and layout ---
+function showCountyDetails(countyName) {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) {
+    sidebar.classList.remove('minimized');
+    const floatBtn = document.getElementById('sidebar-float-toggle');
+    if (floatBtn) floatBtn.style.display = 'none';
+    const btn = document.getElementById('sidebar-minimize-btn');
+    if (btn) btn.textContent = '−';
+  }
+  const detailsDiv = document.getElementById('county-details');
+  const nameEl = document.getElementById('county-name');
+  const contentEl = document.getElementById('county-info-content');
+  if (!detailsDiv || !nameEl || !contentEl) return;
+  nameEl.textContent = `${countyName} County`;
+  let sidebarContent = '';
+  if (currentElectionResults && currentElectionResults[countyName]) {
+    const data = currentElectionResults[countyName];
+    // NC-style calculations
+    const demVotes = data.dem_votes || data.president_dem || 0;
+    const repVotes = data.rep_votes || data.president_rep || 0;
+    const totalVotes = data.total_votes || data.president_total || (demVotes + repVotes);
+    const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
+    const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
+    const marginPct = Math.abs(demPct - repPct);
+    const winner = demPct > repPct ? 'Democratic' : 'Republican';
+    // Competitiveness (NC logic)
+    let competitiveness;
+    if (marginPct >= 40) {
+      competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+    } else if (marginPct >= 30) {
+      competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+    } else if (marginPct >= 20) {
+      competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+    } else if (marginPct >= 10) {
+      competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+    } else if (marginPct >= 5.5) {
+      competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+    } else if (marginPct >= 1) {
+      competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+    } else if (marginPct >= 0.5) {
+      competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+    } else {
+      competitiveness = `Tossup (${winner} win)`;
+    }
+    sidebarContent = `
+      <div class="result-summary">
+        <h5>Result Summary</h5>
+        <p><strong>Winner:</strong> ${winner}</p>
+        <p><strong>Margin:</strong> ${winner} +${marginPct.toFixed(1)}%</p>
+        <p><strong>Democratic:</strong> ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+        <p><strong>Republican:</strong> ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+        <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
+        <p><strong>Competitiveness:</strong> ${competitiveness}</p>
+      </div>
+    `;
+  } else {
+    sidebarContent = `<p><em>No results found for this county in the selected contest.</em></p>`;
+  }
+  contentEl.innerHTML = sidebarContent;
   detailsDiv.style.display = 'block';
 }
 
