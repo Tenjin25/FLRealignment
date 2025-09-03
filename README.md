@@ -194,7 +194,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
-**📧 Contact**: [Your contact information]
+**📧 Contact**: Shamard415@gmail.com
 **📅 Last Updated**: September 2025
+
 
 
