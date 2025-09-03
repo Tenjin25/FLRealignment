@@ -384,7 +384,7 @@ body {
   padding: 16px;
   background: #f9fafb;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e7eaf3;
 }
 .county-details h4 {
   margin: 0 0 12px 0;
@@ -543,9 +543,9 @@ body {
 
     <!-- Sidebar for County Details and Analysis -->
     <div class="sidebar" id="sidebar">
-  <div class="sidebar-header" id="sidebar-header">
+  <div class="sidebar-header" id="sidebar-header" style="position:relative;">
     <h3>📊 County Analysis</h3>
-    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
+    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn" style="position:absolute;top:16px;right:16px;background:#2563eb;color:#fff;border:none;font-size:40px;width:56px;height:56px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1003;">−</button>
   </div>
   <div class="sidebar-content">
     <div class="county-details" id="county-details" style="display: none;">
@@ -559,8 +559,10 @@ body {
       <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;" />
     </div>
     <div class="statewide-results" id="statewide-results">
-      <h4>🏛️ Florida Statewide</h4>
-      <div id="statewide-content"></div>
+      <h4 id="statewide">🏛️ Florida Statewide</h4>
+      <div id="statewide-content">
+        <p>Select a contest to see statewide results and margin.</p>
+      </div>
     </div>
     <div class="findings-section">
       <h4>🔍 Research Findings</h4>
@@ -1198,6 +1200,7 @@ map.on('load', function() {
               const content = formatTooltipContent(`${countyName} County - Historical Trends`, trends);
               showHoverTooltip(e.point.x, e.point.y, content);
               
+
               // Also show detailed sidebar
               showCountyDetails(countyName);
               lastSelectedCounty = countyName;
@@ -1651,59 +1654,108 @@ map.on('load', function() {
       }
     }
   }
-
   contentEl.innerHTML = demographicInfo + electionInfo;
   detailsDiv.style.display = 'block';
 }
 
-    function showStateDistrictDetails(districtNum, chamber) {
+
+// Share button (NC map style)
+var shareContainer = document.getElementById('share-container');
+if (shareContainer) {
+  shareContainer.innerHTML = '<button id="share-btn" style="padding:8px 16px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;">Share Map</button>';
+  var shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.onclick = function() {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Map link copied to clipboard!');
+    };
+  }
+}
+
+    function toggleMainControls() {
+      const controls = document.getElementById('main-controls');
+      const controlsContent = document.getElementById('controls-content');
+      const minimizeBtn = document.getElementById('controls-minimize-btn');
+      
+      if (controls.classList.contains('minimized')) {
+        // Expand controls
+        controls.classList.remove('minimized');
+        controlsContent.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize controls';
+      } else {
+        // Minimize controls
+        controls.classList.add('minimized');
+        controlsContent.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand controls';
+      }
+    }
+
+    // Floating expand button logic (modern NC map style)
+function updateFloatBtnVisibility() {
+  const sidebar = document.getElementById('sidebar');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    floatBtn.style.display = 'flex';
+  } else {
+    floatBtn.style.display = 'none';
+  }
+}
+document.getElementById('sidebar-float-toggle').onclick = function() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('minimized');
+  document.getElementById('sidebar-minimize-btn').textContent = '−';
+  updateFloatBtnVisibility();
+};
+document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-minimize-btn');
+      sidebar.classList.toggle('minimized');
+      btn.textContent = sidebar.classList.contains('minimized') ? '+' : '−';
+      setTimeout(() => {
+        if (window.map && typeof window.map.resize === 'function') {
+          window.map.resize();
+        }
+      }, 350);
+    }
+
+    function showCountyDetails(countyName) {
       const detailsDiv = document.getElementById('county-details');
       const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
       
-      const title = chamber === 'house' ? `State House District ${districtNum}` : `State Senate District ${districtNum}`;
-      nameEl.textContent = title;
+      nameEl.textContent = `${countyName} County`;
       
-      // Get district info from appropriate CSV
-      const districtInfo = chamber === 'house' 
-        ? stateHouseInfo?.find(d => d.district == districtNum)
-        : stateSenateInfo?.find(d => d.district == districtNum);
-      
-      let demographicInfo = '';
-      if (districtInfo) {
-        demographicInfo = `
-          <div style="margin-bottom: 16px;">
-            <h5>👥 Demographics (VAP)</h5>
-            <p><strong>Total Population:</strong> ${districtInfo.total_population.toLocaleString()}</p>
-            <p><strong>White:</strong> ${districtInfo.white_vap_pct}%</p>
-            <p><strong>Black:</strong> ${districtInfo.black_vap_pct}%</p>
-            <p><strong>Hispanic:</strong> ${districtInfo.hispanic_vap_pct}%</p>
-          </div>
-        `;
+      if (!currentElectionResults) {
+        contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
+        detailsDiv.style.display = 'block';
+        return;
       }
       
-      // Get current contest results if available
+      // Find county results for current contest
+      const countyData = currentElectionResults[countyName];
+      
+      if (!countyData) {
+        contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
+        detailsDiv.style.display = 'block';
+        return;
+      }
+
+      // Get the current contest type and year from the dropdown
       const contestValue = document.getElementById('contestSelect').value;
       let electionInfo = '';
-      
-      if (contestValue && electionData) {
-        const [contestType, year] = contestValue.split('_');
-        const expectedType = chamber === 'house' ? 'state_house' : 'state_senate';
-        
-        if (contestType === expectedType) {
-          // For state legislative districts, we need to aggregate county data by district
-          // This is complex without a county-to-district mapping, so show general message
-          electionInfo = `
-            <div style="margin-bottom: 16px;">
-              <h5>📊 ${year} ${chamber === 'house' ? 'State House' : 'State Senate'}</h5>
-              <p style="color: #666; font-style: italic;">District-level results require county-to-district mapping. 
-              Click to see general trends for this contest type.</p>
-            </div>
-          `;
-        } else if (contestType === 'us_house') {
-          // Congressional contest - show district-specific results if available
+
+      if (contestValue && congressionalData) {
+        const lastUnderscoreIndex = contestValue.lastIndexOf('_');
+        const contestType = contestValue.substring(0, lastUnderscoreIndex);
+        const year = contestValue.substring(lastUnderscoreIndex + 1);
+
+        if (contestType === 'us_house') {
           const result = congressionalData.find(row =>
-            String(row.year) == String(year) && String(row.district) == String(districtNum)
+            String(row.year) === String(year) && String(row.district) === String(districtNum)
           );
 
           if (result && result.us_house_total > 0) {
@@ -2132,9 +2184,7 @@ function drawCountySwingLayer(swingData) {
     ctx.fill();
   });
 }
-// Example usage: drawCountySwingLayer([{x:100,y:200,swing:3.5},{x:300,y:400,swing:-2.1}]);
-
-    window.onload = init;
-  </script>
+window.onload = init;
+</script>
 </body>
 </html>
