@@ -193,7 +193,6 @@
             feature.properties.rep_percentage = repPercentage;
             feature.properties.dem_votes = countyResults.dem_votes;
             feature.properties.rep_votes = countyResults.rep_votes;
-            results.push({ county: displayCountyName(countyName), demVotes: countyResults.dem_votes, repVotes: countyResults.rep_votes, demPercentage: demPercentage, repPercentage: repPercentage, winner: demPercentage > repPercentage ? 'democrat' : 'republican', margin: Math.abs(demPercentage - repPercentage), demCandidate: countyResults.dem_candidate, repCandidate: countyResults.rep_candidate });
           } else {
             feature.properties.dem_percentage = null;
             feature.properties.rep_percentage = null;
@@ -203,7 +202,17 @@
         });
       }
       map.getSource('counties').setData(countyData);
-      updateSidebar(results);
+        updateSidebar(countyData.features.map(feature => ({
+          county: displayCountyName(normalizeCountyName(feature.properties.NAMELSAD || feature.properties.NAME)),
+          demVotes: feature.properties.dem_votes,
+          repVotes: feature.properties.rep_votes,
+          demPercentage: feature.properties.dem_percentage,
+          repPercentage: feature.properties.rep_percentage,
+          winner: feature.properties.dem_percentage > feature.properties.rep_percentage ? 'democrat' : 'republican',
+          margin: Math.abs(feature.properties.dem_percentage - feature.properties.rep_percentage),
+          demCandidate: feature.properties.dem_candidate,
+          repCandidate: feature.properties.rep_candidate
+        })));
       updateMapColors(contestData);
       const statewideData = calculateStatewideResults(contestData);
       if (statewideData.totalVotes > 0) {
