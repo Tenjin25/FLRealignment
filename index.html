@@ -1029,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
       const detailsDiv = document.getElementById('county-details');
       const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
-      
+      let demographicInfo = '';
       nameEl.textContent = `${countyName} County`;
       
       if (!currentElectionResults) {
