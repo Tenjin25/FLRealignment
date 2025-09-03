@@ -1014,7 +1014,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
       
-      nameEl.textContent = `${countyName} County`;
+  nameEl.textContent = countyName ? `${countyName} County` : 'Select a County';
       
       if (!currentElectionResults) {
         contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
@@ -1128,23 +1128,22 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       
       // Generate detailed results HTML with candidate names
       contentEl.innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <h5>🎯 Competitiveness</h5>
-          <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+        <div style="margin-bottom: 18px;">
+          <span style="display:block;font-size:20px;font-weight:700;color:#1e293b;">${countyName} County</span>
         </div>
-        <div style="margin-bottom: 16px;">
-          <h5>📈 Margin</h5>
-          <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
-            ${winner} +${marginPct.toFixed(1)}%
-          </p>
+        <div class="result-summary" style="margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
+          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">🎯 Competitiveness</h5>
+          <p style="color:${compColor};font-weight:bold;font-size:16px;">${competitiveness}</p>
         </div>
-        <div style="margin-bottom: 16px;">
-          <h5>🗳️ Vote Breakdown</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">${demCandidate}: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color: #dc2626; font-weight: bold;">${repCandidate}: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-          <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
-            Total Votes: ${totalVotes.toLocaleString()}
-          </p>
+        <div class="margin-section" style="margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
+          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">📈 Margin</h5>
+          <p style="color:${winner === 'Republican' ? '#dc2626' : '#1e40af'};font-weight:bold;font-size:18px;">${winner} +${marginPct.toFixed(1)}%</p>
+        </div>
+        <div class="vote-breakdown" style="margin-bottom:18px;">
+          <h5 style="margin:0 0 8px 0;color:#374151;font-size:14px;font-weight:600;">🗳️ Vote Breakdown</h5>
+          <p><span style="color:#1e40af;font-weight:bold;">${demCandidate}: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+          <p><span style="color:#dc2626;font-weight:bold;">${repCandidate}: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+          <p style="font-weight:600;border-top:1px solid #e5e7eb;padding-top:8px;margin-top:8px;">Total Votes: ${totalVotes.toLocaleString()}</p>
         </div>
       `;
       
