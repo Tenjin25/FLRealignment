@@ -100,14 +100,14 @@ body {
   transition: width 0.3s cubic-bezier(.4,0,.2,1);
 }
 .sidebar.minimized {
-  width: 60px !important;
-  min-width: 60px !important;
-  max-width: 60px !important;
-  overflow: visible !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px) !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -1050,6 +1050,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const repVotes = countyData[`${contestType}_rep`] || 0;
       const totalVotes = countyData[`${contestType}_total`] || 0;
 
+      // Candidate names for major contests
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      if (contestType === 'president') {
+        if (year == 2024) { demCandidate = 'Harris (D)'; repCandidate = 'Trump (R)'; }
+        else if (year == 2020) { demCandidate = 'Biden (D)'; repCandidate = 'Trump (R)'; }
+        else if (year == 2016) { demCandidate = 'Clinton (D)'; repCandidate = 'Trump (R)'; }
+        else if (year == 2012) { demCandidate = 'Obama (D)'; repCandidate = 'Romney (R)'; }
+        else if (year == 2008) { demCandidate = 'Obama (D)'; repCandidate = 'McCain (R)'; }
+      } else if (contestType === 'governor') {
+        if (year == 2024) { demCandidate = 'Crist (D)'; repCandidate = 'DeSantis (R)'; }
+        else if (year == 2022) { demCandidate = 'Crist (D)'; repCandidate = 'DeSantis (R)'; }
+        else if (year == 2018) { demCandidate = 'Gillum (D)'; repCandidate = 'DeSantis (R)'; }
+        else if (year == 2014) { demCandidate = 'Crist (D)'; repCandidate = 'Scott (R)'; }
+        else if (year == 2010) { demCandidate = 'Sink (D)'; repCandidate = 'Scott (R)'; }
+      } else if (contestType === 'us_senate') {
+        if (year == 2024) { demCandidate = 'TBD (D)'; repCandidate = 'Scott (R)'; }
+        else if (year == 2022) { demCandidate = 'Demings (D)'; repCandidate = 'Rubio (R)'; }
+        else if (year == 2018) { demCandidate = 'Nelson (D)'; repCandidate = 'Scott (R)'; }
+        else if (year == 2016) { demCandidate = 'Murphy (D)'; repCandidate = 'Rubio (R)'; }
+        else if (year == 2012) { demCandidate = 'Nelson (D)'; repCandidate = 'Mack (R)'; }
+        else if (year == 2010) { demCandidate = 'Meek (D)'; repCandidate = 'Rubio (R)'; }
+      }
+
       if (totalVotes === 0) {
         contentEl.innerHTML = `<p>No ${formatContestName(contestType, year)} data available for ${countyName} County in ${year}.</p>`;
         detailsDiv.style.display = 'block';
@@ -1102,7 +1126,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       
-      // Generate detailed results HTML
+      // Generate detailed results HTML with candidate names
       contentEl.innerHTML = `
         <div style="margin-bottom: 16px;">
           <h5>🎯 Competitiveness</h5>
@@ -1116,8 +1140,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         </div>
         <div style="margin-bottom: 16px;">
           <h5>🗳️ Vote Breakdown</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+          <p><span style="color: #1e40af; font-weight: bold;">${demCandidate}: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+          <p><span style="color: #dc2626; font-weight: bold;">${repCandidate}: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
           <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
             Total Votes: ${totalVotes.toLocaleString()}
           </p>
