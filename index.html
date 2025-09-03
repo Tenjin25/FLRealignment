@@ -485,64 +485,39 @@ body {
     </div>
 
     <!-- Sidebar for County Details and Analysis -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header" id="sidebar-header">
-            <h3>📊 County Analysis</h3>
-            <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
-        </div>
-        <div class="sidebar-content">
-            <!-- County Details -->
-            <div class="county-details" id="county-details" style="display: none;">
-                <h4 id="county-name">Select a County</h4>
-                <div id="county-info-content">
-                    Click on any county to see detailed election results and analysis.
-                </div>
-            </div>
-            
-            <!-- County Search -->
-            <div style="margin-bottom: 16px;">
-                <label for="county-search" style="font-weight:600;">Search County:</label>
-                <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
-            </div>
-            
-            <!-- Statewide Results -->
-            <div class="statewide-results" id="statewide-results">
-                <h4 id="statewide">🏛️ Florida Statewide</h4>
-                <div id="statewide-content">
-                    <p>Select a contest to see statewide results and margin.</p>
-                </div>
-            </div>
-            
-            <!-- Research Findings -->
-            <div class="findings-section">
-                <h4>🔍 Research Findings</h4>
-                <div class="finding-card">
-                    <h5>Miami-Dade County - Historic Republican Flip</h5>
-                    <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-                    <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> → <span class="metric">2024: R+11.4%</span></p>
-                    <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-                    <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
-                </div>
-                <div class="finding-card">
-                    <h5>Orange County - Suburban Evolution</h5>
-                    <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
-                    <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
-                    <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> → <span class="metric">2024: D+6.4%</span></p>
-                    <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
-                </div>
-                <div class="finding-card">
-                    <h5>Statewide Patterns & I-4 Corridor</h5>
-                    <p><strong>Rural-Urban Divide:</strong> Growing polarization between urban coastal counties and rural interior counties.</p>
-                    <p><strong>I-4 Corridor:</strong> Tampa-Orlando corridor remains the key battleground determining statewide outcomes. <span class="metric">Hillsborough</span>, <span class="metric">Orange</span>, <span class="metric">Seminole</span> counties pivotal.</p>
-                    <p><strong>Registration Trends:</strong> Unaffiliated voter growth creating volatile election dynamics across swing counties.</p>
-                    <p><strong>Demographics:</strong> Hispanic population growth in Central Florida reshaping electoral map.</p>
-                </div>
-            </div>
-        </div>
-        <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-            Created by Shamar Davis
-        </div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header" id="sidebar-header">
+      <h3>📊 County Analysis</h3>
+      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
     </div>
+    <div class="sidebar-content">
+      <div class="county-details" id="county-details" style="display: none;">
+        <h4 id="county-name">Select a County</h4>
+        <div id="county-info-content"></div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label for="county-search" style="font-weight:600;">Search County:</label>
+        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;" />
+      </div>
+      <div class="statewide-results" id="statewide-results">
+        <h4 id="statewide">🏛️ Florida Statewide</h4>
+        <div id="statewide-content"></div>
+      </div>
+      <div class="findings-section">
+        <h4>🔍 Research Findings</h4>
+        <div class="finding-card"></div>
+        <div class="finding-card"></div>
+        <div class="finding-card"></div>
+      </div>
+    </div>
+    <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+      Created by Shamar Davis
+    </div>
+    <div class="status-panel" id="status" style="display:none;">
+      <button id="status-exit" title="Close" style="position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:6px;border:none;background:#eee;cursor:pointer;font-weight:bold;font-size:18px;">×</button>
+      <strong>Status:</strong> Loading map and data...
+    </div>
+  </div>
 
     <!-- Legend -->
     <div class="legend" id="legend">
@@ -621,23 +596,25 @@ body {
   return r.text();
     }
 
-    function parseCSV(csvText) {
-      try {
-        const result = Papa.parse(csvText, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true
-        });
-        if (result.errors.length) {
-          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
-          console.error(result.errors);
-        }
-        return result.data;
-      } catch (err) {
-        setStatus('CSV Parse Exception: ' + err.message);
-        console.error(err);
-        return [];
-      }
+function parseCSV(csvText) {
+  try {
+    const result = Papa.parse(csvText, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    });
+    if (result.errors.length) {
+      setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+      console.error(result.errors);
+    }
+    return result.data;
+  } catch (err) {
+    setStatus('CSV Parse Exception: ' + err.message);
+    console.error(err);
+    return [];
+  }
+}
+
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -659,7 +636,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
