@@ -441,7 +441,9 @@ body {
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map" style="position:relative;width:100%;height:100%;">
+        <canvas id="countySwingLayer" width="1920" height="1080" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1000;"></canvas>
+    </div>
     
     <!-- Hover Tooltip -->
     <div id="hover-tooltip" class="hover-tooltip">
@@ -544,29 +546,29 @@ body {
         </div>
     </div>
 
-    <!-- Legend -->
+    <!-- Modern legend block (NC map style) -->
     <div class="legend" id="legend">
-        <div class="legend-header">
-            <h4>Political Categories</h4>
-            <button class="minimize-btn" onclick="toggleLegend()" id="legend-minimize-btn">−</button>
-        </div>
-        <div class="legend-content" id="legend-content">
-            <div class="legend-item"><div class="legend-color" style="background: #67000d;"></div>Annihilation Republican (40%+)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #a50f15;"></div>Dominant Republican (30-40%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #cb181d;"></div>Stronghold Republican (20-30%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #ef3b2c;"></div>Safe Republican (10-20%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fb6a4a;"></div>Likely Republican (5.5-10%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fcae91;"></div>Lean Republican (1-5.5%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fee8c8;"></div>Tilt Republican (0.5-1%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #f7f7f7; border: 1px solid #999;"></div>Tossup (±0.5%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #e1f5fe;"></div>Tilt Democratic (0.5-1%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #c6dbef;"></div>Lean Democratic (1-5.5%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #9ecae1;"></div>Likely Democratic (5.5-10%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #6baed6;"></div>Safe Democratic (10-20%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #3182bd;"></div>Stronghold Democratic (20-30%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #08519c;"></div>Dominant Democratic (30-40%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #08306b;"></div>Annihilation Democratic (40%+)</div>
-        </div>
+      <div class="legend-header">
+        <h4>Political Categories</h4>
+        <button class="minimize-btn" onclick="toggleLegend()" id="legend-minimize-btn">−</button>
+      </div>
+      <div class="legend-content" id="legend-content">
+        <div class="legend-item"><div class="legend-color" style="background: #67000d;"></div>Annihilation Republican (40%+)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #a50f15;"></div>Dominant Republican (30-40%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #cb181d;"></div>Stronghold Republican (20-30%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #ef3b2c;"></div>Safe Republican (10-20%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #fb6a4a;"></div>Likely Republican (5.5-10%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #fcae91;"></div>Lean Republican (1-5.5%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #fee8c8;"></div>Tilt Republican (0.5-1%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #f7f7f7; border: 1px solid #999;"></div>Tossup (±0.5%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #e1f5fe;"></div>Tilt Democratic (0.5-1%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #c6dbef;"></div>Lean Democratic (1-5.5%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #9ecae1;"></div>Likely Democratic (5.5-10%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #6baed6;"></div>Safe Democratic (10-20%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #3182bd;"></div>Stronghold Democratic (20-30%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #08519c;"></div>Dominant Democratic (30-40%)</div>
+        <div class="legend-item"><div class="legend-color" style="background: #08306b;"></div>Annihilation Democratic (40%+)</div>
+      </div>
     </div>
 
     <!-- Status panel -->
@@ -643,17 +645,24 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   // Returns a new GeoJSON with election results merged into feature properties
   if (!boundaryGeoJSON || !boundaryGeoJSON.features || !electionData) return boundaryGeoJSON;
   const electionMap = {};
+  function normalizeCountyName(name) {
+    if (!name) return '';
+    return name
+      .replace(/St[\.]?\s*Lucie/i, 'St Lucie')
+      .replace(/St[\.]?\s*Johns/i, 'St Johns')
+      .replace(/\./g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
   electionData.forEach(row => {
-    // Normalize county names for matching
-    let name = (row[countyNameKey] || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    let name = normalizeCountyName(row[countyNameKey] || '');
     electionMap[name.toUpperCase()] = row;
   });
   boundaryGeoJSON.features.forEach(f => {
     const p = f.properties || {};
-    let name = (p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
+    let name = normalizeCountyName(p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '');
     const electionRow = electionMap[name.toUpperCase()];
     if (electionRow) {
-      // Merge election data into properties
       Object.assign(f.properties, electionRow);
     }
   });
@@ -970,25 +979,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       detailsDiv.style.display = 'block';
     }
 
-    function toggleLegend() {
-      const legend = document.getElementById('legend');
-      const legendContent = document.getElementById('legend-content');
-      const minimizeBtn = document.getElementById('legend-minimize-btn');
-      
-      if (legend.classList.contains('minimized')) {
-        // Expand legend
-        legend.classList.remove('minimized');
-        legendContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize legend';
-      } else {
-        // Minimize legend
-        legend.classList.add('minimized');
-        legendContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand legend';
-      }
-    }
+    // Legend minimize/expand logic
+function toggleLegend() {
+  const legend = document.getElementById('legend');
+  const btn = document.getElementById('legend-minimize-btn');
+  if (legend.classList.contains('minimized')) {
+    legend.classList.remove('minimized');
+    btn.textContent = '−';
+  } else {
+    legend.classList.add('minimized');
+    btn.textContent = '+';
+  }
+}
+
+// Share button (NC map style)
+document.getElementById('share-container').innerHTML = '<button id="share-btn" style="padding:8px 16px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.12);cursor:pointer;">Share Map</button>';
+document.getElementById('share-btn').onclick = function() {
+  navigator.clipboard.writeText(window.location.href);
+  alert('Map link copied to clipboard!');
+};
 
     function toggleMainControls() {
       const controls = document.getElementById('main-controls');
@@ -1010,27 +1019,43 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
     }
 
+    // Floating expand button logic (modern NC map style)
+function updateFloatBtnVisibility() {
+  const sidebar = document.getElementById('sidebar');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    floatBtn.style.display = 'flex';
+  } else {
+    floatBtn.style.display = 'none';
+  }
+}
+document.getElementById('sidebar-float-toggle').onclick = function() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('minimized');
+  document.getElementById('sidebar-minimize-btn').textContent = '−';
+  updateFloatBtnVisibility();
+};
+document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
+
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const sidebarContent = document.querySelector('.sidebar-content');
       const minimizeBtn = document.getElementById('sidebar-minimize-btn');
       const mapElement = document.getElementById('map');
-      
       if (sidebar.classList.contains('minimized')) {
-        // Expand sidebar
         sidebar.classList.remove('minimized');
         mapElement.classList.remove('sidebar-minimized');
         sidebarContent.style.display = 'block';
         minimizeBtn.textContent = '−';
         minimizeBtn.title = 'Minimize sidebar';
       } else {
-        // Minimize sidebar
         sidebar.classList.add('minimized');
         mapElement.classList.add('sidebar-minimized');
         sidebarContent.style.display = 'none';
         minimizeBtn.textContent = '+';
         minimizeBtn.title = 'Expand sidebar';
       }
+      updateFloatBtnVisibility();
     }
 
     function showCountyDetails(countyName) {
@@ -1129,6 +1154,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Generate detailed results HTML
       contentEl.innerHTML = `
         <div style="margin-bottom: 16px;">
+          <h5>🗳️ Candidates</h5>
+          <p><span style="color: #1e40af; font-weight: bold;">${result.dem_candidate ? result.dem_candidate + ' (D)' : 'Democratic'}</span></p>
+          <p><span style="color: #dc2626; font-weight: bold;">${result.rep_candidate ? result.rep_candidate + ' (R)' : 'Republican'}</span></p>
+        </div>
+        <div style="margin-bottom: 16px;">
           <h5>🎯 Competitiveness</h5>
           <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
         </div>
@@ -1150,6 +1180,37 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       
       detailsDiv.style.display = 'block';
     }
+
+    // Add county name labels to the map (like NC map)
+map.on('load', function() {
+  // Add county name labels layer
+  map.addLayer({
+    id: 'county-labels',
+    type: 'symbol',
+    source: 'counties',
+    layout: {
+      'text-field': [
+        'coalesce',
+        ['get', 'COUNTYNAME'],
+        ['get', 'County'],
+        ['get', 'name'],
+        ['get', 'NAMELSAD'],
+        ['get', 'NAME'],
+        ''
+      ],
+      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+      'text-size': 14,
+      'text-offset': [0, 0.6],
+      'text-anchor': 'top'
+    },
+    paint: {
+      'text-color': '#222',
+      'text-halo-color': '#fff',
+      'text-halo-width': 2,
+      'text-opacity': 0.85
+    }
+  });
+});
 
     function addCountyLayers() {
       if (!map.getLayer('county-fill')) {
@@ -2042,6 +2103,32 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
+
+    // County swing arrows logic
+function drawCountySwingLayer(swingData) {
+  const canvas = document.getElementById('countySwingLayer');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  swingData.forEach(({ x, y, swing }) => {
+    // Arrow color: blue for Dem swing, red for GOP swing
+    ctx.strokeStyle = swing > 0 ? '#2563eb' : '#cb181d';
+    ctx.lineWidth = Math.min(10, Math.abs(swing));
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + swing * 10, y); // Arrow length by swing value
+    ctx.stroke();
+    // Draw arrowhead
+    ctx.beginPath();
+    ctx.moveTo(x + swing * 10, y);
+    ctx.lineTo(x + swing * 10 - 5, y - 5);
+    ctx.lineTo(x + swing * 10 - 5, y + 5);
+    ctx.closePath();
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fill();
+  });
+}
+// Example usage: drawCountySwingLayer([{x:100,y:200,swing:3.5},{x:300,y:400,swing:-2.1}]);
 
     window.onload = init;
   </script>
