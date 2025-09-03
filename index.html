@@ -1089,10 +1089,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var floatBtn = document.getElementById('sidebar-float-toggle');
   if (floatBtn) {
     floatBtn.onclick = function() {
-      var sidebar = document.getElementById('sidebar');
-      sidebar.classList.remove('minimized');
-      document.getElementById('sidebar-minimize-btn').textContent = '−';
-      updateFloatBtnVisibility();
+      toggleSidebar();
     };
   }
 });
@@ -1101,8 +1098,16 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const btn = document.getElementById('sidebar-minimize-btn');
-      sidebar.classList.toggle('minimized');
-      btn.textContent = sidebar.classList.contains('minimized') ? '+' : '−';
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      if (sidebar.classList.contains('minimized')) {
+        sidebar.classList.remove('minimized');
+        btn.textContent = '−';
+        if (floatBtn) floatBtn.style.display = 'none';
+      } else {
+        sidebar.classList.add('minimized');
+        btn.textContent = '+';
+        if (floatBtn) floatBtn.style.display = 'flex';
+      }
       setTimeout(() => {
         if (window.map && typeof window.map.resize === 'function') {
           window.map.resize();
@@ -1222,8 +1227,29 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
   detailsDiv.style.display = 'block';
 }
 
-    // Quick info functions for hover tooltips
-    function getQuickCountyInfo(countyName) {
+// Ensure sidebar minimize/expand logic matches NC map
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-minimize-btn');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    sidebar.classList.remove('minimized');
+    btn.textContent = '−';
+    if (floatBtn) floatBtn.style.display = 'none';
+  } else {
+    sidebar.classList.add('minimized');
+    btn.textContent = '+';
+    if (floatBtn) floatBtn.style.display = 'flex';
+  }
+  setTimeout(() => {
+    if (window.map && typeof window.map.resize === 'function') {
+      window.map.resize();
+    }
+  }, 350);
+}
+
+// Quick info functions for hover tooltips
+function getQuickCountyInfo(countyName) {
       // Find the most recent presidential election data
       const recent = electionData
         .filter(row => row.county === countyName && row.president_total > 0)
