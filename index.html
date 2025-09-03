@@ -40,6 +40,8 @@ body {
 
 #map.sidebar-minimized {
   width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
 }
 
 /* Hover Tooltip */
@@ -113,15 +115,28 @@ body {
 .sidebar.minimized .sidebar-header {
   display: none !important;
 }
-.sidebar.minimized .minimize-btn {
-  display: flex !important;
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 2000;
+  width: 38px;
+  height: 38px;
   background: #2563eb;
   color: white;
   border: 1px solid #1d4ed8;
+  border-radius: 8px;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sidebar.minimized .sidebar-toggle-btn {
+  display: flex !important;
 }
 .sidebar-header {
   display: flex;
@@ -484,11 +499,10 @@ body {
 
     <!-- Sidebar for County Details and Analysis -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header" id="sidebar-header">
-            <h3>📊 County Analysis</h3>
-            <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
-        </div>
-        <div class="sidebar-content">
+<div class="sidebar-header" id="sidebar-header">
+    <h3>📊 County Analysis</h3>
+</div>
+<button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
             <!-- County Details -->
             <div class="county-details" id="county-details" style="display: none;">
                 <h4 id="county-name">Select a County</h4>
@@ -1189,33 +1203,42 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
 
     // Add county name labels to the map (like NC map)
 map.on('load', function() {
+  // Add counties source if not present
+  if (!map.getSource('counties')) {
+    map.addSource('counties', {
+      type: 'geojson',
+      data: 'data/fl_counties.geojson'
+    });
+  }
   // Add county name labels layer
-  map.addLayer({
-    id: 'county-labels',
-    type: 'symbol',
-    source: 'counties',
-    layout: {
-      'text-field': [
-        'coalesce',
-        ['get', 'COUNTYNAME'],
-        ['get', 'County'],
-        ['get', 'name'],
-        ['get', 'NAMELSAD'],
-        ['get', 'NAME'],
-        ''
-      ],
-      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-      'text-size': 14,
-      'text-offset': [0, 0.6],
-      'text-anchor': 'top'
-    },
-    paint: {
-      'text-color': '#222',
-      'text-halo-color': '#fff',
-      'text-halo-width': 2,
-      'text-opacity': 0.85
-    }
-  });
+  if (!map.getLayer('county-labels')) {
+    map.addLayer({
+      id: 'county-labels',
+      type: 'symbol',
+      source: 'counties',
+      layout: {
+        'text-field': [
+          'coalesce',
+          ['get', 'COUNTYNAME'],
+          ['get', 'County'],
+          ['get', 'name'],
+          ['get', 'NAMELSAD'],
+          ['get', 'NAME'],
+          ''
+        ],
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'text-size': 14,
+        'text-offset': [0, 0.6],
+        'text-anchor': 'top'
+      },
+      paint: {
+        'text-color': '#222',
+        'text-halo-color': '#fff',
+        'text-halo-width': 2,
+        'text-opacity': 0.85
+      }
+    });
+  }
 });
 
     function addCountyLayers() {
