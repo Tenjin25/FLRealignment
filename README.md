@@ -21,7 +21,7 @@ The 2018 Florida governor election was likely the most consequential in the stat
 | 2012 | Mitt Romney         | Barack Obama        | -0.9%      |
 | 2016 | Donald Trump        | Hillary Clinton     | +1.2%      |
 | 2020 | Donald Trump        | Joe Biden           | +3.4%      |
-| 2024 | Donald Trump        | (Dem. Nominee)      | +13%       |
+| 2024 | Donald Trump        | Kamala Harris       | +13%       |
 
 *Negative margin indicates Democratic win. 2024 margin is illustrative for case study purposes.*
 
@@ -196,3 +196,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
 **📧 Contact**: [Your contact information]
 **📅 Last Updated**: September 2025
+
