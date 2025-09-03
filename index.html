@@ -486,18 +486,22 @@ body.sidebar-minimized {
   <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
     </div>
     <div class="sidebar-content">
+      <!-- County Details (top, like NC map) -->
       <div class="county-details" id="county-details" style="display: none;">
         <h4 id="county-name">Select a County</h4>
-        <div id="county-info-content"></div>
+        <div id="county-info-content">Click on any county to see detailed election results and competitiveness analysis.</div>
       </div>
+      <!-- County Search -->
       <div style="margin-bottom: 16px;">
         <label for="county-search" style="font-weight:600;">Search County:</label>
         <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;" />
       </div>
+      <!-- Statewide Results (middle, like NC map) -->
       <div class="statewide-results" id="statewide-results">
         <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div id="statewide-content"></div>
+        <div id="statewide-content"><p>Select a contest to see statewide results and margin.</p></div>
       </div>
+      <!-- Research Findings (bottom, like NC map) -->
       <div class="findings-section">
         <h4>🔍 Research Findings</h4>
         <div class="finding-card">
