@@ -538,6 +538,8 @@ body {
                     <option value="">Select a Contest...</option>
                 </select>
             </div>
+            <!-- Add missing share-container for Share Map button -->
+            <div id="share-container" style="margin-top:16px;"></div>
         </div>
     </div>
 
@@ -593,10 +595,11 @@ body {
     Created by Shamar Davis
   </div>
 </div>
-    <!-- Floating sidebar expand button -->
-    <div id="sidebar-float-toggle" style="display:none;position:fixed;top:50%;left:10px;z-index:2000;background:#2563eb;color:#fff;border-radius:50%;width:40px;height:40px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;font-size:24px;display:none;">
-        &#9776;
-    </div>
+    <!-- Floating sidebar expand button (fixed bug: only one display:none) -->
+    <div id="sidebar-float-toggle"
+  style="position:fixed;top:50%;left:10px;z-index:2000;background:#2563eb;color:#fff;border-radius:50%;width:40px;height:40px;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;font-size:24px;display:none;">
+  &#9776;
+</div>
 
     <!-- Modern legend block (NC map style) -->
     <div class="legend" id="legend">
@@ -958,7 +961,7 @@ function setMapView(view) {
   // if (view === 'counties') addCountyLayers();
   // else if (view === 'districts') addDistrictLayers();
   // else if (view === 'state_house') addStateHouseLayers();
-  // else if (view === 'state_senate') addStateSenatelayers();
+  // else if (view === 'state_senate') addStateSenateLayers();
 }
 
 
@@ -1025,123 +1028,12 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
       }, 350);
     }
 
-    function showCountyDetails(countyName) {
-      console.log('showCountyDetails called for:', countyName);
-      const detailsDiv = document.getElementById('county-details');
-      const nameEl = document.getElementById('county-name');
-      const contentEl = document.getElementById('county-info-content');
-      let demographicInfo = '';
-      nameEl.textContent = `${countyName} County`;
-      // Always show sidebar when a county is clicked
-      detailsDiv.style.display = 'block';
-      
-      if (!currentElectionResults) {
-        contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
-        detailsDiv.style.display = 'block';
-        return;
-      }
-      
-      // Find county results for current contest
-      const countyData = currentElectionResults[countyName];
-      
-      if (!countyData) {
-        contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
-        detailsDiv.style.display = 'block';
-        return;
-      }
+  // Make sure there is only one definition of showCountyDetails in your script.
 
-      // Get the current contest type and year from the dropdown
-      const contestValue = document.getElementById('contestSelect').value;
-      let electionInfo = '';
-
-      if (contestValue && congressionalData) {
-        const lastUnderscoreIndex = contestValue.lastIndexOf('_');
-        const contestType = contestValue.substring(0, lastUnderscoreIndex);
-        const year = contestValue.substring(lastUnderscoreIndex + 1);
-
-        if (contestType === 'us_house') {
-          const result = congressionalData.find(row =>
-            String(row.year) === String(year) && String(row.district) === String(districtNum)
-          );
-
-          if (result && result.us_house_total > 0) {
-            const demVotes = Number(result.us_house_dem) || 0;
-            const repVotes = Number(result.us_house_rep) || 0;
-            const totalVotes = Number(result.us_house_total) || 0;
-
-            const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
-            const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
-            const marginPct = Math.abs(demPct - repPct);
-            const winner = demPct > repPct ? 'Democratic' : 'Republican';
-
-            // Determine competitiveness
-            let competitiveness;
-            if (marginPct >= 40) {
-              competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
-            } else if (marginPct >= 30) {
-              competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
-            } else if (marginPct >= 20) {
-              competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
-            } else if (marginPct >= 10) {
-              competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
-            } else if (marginPct >= 5.5) {
-              competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
-            } else if (marginPct >= 1) {
-              competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
-            } else if (marginPct >= 0.5) {
-              competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
-            } else {
-              competitiveness = `Tossup (${winner} win)`;
-            }
-            let compColor = '#6b7280';
-            if (competitiveness.includes('Rep')) {
-              if (competitiveness.includes('Annihilation')) compColor = '#67000d';
-              else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
-              else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
-              else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
-              else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
-              else if (competitiveness.includes('Lean')) compColor = '#fcae91';
-              else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
-            } else if (competitiveness.includes('Dem')) {
-              if (competitiveness.includes('Annihilation')) compColor = '#08306b';
-              else if (competitiveness.includes('Dominant')) compColor = '#08519c';
-              else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
-              else if (competitiveness.includes('Safe')) compColor = '#6baed6';
-              else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
-              else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
-              else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
-            }
-
-            electionInfo = `
-              <div style="margin-bottom: 16px;">
-                <h5>🎯 Competitiveness</h5>
-                <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <h5>📈 Margin</h5>
-                <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
-                  ${winner} +${marginPct.toFixed(1)}%
-                </p>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <h5>🗳️ Vote Breakdown</h5>
-                <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-                <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-                <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
-              </div>
-            `;
-          }
-        }
-      }
-
-      contentEl.innerHTML = demographicInfo + electionInfo;
-      detailsDiv.style.display = 'block';
-    }
-
-    function showDistrictDetails(districtNum) {
-  const detailsDiv = document.getElementById('county-details');
-  const nameEl = document.getElementById('county-name');
-  const contentEl = document.getElementById('county-info-content');
+  function showDistrictDetails(districtNum) {
+    const detailsDiv = document.getElementById('county-details');
+    const nameEl = document.getElementById('county-name');
+    const contentEl = document.getElementById('county-info-content');
 
   nameEl.textContent = `Congressional District ${districtNum}`;
 
@@ -1602,6 +1494,269 @@ function drawCountySwingLayer(swingData) {
     ctx.fill();
   });
 }
+// Add missing layer functions to prevent errors
+function addCountyLayers() {
+  if (!map.getLayer('county-fill')) {
+    map.addLayer({
+      id: 'county-fill',
+      type: 'fill',
+      source: 'counties',
+      paint: {
+        'fill-color': '#e0e0e0',
+        'fill-opacity': 0.7
+      }
+    });
+    map.addLayer({
+      id: 'county-outline',
+      type: 'line',
+      source: 'counties',
+      paint: {
+        'line-color': '#374151',
+        'line-width': 1
+      }
+    });
+  }
+}
+
+function addDistrictLayers() {
+  if (!map.getLayer('district-fill')) {
+    map.addLayer({
+      id: 'district-fill',
+      type: 'fill',
+      source: 'districts',
+      paint: {
+        'fill-color': '#e0e0e0',
+        'fill-opacity': 0.7
+      }
+    });
+    map.addLayer({
+      id: 'district-outline',
+      type: 'line',
+      source: 'districts',
+      paint: {
+        'line-color': '#374151',
+        'line-width': 1
+      }
+    });
+  }
+}
+
+function addStateHouseLayers() {
+  if (!map.getLayer('state-house-fill')) {
+    map.addLayer({
+      id: 'state-house-fill',
+      type: 'fill',
+      source: 'state-house',
+      paint: {
+        'fill-color': '#e0e0e0',
+        'fill-opacity': 0.7
+      }
+    });
+    map.addLayer({
+      id: 'state-house-outline',
+      type: 'line',
+      source: 'state-house',
+      paint: {
+        'line-color': '#374151',
+        'line-width': 1
+      }
+    });
+  }
+}
+
+function addStateSenateLayers() {
+  if (!map.getLayer('state-senate-fill')) {
+    map.addLayer({
+      id: 'state-senate-fill',
+      type: 'fill',
+      source: 'state-senate',
+      paint: {
+        'fill-color': '#e0e0e0',
+        'fill-opacity': 0.7
+      }
+    });
+    map.addLayer({
+      id: 'state-senate-outline',
+      type: 'line',
+      source: 'state-senate',
+      paint: {
+        'line-color': '#374151',
+        'line-width': 1
+      }
+    });
+  }
+}
+
+// --- INTERACTION HANDLERS ---
+// Add click and hover handlers for counties and districts
+map.on('click', 'county-fill', function(e) {
+  if (!e.features || !e.features.length) return;
+  const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || '';
+  lastSelectedCounty = countyName;
+  showCountyDetails(countyName);
+  document.getElementById('sidebar').classList.remove('minimized');
+  document.getElementById('sidebar-minimize-btn').textContent = '−';
+  updateFloatBtnVisibility();
+});
+
+map.on('mousemove', 'county-fill', function(e) {
+  if (!e.features || !e.features.length) {
+    document.getElementById('hover-tooltip').style.display = 'none';
+    return;
+  }
+  const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || '';
+  const tooltip = document.getElementById('hover-tooltip');
+  tooltip.innerHTML = getQuickCountyInfo(countyName);
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.point.x + 15) + 'px';
+  tooltip.style.top = (e.point.y + 15) + 'px';
+});
+
+map.on('mouseleave', 'county-fill', function() {
+  document.getElementById('hover-tooltip').style.display = 'none';
+});
+
+// District click/hover handlers
+map.on('click', 'district-fill', function(e) {
+  if (!e.features || !e.features.length) return;
+  const districtNum = e.features[0].properties.DISTRICT;
+  showDistrictDetails(districtNum);
+  document.getElementById('sidebar').classList.remove('minimized');
+  document.getElementById('sidebar-minimize-btn').textContent = '−';
+  updateFloatBtnVisibility();
+});
+
+map.on('mousemove', 'district-fill', function(e) {
+  if (!e.features || !e.features.length) {
+    document.getElementById('hover-tooltip').style.display = 'none';
+    return;
+  }
+  const districtNum = e.features[0].properties.DISTRICT;
+  const tooltip = document.getElementById('hover-tooltip');
+  tooltip.innerHTML = getQuickDistrictInfo(districtNum, 'congressional');
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.point.x + 15) + 'px';
+  tooltip.style.top = (e.point.y + 15) + 'px';
+});
+
+map.on('mouseleave', 'district-fill', function() {
+  document.getElementById('hover-tooltip').style.display = 'none';
+});
+
+// Only keep one definition of showCountyDetails to avoid errors.
+function showCountyDetails(countyName) {
+  const detailsDiv = document.getElementById('county-details');
+  const nameEl = document.getElementById('county-name');
+  const contentEl = document.getElementById('county-info-content');
+  let demographicInfo = '';
+  nameEl.textContent = `${countyName} County`;
+
+  if (!currentElectionResults) {
+    contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
+    detailsDiv.style.display = 'block';
+    return;
+  }
+
+  // Find county results for current contest
+  const countyData = currentElectionResults[countyName];
+
+  if (!countyData) {
+    contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
+    detailsDiv.style.display = 'block';
+    return;
+  }
+
+  // Get the current contest type and year from the dropdown
+  const contestValue = document.getElementById('contestSelect').value;
+  let electionInfo = '';
+
+  // Fix: define districtNum if needed (for US House contest)
+  let districtNum = countyData.district || countyData.DISTRICT || null;
+
+  if (contestValue && congressionalData) {
+    const lastUnderscoreIndex = contestValue.lastIndexOf('_');
+    const contestType = contestValue.substring(0, lastUnderscoreIndex);
+    const year = contestValue.substring(lastUnderscoreIndex + 1);
+
+    if (contestType === 'us_house' && districtNum) {
+      const result = congressionalData.find(row =>
+        String(row.year) === String(year) && String(row.district) === String(districtNum)
+      );
+
+      if (result && result.us_house_total > 0) {
+        const demVotes = Number(result.us_house_dem) || 0;
+        const repVotes = Number(result.us_house_rep) || 0;
+        const totalVotes = Number(result.us_house_total) || 0;
+
+        const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
+        const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
+        const marginPct = Math.abs(demPct - repPct);
+        const winner = demPct > repPct ? 'Democratic' : 'Republican';
+
+        // Determine competitiveness
+        let competitiveness;
+        if ( marginPct >= 40) {
+          competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+        } else if (marginPct >= 30) {
+          competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+        } else if (marginPct >= 20) {
+          competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+        } else if (marginPct >= 10) {
+          competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+        } else if (marginPct >= 5.5) {
+          competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+        } else if (marginPct >= 1) {
+          competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+        } else if (marginPct >= 0.5) {
+          competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+        } else {
+          competitiveness = `Tossup (${winner} win)`;
+        }
+        let compColor = '#6b7280';
+        if (competitiveness.includes('Rep')) {
+          if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+          else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+          else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+          else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+          else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+          else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+          else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
+        } else if (competitiveness.includes('Dem')) {
+          if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+          else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+          else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+          else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+          else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+          else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+          else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+        }
+
+        electionInfo = `
+          <div style="margin-bottom: 16px;">
+            <h5>🎯 Competitiveness</h5>
+            <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <h5>📈 Margin</h5>
+            <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
+              ${winner} +${marginPct.toFixed(1)}%
+            </p>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <h5>🗳️ Vote Breakdown</h5>
+            <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+            <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+            <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  contentEl.innerHTML = demographicInfo + electionInfo;
+  detailsDiv.style.display = 'block';
+}
+
 window.onload = init;
 </script>
 </body>
