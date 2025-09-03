@@ -20,28 +20,71 @@ html, body {
   box-sizing: border-box;
 }
 body {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
 }
 #map {
-  flex: 1 1 auto;
-  position: relative;
-  min-height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
-  width: 100%;
+  min-height: 0;
   background: #f0f4f8;
-  transition: width 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 1;
 }
 
-#map.sidebar-minimized {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  min-width: 0 !important;
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto;
+  z-index: 1002;
+  transition: width 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+}
+.sidebar.minimized {
+  width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  position: relative;
+}
+.minimize-btn.sidebar-toggle-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1003;
+}
+.minimize-btn.sidebar-toggle-btn:hover {
+  background: #1d4ed8;
 }
 
 /* Hover Tooltip */
@@ -960,23 +1003,12 @@ document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
 
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
-      const sidebarContent = document.querySelector('.sidebar-content');
-      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-      const mapElement = document.getElementById('map');
-      if (sidebar.classList.contains('minimized')) {
-        sidebar.classList.remove('minimized');
-        mapElement.classList.remove('sidebar-minimized');
-        sidebarContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize sidebar';
-      } else {
-        sidebar.classList.add('minimized');
-        mapElement.classList.add('sidebar-minimized');
-        sidebarContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand sidebar';
-      }
-      updateFloatBtnVisibility();
+      sidebar.classList.toggle('minimized');
+      setTimeout(() => {
+        if (window.map && typeof window.map.resize === 'function') {
+          window.map.resize();
+        }
+      }, 350); // Wait for CSS transition
     }
 
     function showCountyDetails(countyName) {
@@ -1209,6 +1241,7 @@ map.on('load', function() {
               const content = formatTooltipContent(`Congressional District ${districtNum} - Historical Trends`, trends);
               showHoverTooltip(e.point.x, e.point.y, content);
               
+
               // Also show detailed sidebar
               showDistrictDetails(districtNum);
               lastSelectedCounty = `District ${districtNum}`;
@@ -1263,6 +1296,7 @@ map.on('load', function() {
               const content = formatTooltipContent(`State House District ${districtNum} - Historical Trends`, trends);
               showHoverTooltip(e.point.x, e.point.y, content);
               
+
               // Also show detailed sidebar
               showStateDistrictDetails(districtNum, 'house');
               lastSelectedCounty = `State House District ${districtNum}`;
@@ -1317,6 +1351,7 @@ map.on('load', function() {
               const content = formatTooltipContent(`State Senate District ${districtNum} - Historical Trends`, trends);
               showHoverTooltip(e.point.x, e.point.y, content);
               
+
               // Also show detailed sidebar
               showStateDistrictDetails(districtNum, 'senate');
               lastSelectedCounty = `State Senate District ${districtNum}`;
@@ -1692,7 +1727,6 @@ map.on('load', function() {
             if (competitiveness.includes('Rep')) {
               if (competitiveness.includes('Annihilation')) compColor = '#67000d';
               else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
-             
               else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
               else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
               else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
@@ -2025,7 +2059,6 @@ map.on('load', function() {
 
       // We need county-to-district mapping - this is a simplified approach
       // In a full implementation, you'd need actual county-to-district mapping data
-      
       // For now, we'll apply the statewide contest to districts using a placeholder approach
       // Each district will show the statewide result (this could be enhanced with actual mapping)
       
