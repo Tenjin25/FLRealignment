@@ -1845,13 +1845,23 @@ function showCountyDetails(countyName) {
       </div>
       <div class="margin-section">
         <h5>📈 Margin</h5>
-        <p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winner} +${marginPct.toFixed(1)}%</p>
+        <p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winner} +${marginPct.toFixed(2)}%</p>
         <p style="color: #6b7280; font-size: 14px;">(${Math.abs(demVotes-repVotes).toLocaleString()} vote margin)</p>
       </div>
       <div class="vote-breakdown">
         <h5>🗳️ Vote Breakdown</h5>
-        <p><span style="color: #2563eb; font-weight: bold;">Democratic:</span> ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-        <p><span style="color: #dc2626; font-weight: bold;">Republican:</span> ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="color:#2563eb;font-weight:bold;">Democratic:</td>
+            <td style="text-align:right;">${demVotes.toLocaleString()}</td>
+            <td style="text-align:right;">${demPct.toFixed(2)}%</td>
+          </tr>
+          <tr>
+            <td style="color:#dc2626;font-weight:bold;">Republican:</td>
+            <td style="text-align:right;">${repVotes.toLocaleString()}</td>
+            <td style="text-align:right;">${repPct.toFixed(2)}%</td>
+          </tr>
+        </table>
       </div>
       <div class="competitiveness-section">
         <h5>🎯 Competitiveness</h5>
