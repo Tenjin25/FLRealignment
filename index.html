@@ -90,15 +90,36 @@ body {
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 20px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  position: relative;
 }
 .sidebar-header h3 {
   margin: 0;
   font-size: 1.1rem;
   color: #374151;
+  flex: 1;
+  text-align: left;
+}
+#sidebar-minimize-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
+  width: 48px;
+  height: 48px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 .sidebar-content {
   padding: 20px;
@@ -427,29 +448,36 @@ body {
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 20px;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  position: relative;
 }
 .sidebar-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 1.1rem;
+  color: #374151;
+  flex: 1;
+  text-align: left;
 }
-.sidebar-header .minimize-btn {
-  color: #fff;
-  background: #2563eb;
-  border: none;
-  font-size: 32px;
+#sidebar-minimize-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
   width: 48px;
   height: 48px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 /* Show floating expand button when sidebar is minimized */
@@ -1658,41 +1686,46 @@ map.on('mouseleave', 'district-fill', function() {
 
 // Only keep one definition of showCountyDetails to avoid errors.
 function showCountyDetails(countyName) {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) {
+    sidebar.classList.remove('minimized');
+    const floatBtn = document.getElementById('sidebar-float-toggle');
+    if (floatBtn) floatBtn.style.display = 'none';
+    const btn = document.getElementById('sidebar-minimize-btn');
+    if (btn) btn.textContent = '−';
+  }
   const detailsDiv = document.getElementById('county-details');
   const nameEl = document.getElementById('county-name');
   const contentEl = document.getElementById('county-info-content');
-  let demographicInfo = '';
+  if (!detailsDiv || !nameEl || !contentEl) return;
   nameEl.textContent = `${countyName} County`;
-
-  if (!currentElectionResults) {
-    contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
-    detailsDiv.style.display = 'block';
-    return;
+  let sidebarContent = '';
+  // --- Robust county normalization for lookup ---
+  let normalizedCounty = countyName.trim().toLowerCase();
+  let data = null;
+  if (currentElectionResults) {
+    let countyKey = Object.keys(currentElectionResults).find(k => k.trim().toLowerCase() === normalizedCounty);
+    if (countyKey) {
+     
+      data = currentElectionResults[countyKey];
+    }
   }
-
-  // Find county results for current contest
-  const countyData = currentElectionResults[countyName];
-
-  if (!countyData) {
-    contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
-    detailsDiv.style.display = 'block';
-    return;
-  }
-
-  // Candidate name logic (try to match NC map)
-  let demCandidate = countyData.dem_candidate || countyData.president_dem_candidate || 'Democratic';
-  let repCandidate = countyData.rep_candidate || countyData.president_rep_candidate || 'Republican';
-  // Manual overrides for known contests (add more as needed)
-  const contestValue = document.getElementById('contestSelect').value;
-  const yearMatch = contestValue.match(/_(\d{4})$/);
-  const year = yearMatch ? yearMatch[1] : null;
-  if (year) {
-    if (/president/.test(contestValue)) {
-      if (year === '2024') { demCandidate = 'Harris'; repCandidate = 'Trump'; }
-      else if (year === '2020') { demCandidate = 'Biden'; repCandidate = 'Trump'; }
-      else if (year === '2016') { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
-      else if (year === '2012') { demCandidate = 'Obama'; repCandidate = 'Romney'; }
-      else if (year === '2008') { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+  if (data) {
+    // Candidate name logic (try to match NC map)
+    let demCandidate = data.dem_candidate || data.president_dem_candidate || 'Democratic';
+    let repCandidate = data.rep_candidate || data.president_rep_candidate || 'Republican';
+    // Manual overrides for known contests (add more as needed)
+    const contestValue = document.getElementById('contestSelect').value;
+    const yearMatch = contestValue.match(/_(\d{4})$/);
+    const year = yearMatch ? yearMatch[1] : null;
+    if (year) {
+      if (/president/.test(contestValue)) {
+        if (year === '2024') { demCandidate = 'Harris'; repCandidate = 'Trump'; }
+        else if (year === '2020') { demCandidate = 'Biden'; repCandidate = 'Trump'; }
+        else if (year === '2016') { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
+        else if (year === '2012') { demCandidate = 'Obama'; repCandidate = 'Romney'; }
+        else if (year === '2008') { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+      }
     }
     // NC-style calculations
     const demVotes = data.dem_votes || data.president_dem || 0;
