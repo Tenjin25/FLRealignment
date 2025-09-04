@@ -1690,63 +1690,49 @@ map.on('mouseleave', 'district-fill', function() {
 
 // Only keep one definition of showCountyDetails to avoid errors.
 function showCountyDetails(countyName) {
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar) {
-    sidebar.classList.remove('minimized');
-    const floatBtn = document.getElementById('sidebar-float-toggle');
-    if (floatBtn) floatBtn.style.display = 'none';
-    const btn = document.getElementById('sidebar-minimize-btn');
-    if (btn) btn.textContent = '−';
-  }
   const detailsDiv = document.getElementById('county-details');
   const nameEl = document.getElementById('county-name');
   const contentEl = document.getElementById('county-info-content');
-  if (!detailsDiv || !nameEl || !contentEl) return;
   nameEl.textContent = `${countyName} County`;
-  let sidebarContent = '';
-  // --- Robust county normalization for lookup ---
-  let normalizedCounty = countyName.trim().toLowerCase();
-  let data = null;
-  if (currentElectionResults) {
-    let countyKey = Object.keys(currentElectionResults).find(k => k.trim().toLowerCase() === normalizedCounty);
-    if (countyKey) {
-      data = currentElectionResults[countyKey];
-    }
-  }
-  if (!data) {
-    sidebarContent = `<p><em>No results found for this county in the selected contest.</em></p>`;
-    contentEl.innerHTML = sidebarContent;
+  if (!currentElectionResults) {
+    contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
     detailsDiv.style.display = 'block';
     return;
   }
-  // Candidate name logic (try to match NC map)
-  let demCandidate = data.dem_candidate || data.president_dem_candidate || 'Democratic';
-  let repCandidate = data.rep_candidate || data.president_rep_candidate || 'Republican';
-  // Manual overrides for known contests (add more as needed)
-  const contestValue = document.getElementById('contestSelect').value;
-  const yearMatch = contestValue.match(/_(\d{4})$/);
-  const year = yearMatch ? yearMatch[1] : null;
-  if (year) {
-    if (/president/.test(contestValue)) {
-      if (year === '2024') { demCandidate = 'Harris'; repCandidate = 'Trump'; }
-      else if (year === '2020') { demCandidate = 'Biden'; repCandidate = 'Trump'; }
-      else if (year === '2016') { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
-      else if (year === '2012') { demCandidate = 'Obama'; repCandidate = 'Romney'; }
-      else if (year === '2008') { demCandidate = 'Obama'; repCandidate = 'McCain'; }
-    }
+  // Find county results for current contest
+  const countyData = currentElectionResults[countyName];
+  if (!countyData) {
+    contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
+    detailsDiv.style.display = 'block';
+    return;
   }
-  // NC-style calculations
-  const demVotes = data.dem_votes || data.president_dem || 0;
-  const repVotes = data.rep_votes || data.president_rep || 0;
-  const totalVotes = data.total_votes || data.president_total || (demVotes + repVotes);
-  const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
-  const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
-  const margin = repVotes - demVotes;
-  const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
-  const winner = margin > 0 ? 'Republican' : 'Democratic';
-  const winnerCandidate = margin > 0 ? repCandidate : demCandidate;
-  const marginText = margin > 0 ? 'R+' + marginPct + '%' : 'D+' + marginPct + '%';
-  // Competitiveness (NC logic)
+  // Get the current contest type and year from the dropdown
+  const contestSelect = document.getElementById('contestSelect');
+  const contestKey = contestSelect.value;
+  if (!contestKey) {
+    contentEl.innerHTML = '<p>Select a contest to see detailed results.</p>';
+    detailsDiv.style.display = 'block';
+    return;
+  }
+  // Parse contest info
+  const lastUnderscoreIndex = contestKey.lastIndexOf('_');
+  const contestType = contestKey.substring(0, lastUnderscoreIndex);
+  const year = contestKey.substring(lastUnderscoreIndex + 1);
+  // Get vote data for this contest
+  const demVotes = countyData[`${contestType}_dem`] || 0;
+  const repVotes = countyData[`${contestType}_rep`] || 0;
+  const totalVotes = countyData[`${contestType}_total`] || 0;
+  if (totalVotes === 0) {
+    contentEl.innerHTML = `<p>No ${formatContestName(contestType, year)} data available for ${countyName} County in ${year}.</p>`;
+    detailsDiv.style.display = 'block';
+    return;
+  }
+  // Calculate percentages
+  const demPct = (demVotes / totalVotes * 100);
+  const repPct = (repVotes / totalVotes * 100);
+  const marginPct = Math.abs(demPct - repPct);
+  const winner = repPct > demPct ? 'Republican' : 'Democratic';
+  // Determine competitiveness category
   let competitiveness;
   if (marginPct >= 40) {
     competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
@@ -1765,8 +1751,7 @@ function showCountyDetails(countyName) {
   } else {
     competitiveness = `Tossup (${winner} win)`;
   }
-  // Color logic
-  let winnerColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
+  // Color coding for competitiveness
   let compColor = '#6b7280';
   if (competitiveness.includes('Rep')) {
     if (competitiveness.includes('Annihilation')) compColor = '#67000d';
@@ -1785,42 +1770,32 @@ function showCountyDetails(countyName) {
     else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
     else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
   }
-  sidebarContent = `
-    <div class="result-summary">
-      <h5>📊 Election Results</h5>
-      <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
+  // Generate detailed results HTML
+  contentEl.innerHTML = `
+    <div style="margin-bottom: 16px;">
+      <h5>🗳️ Candidates</h5>
+      <p><span style="color: #1e40af; font-weight: bold;">${countyData.dem_candidate ? countyData.dem_candidate + ' (D)' : 'Democratic'}</span></p>
+      <p><span style="color: #dc2626; font-weight: bold;">${countyData.rep_candidate ? countyData.rep_candidate + ' (R)' : 'Republican'}</span></p>
     </div>
-    <div class="winner-section">
-      <h5>🏆 Winner</h5>
-      <p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner.charAt(0)})</p>
-    </div>
-    <div class="margin-section">
-      <h5>📈 Margin</h5>
-      <p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${marginText}</p>
-      <p style="color: #6b7280; font-size: 14px;">(${Math.abs(margin).toLocaleString()} vote margin)</p>
-    </div>
-    <div class="vote-breakdown">
-      <h5>🗳️ Vote Breakdown</h5>
-      <table style="width:100%;border-collapse:collapse;">
-        <tr>
-          <td style="color:#2563eb;font-weight:bold;">${demCandidate} (D):</td>
-          <td style="text-align:right;">${demVotes.toLocaleString()}</td>
-          <td style="text-align:right;">${demPct.toFixed(2)}%</td>
-        </tr>
-        <tr>
-          <td style="color:#dc2626;font-weight:bold;">${repCandidate} (R):</td>
-          <td style="text-align:right;">${repVotes.toLocaleString()}</td>
-          <td style="text-align:right;">${repPct.toFixed(2)}%</td>
-        </tr>
-      </table>
-    </div>
-    <div class="competitiveness-section">
+    <div style="margin-bottom: 16px;">
       <h5>🎯 Competitiveness</h5>
       <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
-      ${marginPct <= 0.5 ? `<p style='color: #f59e0b; font-style: italic;'>(Extremely close!)</p>` : marginPct <= 1 ? `<p style='color: #f59e0b; font-style: italic;'>(Very close!)</p>` : ''}
+    </div>
+    <div style="margin-bottom: 16px;">
+      <h5>📈 Margin</h5>
+      <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
+        ${winner} +${marginPct.toFixed(1)}%
+      </p>
+    </div>
+    <div style="margin-bottom: 16px;">
+      <h5>🗳️ Vote Breakdown</h5>
+      <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+      <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+      <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
+        Total Votes: ${totalVotes.toLocaleString()}
+      </p>
     </div>
   `;
-  contentEl.innerHTML = sidebarContent;
   detailsDiv.style.display = 'block';
 }
 
