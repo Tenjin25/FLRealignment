@@ -559,9 +559,9 @@ body {
 
     <!-- Sidebar for County Details and Analysis -->
     <div class="sidebar" id="sidebar">
-  <div class="sidebar-header" id="sidebar-header" style="position:relative;">
-    <h3>📊 County Analysis</h3>
-    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn" style="position:absolute;top:20px;right:20px;background:#2563eb;color:#fff;border:none;font-size:32px;width:48px;height:48px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1003;">−</button>
+  <div class="sidebar-header" id="sidebar-header" style="position:relative;height:68px;padding:0;display:flex;align-items:center;justify-content:flex-end;">
+    <h3 style="margin:0;font-size:1.1rem;color:#374151;flex:1;text-align:left;padding:20px 0 20px 24px;">📊 County Analysis</h3>
+    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn" style="position:absolute;top:10px;right:20px;background:#2563eb;color:#fff;border:none;font-size:32px;width:48px;height:48px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1003;">−</button>
   </div>
   <div class="sidebar-content">
     <div class="county-details" id="county-details" style="display: none;">
@@ -1827,8 +1827,9 @@ function showCountyDetails(countyName) {
 window.onload = init;
 
 document.getElementById('contestSelect').addEventListener('change', function() {
-  // If a county was previously selected, refresh its details for the new contest/year
+  // Always update results for the selected contest/year before showing county details
   if (lastSelectedCounty) {
+    // Re-normalize county name for the new contest
     showCountyDetails(lastSelectedCounty);
   }
 });
