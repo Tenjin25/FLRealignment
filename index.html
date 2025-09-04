@@ -456,20 +456,20 @@ body {
 .sidebar.minimized ~ #sidebar-float-toggle {
   display: flex !important;
 }
-/* Floating expand button for sidebar (top right, even smaller, shows + when minimized) */
+/* Floating expand/collapse button for sidebar (top right, larger, shows + when minimized and - when open) */
 #sidebar-float-toggle {
   position: fixed;
-  top: 18px;
-  right: 18px;
+  top: 20px;
+  right: 20px;
   z-index: 10001;
-  width: 24px;
-  height: 24px;
+  width: 48px;
+  height: 48px;
   background: #2563eb;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  font-size: 16px;
+  font-size: 32px;
   display: none;
   align-items: center;
   justify-content: center;
@@ -577,8 +577,8 @@ body {
     Created by Shamar Davis
   </div>
 </div>
-    <!-- Floating expand button for sidebar (top right, even smaller) -->
-    <button id="sidebar-float-toggle" style="position:fixed;top:18px;right:18px;z-index:10001;width:24px;height:24px;background:#2563eb;color:#fff;border:none;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:16px;display:none;align-items:center;justify-content:center;cursor:pointer;">+</button>
+    <!-- Floating expand/collapse button for sidebar (top right, larger) -->
+    <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:32px;display:none;align-items:center;justify-content:center;cursor:pointer;">+</button>
 
     <!-- Modern legend block (NC map style) -->
     <div class="legend" id="legend">
@@ -607,18 +607,13 @@ body {
     <script>
       function toggleLegend() {
         const legend = document.getElementById('legend');
-        const legendContent = document.getElementById('legend-content');
-        const minimizeBtn = document.getElementById('legend-minimize-btn');
+        const btn = document.getElementById('legend-minimize-btn');
         if (legend.classList.contains('minimized')) {
           legend.classList.remove('minimized');
-          legendContent.style.display = 'block';
-          minimizeBtn.textContent = '−';
-          minimizeBtn.title = 'Minimize legend';
+          btn.textContent = '−';
         } else {
           legend.classList.add('minimized');
-          legendContent.style.display = 'none';
-          minimizeBtn.textContent = '+';
-          minimizeBtn.title = 'Expand legend';
+          btn.textContent = '+';
         }
       }
     </script>
@@ -996,34 +991,35 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
-document.addEventListener('DOMContentLoaded', updateFloatBtnVisibility);
-
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const btn = document.getElementById('sidebar-minimize-btn');
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      if (sidebar.classList.contains('minimized')) {
-        sidebar.classList.remove('minimized');
-        btn.textContent = '−';
-        if (floatBtn) floatBtn.style.display = 'none';
-      } else {
-        sidebar.classList.add('minimized');
-        btn.textContent = '+';
-        if (floatBtn) {
-          floatBtn.style.display = 'flex';
-          floatBtn.innerHTML = '+';
-        }
-      }
-      setTimeout(() => {
-        if (window.map && typeof window.map.resize === 'function') {
-          window.map.resize();
-        }
-      }, 350);
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-minimize-btn');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    sidebar.classList.remove('minimized');
+    btn.textContent = '−';
+    if (floatBtn) {
+      floatBtn.style.display = 'none';
+      floatBtn.innerHTML = '−';
     }
+  } else {
+    sidebar.classList.add('minimized');
+    btn.textContent = '+';
+    if (floatBtn) {
+      floatBtn.style.display = 'flex';
+      floatBtn.innerHTML = '+';
+    }
+  }
+  setTimeout(() => {
+    if (window.map && typeof window.map.resize === 'function') {
+      window.map.resize();
+    }
+  }, 350);
+}
 
-  // Make sure there is only one definition of showCountyDetails in your script.
+// Make sure there is only one definition of showCountyDetails in your script.
 
-  function showDistrictDetails(districtNum) {
+function showDistrictDetails(districtNum) {
     const detailsDiv = document.getElementById('county-details');
     const nameEl = document.getElementById('county-name');
     const contentEl = document.getElementById('county-info-content');
@@ -1705,14 +1701,14 @@ function showCountyDetails(countyName) {
         const repVotes = Number(result.us_house_rep) || 0;
         const totalVotes = Number(result.us_house_total) || 0;
 
-        const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
+        const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 :  0;
         const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
         const marginPct = Math.abs(demPct - repPct);
         const winner = demPct > repPct ? 'Democratic' : 'Republican';
 
         // Determine competitiveness
         let competitiveness;
-        if ( marginPct >= 40) {
+        if (marginPct >= 40) {
           competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
         } else if (marginPct >= 30) {
           competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
