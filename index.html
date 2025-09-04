@@ -529,7 +529,7 @@ body {
     <div class="sidebar" id="sidebar">
   <div class="sidebar-header" id="sidebar-header" style="position:relative;">
     <h3>📊 County Analysis</h3>
-    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn" style="position:absolute;top:16px;right:16px;background:#2563eb;color:#fff;border:none;font-size:40px;width:56px;height:56px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1003;">−</button>
+    <button class="minimize-btn sidebar-toggle-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn" style="position:absolute;top:20px;right:20px;background:#2563eb;color:#fff;border:none;font-size:32px;width:48px;height:48px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1003;">−</button>
   </div>
   <div class="sidebar-content">
     <div class="county-details" id="county-details" style="display: none;">
@@ -578,7 +578,7 @@ body {
   </div>
 </div>
     <!-- Floating expand/collapse button for sidebar (top right, larger) -->
-    <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:32px;display:none;align-items:center;justify-content:center;cursor:pointer;">+</button>
+    <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</button>
 
     <!-- Modern legend block (NC map style) -->
     <div class="legend" id="legend">
@@ -1701,7 +1701,7 @@ function showCountyDetails(countyName) {
         const repVotes = Number(result.us_house_rep) || 0;
         const totalVotes = Number(result.us_house_total) || 0;
 
-        const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 :  0;
+        const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 :   0;
         const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
         const marginPct = Math.abs(demPct - repPct);
         const winner = demPct > repPct ? 'Democratic' : 'Republican';
@@ -1814,15 +1814,49 @@ function showCountyDetails(countyName) {
     } else {
       competitiveness = `Tossup (${winner} win)`;
     }
+    // --- NC map sidebar layout ---
+    let winnerColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
+    let compColor = '#6b7280';
+    if (competitiveness.includes('Rep')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+      else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+      else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+      else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+      else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+      else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+      else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
+    } else if (competitiveness.includes('Dem')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+      else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+      else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+      else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+      else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+      else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+      else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+    }
     sidebarContent = `
       <div class="result-summary">
-        <h5>Result Summary</h5>
-        <p><strong>Winner:</strong> ${winner}</p>
-        <p><strong>Margin:</strong> ${winner} +${marginPct.toFixed(1)}%</p>
-        <p><strong>Democratic:</strong> ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-        <p><strong>Republican:</strong> ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+        <h5>📊 Election Results</h5>
         <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
-        <p><strong>Competitiveness:</strong> ${competitiveness}</p>
+      </div>
+      <div class="winner-section">
+        <h5>🏆 Winner</h5>
+        <p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winner}</p>
+      </div>
+      <div class="margin-section">
+        <h5>📈 Margin</h5>
+        <p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winner} +${marginPct.toFixed(1)}%</p>
+        <p style="color: #6b7280; font-size: 14px;">(${Math.abs(demVotes-repVotes).toLocaleString()} vote margin)</p>
+      </div>
+      <div class="vote-breakdown">
+        <h5>🗳️ Vote Breakdown</h5>
+        <p><span style="color: #2563eb; font-weight: bold;">Democratic:</span> ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+        <p><span style="color: #dc2626; font-weight: bold;">Republican:</span> ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+      </div>
+      <div class="competitiveness-section">
+        <h5>🎯 Competitiveness</h5>
+        <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+        ${marginPct <= 0.5 ? `<p style='color: #f59e0b; font-style: italic;'>(Extremely close!)</p>` : marginPct <= 1 ? `<p style='color: #f59e0b; font-style: italic;'>(Very close!)</p>` : ''}
       </div>
     `;
   } else {
@@ -1833,6 +1867,13 @@ function showCountyDetails(countyName) {
 }
 
 window.onload = init;
+
+document.getElementById('contestSelect').addEventListener('change', function() {
+  // If a county was previously selected, refresh its details for the new contest/year
+  if (lastSelectedCounty) {
+    showCountyDetails(lastSelectedCounty);
+  }
+});
 </script>
 </body>
 </html>
