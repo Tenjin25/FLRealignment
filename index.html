@@ -1,3 +1,18 @@
+    // Zoom to county by name using turf.js
+    function zoomToCounty(countyName) {
+      const countiesSource = map.getSource('counties');
+      if (!countiesSource || !countiesSource._data || !countiesSource._data.features) return;
+      const counties = countiesSource._data.features;
+      // Try to match by various property names
+      const countyFeature = counties.find(f => {
+        const props = f.properties || {};
+        const name = (props.County || props.COUNTYNAME || props.NAME || '').toString().toLowerCase();
+        return name === countyName.toLowerCase();
+      });
+      if (!countyFeature) return;
+      const bbox = turf.bbox(countyFeature);
+      map.fitBounds(bbox, { padding: 40, maxZoom: 10 });
+    }
 <!DOCTYPE html>
 <html>
 <head>
@@ -443,11 +458,7 @@ body {
 <body>
     <div id="map"></div>
     
-    <!-- Hover Tooltip -->
-    <div id="hover-tooltip" class="hover-tooltip">
-        <div class="tooltip-title"></div>
-        <div class="tooltip-trends"></div>
-    </div>
+
 
     <!-- Main Controls Dropdown (Contest Selector) -->
     <div class="main-controls" id="main-controls">
@@ -485,64 +496,57 @@ body {
     </div>
 
     <!-- Sidebar for County Details and Analysis -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header" id="sidebar-header">
-            <h3>📊 County Analysis</h3>
-            <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
-        </div>
-        <div class="sidebar-content">
-            <!-- County Details -->
-            <div class="county-details" id="county-details" style="display: none;">
-                <h4 id="county-name">Select a County</h4>
-                <div id="county-info-content">
-                    Click on any county to see detailed election results and analysis.
-                </div>
-            </div>
-            
-            <!-- County Search -->
-            <div style="margin-bottom: 16px;">
-                <label for="county-search" style="font-weight:600;">Search County:</label>
-                <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
-            </div>
-            
-            <!-- Statewide Results -->
-            <div class="statewide-results" id="statewide-results">
-                <h4 id="statewide">🏛️ Florida Statewide</h4>
-                <div id="statewide-content">
-                    <p>Select a contest to see statewide results and margin.</p>
-                </div>
-            </div>
-            
-            <!-- Research Findings -->
-            <div class="findings-section">
-                <h4>🔍 Research Findings</h4>
-                <div class="finding-card">
-                    <h5>Miami-Dade County - Historic Republican Flip</h5>
-                    <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-                    <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> → <span class="metric">2024: R+11.4%</span></p>
-                    <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-                    <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
-                </div>
-                <div class="finding-card">
-                    <h5>Orange County - Suburban Evolution</h5>
-                    <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
-                    <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
-                    <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> → <span class="metric">2024: D+6.4%</span></p>
-                    <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
-                </div>
-                <div class="finding-card">
-                    <h5>Statewide Patterns & I-4 Corridor</h5>
-                    <p><strong>Rural-Urban Divide:</strong> Growing polarization between urban coastal counties and rural interior counties.</p>
-                    <p><strong>I-4 Corridor:</strong> Tampa-Orlando corridor remains the key battleground determining statewide outcomes. <span class="metric">Hillsborough</span>, <span class="metric">Orange</span>, <span class="metric">Seminole</span> counties pivotal.</p>
-                    <p><strong>Registration Trends:</strong> Unaffiliated voter growth creating volatile election dynamics across swing counties.</p>
-                    <p><strong>Demographics:</strong> Hispanic population growth in Central Florida reshaping electoral map.</p>
-                </div>
-            </div>
-        </div>
-        <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-            Created by Shamar Davis
-        </div>
+  <div class="sidebar minimized" id="sidebar">
+    <div class="sidebar-header" id="sidebar-header">
+      <h3>📊 County Analysis</h3>
+      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
     </div>
+    <div class="sidebar-content">
+      <div class="county-details" id="county-details" style="display: none;">
+        <h4 id="county-name">Select a County</h4>
+        <div id="county-info-content">
+          Click on any county to see detailed election results and analysis.
+        </div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label for="county-search" style="font-weight:600;">Search County:</label>
+        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
+      </div>
+      <div class="statewide-results" id="statewide-results">
+        <h4 id="statewide">🏛️ Florida Statewide</h4>
+        <div id="statewide-content">
+          <p>Select a contest to see statewide results and margin.</p>
+        </div>
+      </div>
+      <div class="findings-section">
+        <h4>🔍 Research Findings</h4>
+        <div class="finding-card">
+          <h5>Miami-Dade County - Historic Republican Flip</h5>
+          <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
+          <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> → <span class="metric">2024: R+11.4%</span></p>
+          <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
+          <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+        </div>
+        <div class="finding-card">
+          <h5>Orange County - Suburban Evolution</h5>
+          <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
+          <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
+          <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> → <span class="metric">2024: D+6.4%</span></p>
+          <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
+        </div>
+        <div class="finding-card">
+          <h5>Statewide Patterns & I-4 Corridor</h5>
+          <p><strong>Rural-Urban Divide:</strong> Growing polarization between urban coastal counties and rural interior counties.</p>
+          <p><strong>I-4 Corridor:</strong> Tampa-Orlando corridor remains the key battleground determining statewide outcomes. <span class="metric">Hillsborough</span>, <span class="metric">Orange</span>, <span class="metric">Seminole</span> counties pivotal.</p>
+          <p><strong>Registration Trends:</strong> Unaffiliated voter growth creating volatile election dynamics across swing counties.</p>
+          <p><strong>Demographics:</strong> Hispanic population growth in Central Florida reshaping electoral map.</p>
+        </div>
+      </div>
+    </div>
+    <div style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+      Created by Shamar Davis
+    </div>
+  </div>
 
     <!-- Legend -->
     <div class="legend" id="legend">
@@ -1165,43 +1169,26 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           source: 'counties', 
           paint: { 'line-color': '#333', 'line-width': 1 } 
         });
-        
-        // Add click handler for counties with full trends popup
+        // Add click handler for counties: show sidebar with details
         map.on('click', 'county-fill', (e) => {
           if (e.features && e.features[0] && e.features[0].properties) {
             const countyName = e.features[0].properties.County;
             if (countyName) {
-              // Show full historical trends popup on click
-              const trends = getHistoricalTrends(countyName, false, null);
-              const content = formatTooltipContent(`${countyName} County - Historical Trends`, trends);
-              showHoverTooltip(e.point.x, e.point.y, content);
-              
-              // Also show detailed sidebar
               showCountyDetails(countyName);
               lastSelectedCounty = countyName;
+              // Expand sidebar if minimized
+              const sidebar = document.getElementById('sidebar');
+              if (sidebar.classList.contains('minimized')) {
+                toggleSidebar();
+              }
             }
           }
         });
-        
-        // Quick hover tooltip with basic info
         map.on('mouseenter', 'county-fill', (e) => {
           map.getCanvas().style.cursor = 'pointer';
         });
-        
-        map.on('mousemove', 'county-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.County;
-            console.log('Hover detected on county:', countyName, 'Properties:', e.features[0].properties);
-            if (countyName) {
-              const quickInfo = getQuickCountyInfo(countyName);
-              showHoverTooltip(e.point.x, e.point.y, quickInfo);
-            }
-          }
-        });
-        
         map.on('mouseleave', 'county-fill', () => {
           map.getCanvas().style.cursor = '';
-          hideHoverTooltip();
         });
       }
     }
@@ -1372,18 +1359,53 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       document.getElementById('county-details').style.display = 'none';
     }
 
-    function showHoverTooltip(x, y, content) {
-      const tooltip = document.getElementById('hover-tooltip');
-      tooltip.style.left = (x + 15) + 'px';
-      tooltip.style.top = (y + 15) + 'px';
-      tooltip.innerHTML = content;
-      tooltip.style.display = 'block';
-    }
 
-    function hideHoverTooltip() {
-      const tooltip = document.getElementById('hover-tooltip');
-      tooltip.style.display = 'none';
-    }
+    // Sidebar minimized by default on load, expand on click
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const btn = document.getElementById('sidebar-minimize-btn');
+      sidebar.classList.add('minimized');
+      btn.textContent = '+';
+
+      // Populate county search dropdown/list with county names if available
+      // Wait for map and counties source to be loaded
+      map.on('load', function() {
+        const countiesSource = map.getSource('counties');
+        if (!countiesSource) return;
+        let counties = [];
+        if (countiesSource._data && countiesSource._data.features) {
+          counties = countiesSource._data.features.map(f => f.properties && (f.properties.County || f.properties.COUNTYNAME || f.properties.NAME)).filter(Boolean).sort();
+        }
+        const searchInput = document.getElementById('county-search');
+        if (searchInput && counties.length > 0) {
+          // Create a datalist for autocomplete
+          let datalist = document.getElementById('county-datalist');
+          if (!datalist) {
+            datalist = document.createElement('datalist');
+            datalist.id = 'county-datalist';
+            document.body.appendChild(datalist);
+            searchInput.setAttribute('list', 'county-datalist');
+          }
+          datalist.innerHTML = counties.map(name => `<option value="${name}"></option>`).join('');
+        }
+      });
+
+      // Allow selecting a county by typing and pressing enter
+      const searchInput = document.getElementById('county-search');
+      if (searchInput) {
+        searchInput.addEventListener('change', function() {
+          const val = searchInput.value.trim();
+          if (val) {
+            zoomToCounty(val);
+            showCountyDetails(val);
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('minimized')) {
+              toggleSidebar();
+            }
+          }
+        });
+      }
+    });
 
     function getHistoricalTrends(countyName, isDistrict = false, districtNum = null) {
       const presidentialYears = [2024, 2020, 2016, 2012, 2008];
