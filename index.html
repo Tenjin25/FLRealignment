@@ -2,12 +2,12 @@
 <html>
 <head>
   <script>
-    // Zoom to county by name using turf.js
+    // Only keep the zoomToCounty helper in <head>
     function zoomToCounty(countyName) {
+      // This function will work after the map is initialized
       const countiesSource = map.getSource('counties');
       if (!countiesSource || !countiesSource._data || !countiesSource._data.features) return;
       const counties = countiesSource._data.features;
-      // Try to match by various property names
       const countyFeature = counties.find(f => {
         const props = f.properties || {};
         const name = (props.County || props.COUNTYNAME || props.NAME || '').toString().toLowerCase();
@@ -590,7 +590,7 @@ body {
     const CONFIG = {
       mapboxToken: 'pk.eyJ1Ijoic2hhbWFyZGF2aXMiLCJhIjoiY21kcW8yeDB2MDhvbTJzb29qeGp1aDZmZCJ9.Zw_i6U-dL7_bEKRHTUh7yg',
       paths: {
-        counties: './Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson',
+  counties: 'data/Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson',
         districts: './data/fl_congressional_districts.geojson',
         state_house: './data/fl_state_house_districts.geojson',
         state_senate: './data/fl_state_senate_districts.geojson',
