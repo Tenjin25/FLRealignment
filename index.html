@@ -670,19 +670,19 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function formatContestName(contestType, year) {
       const nameMap = {
-        'president': 'FL President',
+        'president': 'US President',
         'governor': 'FL Governor', 
-        'us_senate': 'FL US Senate',
+        'us_senate': 'US Senate',
         'attorney_general': 'FL Attorney General',
         'cfo': 'FL Chief Financial Officer',
         'agriculture_commissioner': 'FL Agriculture Commissioner',
-        'us_house': 'FL US House',
+        'us_house': 'US House',
         'state_senate': 'FL State Senate',
         'state_house': 'FL State House',
         'gov': 'FL Governor',
-        'pre': 'FL President', 
-        'uss': 'FL US Senator',
-        'usr': 'FL US Representative',
+        'pre': 'US President', 
+        'uss': 'US Senator',
+        'usr': 'US Representative',
         'agr': 'FL Agriculture Commissioner',
         'atg': 'FL Attorney General',
         'cfo': 'FL Chief Financial Officer',
@@ -2629,7 +2629,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
 
-    window.onload = init;
+        window.onload = init;
+
+        function init() {
+          // Example: Set up sidebar, controls, and map event listeners
+          // (You can expand this as needed for your app)
+          setStatus('Loading map and data...');
+          // Add any additional setup here, e.g.:
+          // - populate contest dropdown
+          // - add map event listeners for click/hover
+          // - set default sidebar state
+          // - load initial data if needed
+          // For example:
+          if (typeof map !== 'undefined') {
+            map.resize();
+          }
+          // Optionally, set sidebar to minimized on load
+          const sidebar = document.getElementById('sidebar');
+          if (sidebar) sidebar.classList.remove('minimized');
+        }
 
     map.on('load', function() {
       // Add county name labels
