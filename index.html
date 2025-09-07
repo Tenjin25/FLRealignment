@@ -1057,20 +1057,38 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function showCountyDetails(countyName) {
       const detailsDiv = document.getElementById('county-details');
-      const nameEl = document.getElementById('county-name');
       const contentEl = document.getElementById('county-info-content');
-      
-      nameEl.textContent = `${countyName} County`;
-      
+
+      // Normalize county name for matching (remove punctuation, case-insensitive, trim, handle St. Lucie, St. Johns, etc.)
+      function normalizeCountyName(name) {
+        return (name || '')
+          .replace(/St\.? Lucie/i, 'St Lucie')
+          .replace(/St\.? Johns/i, 'St Johns')
+          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toUpperCase();
+      }
+
       if (!currentElectionResults) {
         contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
         detailsDiv.style.display = 'block';
         return;
       }
-      
-      // Find county results for current contest
-      const countyData = currentElectionResults[countyName];
-      
+
+      // Try to find the county data with normalization
+      let countyData = currentElectionResults[countyName];
+      if (!countyData) {
+        // Try normalized match
+        const norm = normalizeCountyName(countyName);
+        for (const key in currentElectionResults) {
+          if (normalizeCountyName(key) === norm) {
+            countyData = currentElectionResults[key];
+            break;
+          }
+        }
+      }
+
       if (!countyData) {
         contentEl.innerHTML = '<p>No results found for this county in the selected contest.</p>';
         detailsDiv.style.display = 'block';
@@ -1192,10 +1210,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         winnerDisplay = '<span style="color:#64748b;font-weight:700;">Tie</span>';
       }
 
-      // Card-style layout with sections and icons
+      // Card-style layout with sections and icons (no redundant county name)
       contentEl.innerHTML = `
         <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 20px 18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:10px;max-width:420px;">
-          <h3 style="margin:0 0 10px 0;font-size:1.25rem;color:#222;font-weight:600;">${countyName} County</h3>
           <div style="font-size:15px;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">📊</span> <b>Election Results</b></div>
           ${precincts ? `<div style=\"font-size:14px;\"><b>Precincts:</b> ${precincts}</div>` : ''}
           <div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>
