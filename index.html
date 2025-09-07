@@ -2,12 +2,12 @@
 <html>
 <head>
   <script>
-    // Only keep the zoomToCounty helper in <head>
+    // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
-      // This function will work after the map is initialized
       const countiesSource = map.getSource('counties');
       if (!countiesSource || !countiesSource._data || !countiesSource._data.features) return;
       const counties = countiesSource._data.features;
+      // Try to match by various property names
       const countyFeature = counties.find(f => {
         const props = f.properties || {};
         const name = (props.County || props.COUNTYNAME || props.NAME || '').toString().toLowerCase();
@@ -18,6 +18,9 @@
       map.fitBounds(bbox, { padding: 40, maxZoom: 10 });
     }
   </script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <meta charset='utf-8'>
     <title>FL Political Realignment Map (2008-2024)</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
@@ -590,7 +593,7 @@ body {
     const CONFIG = {
       mapboxToken: 'pk.eyJ1Ijoic2hhbWFyZGF2aXMiLCJhIjoiY21kcW8yeDB2MDhvbTJzb29qeGp1aDZmZCJ9.Zw_i6U-dL7_bEKRHTUh7yg',
       paths: {
-  counties: 'data/Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson',
+        counties: './Florida_County_Boundaries_with_FDOT_Districts_6074369993038631266.geojson',
         districts: './data/fl_congressional_districts.geojson',
         state_house: './data/fl_state_house_districts.geojson',
         state_senate: './data/fl_state_senate_districts.geojson',
@@ -638,25 +641,23 @@ body {
   return r.text();
     }
 
-function parseCSV(csvText) {
-  try {
-    const result = Papa.parse(csvText, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true
-    });
-    if (result.errors.length) {
-      setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
-      console.error(result.errors);
-    }
-    return result.data;
-  } catch (err) {
-    setStatus('CSV Parse Exception: ' + err.message);
-    console.error(err);
-    return [];
-  }
-}
-
+    function parseCSV(csvText) {
+      try {
+        const result = Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true
+        });
+        if (result.errors.length) {
+          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+          console.error(result.errors);
+        }
+        return result.data;
+      } catch (err) {
+        setStatus('CSV Parse Exception: ' + err.message);
+        console.error(err);
+        return [];
+      }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -678,6 +679,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
+    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -838,17 +840,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function updateStatewideResults(contestType, year, demVotes, repVotes, totalVotes) {
       const statewideContent = document.getElementById('statewide-content');
+      
       if (totalVotes === 0) {
         statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
         return;
       }
+      
       const demPct = (demVotes / totalVotes) * 100;
       const repPct = (repVotes / totalVotes) * 100;
       const marginPct = Math.abs(demPct - repPct);
       const winner = demPct > repPct ? 'Democratic' : 'Republican';
-      // Use FL_CANDIDATE_LOOKUP for candidate names (statewide, so county code is 'ALL')
-      let demCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, 'ALL', 'DEM') || 'Democratic';
-      let repCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, 'ALL', 'REP') || 'Republican';
+      const loser = demPct > repPct ? 'Republican' : 'Democratic';
+      
+      // Get candidate names based on contest type and year
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      
+      if (contestType === 'president') {
+        if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
+        else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
+        else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
+        else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
+        else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+      }
+      
       statewideContent.innerHTML = `
         <div class="statewide-margin">
           <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'};">
@@ -1109,15 +1124,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
-  // Candidate names
-  let demCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, countyName, 'DEM') || 'Democratic';
-  let repCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, countyName, 'REP') || 'Republican';
-// --- Load candidate CSV at startup ---
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.loadCSV) {
-    FL_CANDIDATE_LOOKUP.loadCSV('/data/fl_candidates.csv');
-  }
-});
+      // Candidate names
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      if (countyData[`${contestType}_dem_name`]) demCandidate = countyData[`${contestType}_dem_name`];
+      if (countyData[`${contestType}_rep_name`]) repCandidate = countyData[`${contestType}_rep_name`];
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -2152,26 +2163,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
-</script>
-
-  <!-- External scripts for correct load order -->
-  <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="scripts/fl_candidate_lookup.js"></script>
-  <!-- Main map logic script: all your main JS goes here, after all libraries are loaded -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Example: minimal working Mapbox map
-  mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhbWFyZGF2aXMiLCJhIjoiY21kcW8yeDB2MDhvbTJzb29qeGp1aDZmZCJ9.Zw_i6U-dL7_bEKRHTUh7yg';
-      var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-81.5158, 27.6648], // Florida center
-        zoom: 6
-      });
-      // ...your main map logic goes here...
-    });
   </script>
 </body>
 </html>
