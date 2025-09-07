@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
       const countiesSource = map.getSource('counties');
@@ -13,9 +17,7 @@
       const bbox = turf.bbox(countyFeature);
       map.fitBounds(bbox, { padding: 40, maxZoom: 10 });
     }
-<!DOCTYPE html>
-<html>
-<head>
+  </script>
   <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
