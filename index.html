@@ -1058,6 +1058,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function showCountyDetails(countyName) {
       // --- NC Map Card-Style Sidebar ---
       const sidebar = document.getElementById('sidebar');
+      const detailsDiv = document.getElementById('county-details');
+      const contentEl = document.getElementById('county-info-content');
+      if (!contentEl || !detailsDiv) return;
       if (sidebar) {
         sidebar.classList.remove('minimized');
         const floatBtn = document.getElementById('sidebar-float-toggle');
@@ -1068,6 +1071,12 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const countyNameElement = document.getElementById('county-name');
       if (countyNameElement) countyNameElement.textContent = countyName + ' County';
       let sidebarContent = '';
+      // Guard: election results must exist
+      if (!currentElectionResults) {
+        contentEl.innerHTML = '<p>Select a contest to see county results.</p>';
+        detailsDiv.style.display = 'block';
+        return;
+      }
       // Normalize and find county data
       function normalizeCountyName(name) {
         return (name || '')
