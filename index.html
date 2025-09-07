@@ -18,6 +18,9 @@
       map.fitBounds(bbox, { padding: 40, maxZoom: 10 });
     }
   </script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <meta charset='utf-8'>
     <title>FL Political Realignment Map (2008-2024)</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
@@ -638,23 +641,25 @@ body {
   return r.text();
     }
 
-    function parseCSV(csvText) {
-      try {
-        const result = Papa.parse(csvText, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true
-        });
-        if (result.errors.length) {
-          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
-          console.error(result.errors);
-        }
-        return result.data;
-      } catch (err) {
-        setStatus('CSV Parse Exception: ' + err.message);
-        console.error(err);
-        return [];
-      }
+function parseCSV(csvText) {
+  try {
+    const result = Papa.parse(csvText, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true
+    });
+    if (result.errors.length) {
+      setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+      console.error(result.errors);
+    }
+    return result.data;
+  } catch (err) {
+    setStatus('CSV Parse Exception: ' + err.message);
+    console.error(err);
+    return [];
+  }
+}
+
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -676,7 +681,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
