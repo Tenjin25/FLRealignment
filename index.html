@@ -2161,9 +2161,17 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="scripts/fl_candidate_lookup.js"></script>
   <!-- Main map logic script: all your main JS goes here, after all libraries are loaded -->
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // ...existing code from your main map logic script (everything except zoomToCounty) goes here...
-  });
+    document.addEventListener('DOMContentLoaded', function() {
+      // Example: minimal working Mapbox map
+      mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [-81.5158, 27.6648], // Florida center
+        zoom: 6
+      });
+      // ...your main map logic goes here...
+    });
   </script>
 </body>
 </html>
