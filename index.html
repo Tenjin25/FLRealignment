@@ -621,7 +621,20 @@ body {
     let currentView = 'counties'; // 'counties', 'districts', 'state_house', 'state_senate'
     let currentElectionResults = null; // Current contest results for county details
 
-    function setStatus(text) { document.getElementById('status').textContent = text; console.log(text); }
+    function setStatus(text, timeout = 4000) {
+      const panel = document.getElementById('status-panel');
+      const msg = document.getElementById('status-message');
+      if (!panel || !msg) return;
+      msg.textContent = text;
+      panel.style.display = 'block';
+      if (window._statusTimeout) clearTimeout(window._statusTimeout);
+      if (timeout > 0) {
+        window._statusTimeout = setTimeout(() => {
+          panel.style.display = 'none';
+        }, timeout);
+      }
+      console.log(text);
+    }
 
     async function loadJSON(path) {
       const r = await fetch(path);
@@ -1025,27 +1038,29 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const sidebarContent = document.querySelector('.sidebar-content');
-      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-      const mapElement = document.getElementById('map');
-      
-      if (sidebar.classList.contains('minimized')) {
-        // Expand sidebar
-        sidebar.classList.remove('minimized');
-        mapElement.classList.remove('sidebar-minimized');
-        sidebarContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize sidebar';
-      } else {
-        // Minimize sidebar
-        sidebar.classList.add('minimized');
-        mapElement.classList.add('sidebar-minimized');
-        sidebarContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand sidebar';
-      }
-    }
+  const sidebar = document.getElementById('sidebar');
+  const sidebarContent = document.querySelector('.sidebar-content');
+  const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+  const mapElement = document.getElementById('map');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    // Expand sidebar
+    sidebar.classList.remove('minimized');
+    mapElement.classList.remove('sidebar-minimized');
+    sidebarContent.style.display = 'block';
+    minimizeBtn.textContent = '−';
+    minimizeBtn.title = 'Minimize sidebar';
+    if (floatBtn) floatBtn.style.display = 'none';
+  } else {
+    // Minimize sidebar
+    sidebar.classList.add('minimized');
+    mapElement.classList.add('sidebar-minimized');
+    sidebarContent.style.display = 'none';
+    minimizeBtn.textContent = '+';
+    minimizeBtn.title = 'Expand sidebar';
+    if (floatBtn) floatBtn.style.display = 'flex';
+  }
+}
 
     function showCountyDetails(countyName) {
       const detailsDiv = document.getElementById('county-details');
@@ -1097,24 +1112,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Calculate percentages
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
-      const marginPct = Math.abs(demPct - repPct);
-      const winner = repPct > demPct ? 'Republican' : 'Democratic';
+      const margin = demPct - repPct; // Ballotpedia style: signed margin
+      const winner = margin > 0 ? 'Democratic' : (margin < 0 ? 'Republican' : 'Tie');
+      const absMargin = Math.abs(margin);
 
       // Determine competitiveness category
       let competitiveness;
-      if (marginPct >= 40) {
+      if (absMargin >= 40) {
         competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
-      } else if (marginPct >= 30) {
+      } else if (absMargin >= 30) {
         competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
-      } else if (marginPct >= 20) {
+      } else if (absMargin >= 20) {
         competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
-      } else if (marginPct >= 10) {
+      } else if (absMargin >= 10) {
         competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
-      } else if (marginPct >= 5.5) {
+      } else if (absMargin >= 5.5) {
         competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
-      } else if (marginPct >= 1) {
+      } else if (absMargin >= 1) {
         competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
-      } else if (marginPct >= 0.5) {
+      } else if (absMargin >= 0.5) {
         competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
       } else {
         competitiveness = `Tossup (${winner} win)`;
@@ -1139,29 +1155,58 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
         else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
-      
-      // Generate detailed results HTML
+
+      // NC map style: D+ or R+ margin (e.g., D+12.34% or R+5.67%)
+      let marginText = '';
+      if (margin > 0) {
+        marginText = `D+${Math.abs(margin).toFixed(2)}%`;
+      } else if (margin < 0) {
+        marginText = `R+${Math.abs(margin).toFixed(2)}%`;
+      } else {
+        marginText = '0.00% Tie';
+      }
+
+      // Calculate raw vote margin
+      const voteMargin = Math.abs(demVotes - repVotes);
+      // Winner display
+      let winnerName = '';
+      let winnerColor = '';
+      if (margin > 0) {
+        winnerName = 'Democratic';
+        winnerColor = '#1e40af';
+      } else if (margin < 0) {
+        winnerName = 'Republican';
+        winnerColor = '#dc2626';
+      } else {
+        winnerName = 'Tie';
+        winnerColor = '#64748b';
+      }
+
+      // Card-style layout
       contentEl.innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <h5>🎯 Competitiveness</h5>
-          <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
-        </div>
-        <div style="margin-bottom: 16px;">
-          <h5>📈 Margin</h5>
-          <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
-            ${winner} +${marginPct.toFixed(1)}%
-          </p>
-        </div>
-        <div style="margin-bottom: 16px;">
-          <h5>🗳️ Vote Breakdown</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-          <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
-            Total Votes: ${totalVotes.toLocaleString()}
-          </p>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 20px 18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:10px;">
+          <h3 style="margin:0 0 10px 0;font-size:1.25rem;color:#222;font-weight:600;">${countyName} County</h3>
+          <div style="font-size:15px;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">📊</span> <b>Election Results</b></div>
+          <div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+          <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🏆</span> <b>Winner</b></div>
+          <div style="font-size:18px;font-weight:700;color:${winnerColor};margin-bottom:10px;">${winnerName}${winnerName !== 'Tie' ? '' : ''}</div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+          <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">📈</span> <b>Margin</b></div>
+          <div style="font-size:20px;font-weight:700;color:${margin > 0 ? '#1e40af' : margin < 0 ? '#dc2626' : '#64748b'};margin-bottom:2px;">${marginText}</div>
+          <div style="font-size:13px;color:#888;margin-bottom:10px;">(${voteMargin.toLocaleString()} vote margin)</div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+          <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🗳️</span> <b>Vote Breakdown</b></div>
+          <div style="margin-bottom:10px;">
+            <span style="color:#1e40af;font-weight:700;">Democratic:</span> ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})<br>
+            <span style="color:#dc2626;font-weight:700;">Republican:</span> ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})
+          </div>
+          <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
+          <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🎯</span> <b>Competitiveness</b></div>
+          <div style="font-size:16px;font-weight:700;color:${compColor};">${competitiveness}</div>
         </div>
       `;
-      
+
       detailsDiv.style.display = 'block';
     }
 
@@ -1178,6 +1223,24 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           type: 'line', 
           source: 'counties', 
           paint: { 'line-color': '#333', 'line-width': 1 } 
+        });
+        // Add county label layer
+        map.addLayer({
+          id: 'county-label',
+          type: 'symbol',
+          source: 'counties',
+          layout: {
+            'text-field': ['coalesce', ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME'], ['get', 'name']],
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-size': 13,
+            'text-anchor': 'center',
+            'text-offset': [0, 0]
+          },
+          paint: {
+            'text-color': '#374151',
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.2
+          }
         });
         // Add click handler for counties: show sidebar with details
         map.on('click', 'county-fill', (e) => {
@@ -2076,6 +2139,27 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
+// Floating sidebar expand button logic
+document.addEventListener('DOMContentLoaded', function() {
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (floatBtn) {
+    floatBtn.onclick = function() {
+      toggleSidebar();
+    };
+  }
+  // Hide float button if sidebar is open on load
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar && !sidebar.classList.contains('minimized')) {
+    floatBtn.style.display = 'none';
+  }
+  // Status panel close button
+  const statusExit = document.getElementById('status-exit');
+  if (statusExit) {
+    statusExit.onclick = function() {
+      document.getElementById('status-panel').style.display = 'none';
+    };
+  }
+});
   </script>
 </body>
 </html>
