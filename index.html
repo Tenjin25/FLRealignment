@@ -625,14 +625,7 @@ body {
       const panel = document.getElementById('status-panel');
       const msg = document.getElementById('status-message');
       if (!panel || !msg) return;
-      msg.textContent = text;
-      panel.style.display = 'block';
-      if (window._statusTimeout) clearTimeout(window._statusTimeout);
-      if (timeout > 0) {
-        window._statusTimeout = setTimeout(() => {
-          panel.style.display = 'none';
-        }, timeout);
-      }
+      // Only log status messages to the console; do not show the floating status panel
       console.log(text);
     }
 
@@ -1168,29 +1161,47 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
       // Calculate raw vote margin
       const voteMargin = Math.abs(demVotes - repVotes);
-      // Winner display
-      let winnerName = '';
-      let winnerColor = '';
-      if (margin > 0) {
-        winnerName = 'Democratic';
-        winnerColor = '#1e40af';
-      } else if (margin < 0) {
-        winnerName = 'Republican';
-        winnerColor = '#dc2626';
-      } else {
-        winnerName = 'Tie';
-        winnerColor = '#64748b';
+
+      // Candidate names (if available)
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      // Try to get candidate names from the data (if present)
+      const contestSelectElem = document.getElementById('contestSelect');
+      let contestKeyVal = contestSelectElem && contestSelectElem.value;
+      if (contestKeyVal && currentElectionResults) {
+        const lastUnderscoreIndex = contestKeyVal.lastIndexOf('_');
+        const contestType = contestKeyVal.substring(0, lastUnderscoreIndex);
+        const year = contestKeyVal.substring(lastUnderscoreIndex + 1);
+        if (countyData[`${contestType}_dem_name`]) demCandidate = countyData[`${contestType}_dem_name`];
+        if (countyData[`${contestType}_rep_name`]) repCandidate = countyData[`${contestType}_rep_name`];
       }
 
-      // Card-style layout
+      // Precincts (if available)
+      let precincts = '';
+      if (countyData.precincts || countyData.Precincts || countyData.PRECINCTS) {
+        precincts = countyData.precincts || countyData.Precincts || countyData.PRECINCTS;
+      }
+
+      // Winner display (with candidate name and party)
+      let winnerDisplay = '';
+      if (margin > 0) {
+        winnerDisplay = `<span style="color:#1e40af;font-weight:700;">${demCandidate} (D)</span>`;
+      } else if (margin < 0) {
+        winnerDisplay = `<span style="color:#dc2626;font-weight:700;">${repCandidate} (R)</span>`;
+      } else {
+        winnerDisplay = '<span style="color:#64748b;font-weight:700;">Tie</span>';
+      }
+
+      // Card-style layout with sections and icons
       contentEl.innerHTML = `
-        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 20px 18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:10px;">
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:22px 20px 18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:10px;max-width:420px;">
           <h3 style="margin:0 0 10px 0;font-size:1.25rem;color:#222;font-weight:600;">${countyName} County</h3>
           <div style="font-size:15px;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">📊</span> <b>Election Results</b></div>
+          ${precincts ? `<div style=\"font-size:14px;\"><b>Precincts:</b> ${precincts}</div>` : ''}
           <div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
           <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🏆</span> <b>Winner</b></div>
-          <div style="font-size:18px;font-weight:700;color:${winnerColor};margin-bottom:10px;">${winnerName}${winnerName !== 'Tie' ? '' : ''}</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:10px;">${winnerDisplay}</div>
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
           <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">📈</span> <b>Margin</b></div>
           <div style="font-size:20px;font-weight:700;color:${margin > 0 ? '#1e40af' : margin < 0 ? '#dc2626' : '#64748b'};margin-bottom:2px;">${marginText}</div>
@@ -1198,8 +1209,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
           <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🗳️</span> <b>Vote Breakdown</b></div>
           <div style="margin-bottom:10px;">
-            <span style="color:#1e40af;font-weight:700;">Democratic:</span> ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})<br>
-            <span style="color:#dc2626;font-weight:700;">Republican:</span> ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})
+            <span style="color:#1e40af;font-weight:700;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})<br>
+            <span style="color:#dc2626;font-weight:700;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})
           </div>
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0;">
           <div style="font-size:15px;color:#555;margin-bottom:6px;display:flex;align-items:center;gap:7px;"><span style="font-size:1.1em;">🎯</span> <b>Competitiveness</b></div>
@@ -1216,7 +1227,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           id: 'county-fill', 
           type: 'fill', 
           source: 'counties', 
-          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.6 } 
+          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.38 } 
         });
         map.addLayer({ 
           id: 'county-stroke', 
