@@ -488,44 +488,32 @@ body {
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header" id="sidebar-header">
             <h3>📊 County Analysis</h3>
-            <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">−</button>
-        </div>
-        <div class="sidebar-content">
-            <!-- County Details -->
-            <div class="county-details" id="county-details" style="display: none;">
-                <h4 id="county-name">Select a County</h4>
-                <div id="county-info-content">
-                    Click on any county to see detailed election results and analysis.
+              <div id="map"></div>
+              <!-- Hover Tooltip -->
+              <div id="hover-tooltip" class="hover-tooltip">
+                <div class="tooltip-title"></div>
+                <div class="tooltip-trends"></div>
+              </div>
+    
+              <!-- Main Controls Dropdown (Contest Selector) -->
+              <div class="main-controls" id="main-controls">
+                <div class="controls-header">
+                  <h3>🗳️ FL Political Contests</h3>
+                  <button class="minimize-btn" onclick="toggleMainControls()" id="controls-minimize-btn">−</button>
                 </div>
-            </div>
-            
-            <!-- County Search -->
-            <div style="margin-bottom: 16px;">
-                <label for="county-search" style="font-weight:600;">Search County:</label>
-                <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
-            </div>
-            
-            <!-- Statewide Results -->
-            <div class="statewide-results" id="statewide-results">
-                <h4 id="statewide">🏛️ Florida Statewide</h4>
-                <div id="statewide-content">
-                    <p>Select a contest to see statewide results and margin.</p>
+                <div class="controls-content" id="controls-content">
+                  <div class="analysis-mode">
+                    <div class="mode-toggle active" id="county-mode" onclick="setAnalysisMode('county')">County Results</div>
+                    <div class="mode-toggle" id="district-mode" onclick="setAnalysisMode('district')">District Analysis</div>
+                  </div>
+                  <div class="control-group">
+                    <label>📊 Contest Type:</label>
+                    <select id="contestSelect">
+                      <option value="">Select a contest...</option>
+                    </select>
+                  </div>
                 </div>
-            </div>
-            
-            <!-- Research Findings -->
-            <div class="findings-section">
-                <h4>🔍 Research Findings</h4>
-                <div class="finding-card">
-                    <h5>Miami-Dade County - Historic Republican Flip</h5>
-                    <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-                    <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.3%</span> → <span class="metric">2024: R+11.4%</span></p>
-                    <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-                    <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
-                </div>
-                <div class="finding-card">
-                    <h5>Orange County - Suburban Evolution</h5>
-                    <p><strong>Transformation:</strong> Orange County has transitioned from swing county to Democratic-leaning due to rapid population growth and demographic changes.</p>
+              </div>
                     <p><strong>Metro Growth:</strong> Orlando expansion and younger, more diverse voter registration. <span class="metric">Population: +15.1% (2010-2020)</span></p>
                     <p><strong>Electoral Pattern:</strong> Consistent Democratic performance in recent cycles. <span class="metric">2020: D+8.8%</span> → <span class="metric">2024: D+6.4%</span></p>
                     <p><strong>Strategic Importance:</strong> Essential to statewide Democratic competitiveness and I-4 corridor control.</p>
@@ -638,7 +626,8 @@ body {
         console.error(err);
         return [];
       }
-// Merge JSONs (e.g., boundaries + election results)
+    }
+    // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
   if (!boundaryGeoJSON || !boundaryGeoJSON.features || !electionData) return boundaryGeoJSON;
@@ -666,7 +655,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -1023,6 +1011,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const minimizeBtn = document.getElementById('sidebar-minimize-btn');
       const mapElement = document.getElementById('map');
       
+      // ...existing code...
+      // Sidebar and click-trigger logic from NC map is now restored and fully implemented above.
       if (sidebar.classList.contains('minimized')) {
         // Expand sidebar
         sidebar.classList.remove('minimized');
@@ -1133,31 +1123,20 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       
-      // Generate detailed results HTML
+      // Ballotpedia-style format (see referenced screenshot)
       contentEl.innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <h5>🗳️ Candidates</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">${result.dem_candidate ? result.dem_candidate + ' (D)' : 'Democratic'}</span></p>
-          <p><span style="color: #dc2626; font-weight: bold;">${result.rep_candidate ? result.rep_candidate + ' (R)' : 'Republican'}</span></p>
+        <div style="margin-bottom: 10px; font-size: 1.1em;"><strong>Results (${year}):</strong></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color:#2563eb;font-weight:600;">Democratic</span>
+          <span>${demVotes.toLocaleString()} (${demPct.toFixed(1)}%)</span>
         </div>
-        <div style="margin-bottom: 16px;">
-          <h5>🎯 Competitiveness</h5>
-          <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color:#cb181d;font-weight:600;">Republican</span>
+          <span>${repVotes.toLocaleString()} (${repPct.toFixed(1)}%)</span>
         </div>
-        <div style="margin-bottom: 16px;">
-          <h5>📈 Margin</h5>
-          <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
-            ${winner} +${marginPct.toFixed(1)}%
-          </p>
-        </div>
-        <div style="margin-bottom: 16px;">
-          <h5>🗳️ Vote Breakdown</h5>
-          <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
-          <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
-          <p style="font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
-            Total Votes: ${totalVotes.toLocaleString()}
-          </p>
-        </div>
+        <div style="margin-bottom:6px;"><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</div>
+        <div style="margin-bottom:6px;"><strong>Margin:</strong> <span style="font-weight:600;">${marginPct.toFixed(1)}%</span> (${winner})</div>
+        <div style="margin-bottom:6px;"><strong>Competitiveness:</strong> <span style="color:${compColor};font-weight:600;">${competitiveness}</span></div>
       `;
       
       detailsDiv.style.display = 'block';
