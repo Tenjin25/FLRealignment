@@ -841,30 +841,17 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function updateStatewideResults(contestType, year, demVotes, repVotes, totalVotes) {
       const statewideContent = document.getElementById('statewide-content');
-      
       if (totalVotes === 0) {
         statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
         return;
       }
-      
       const demPct = (demVotes / totalVotes) * 100;
       const repPct = (repVotes / totalVotes) * 100;
       const marginPct = Math.abs(demPct - repPct);
       const winner = demPct > repPct ? 'Democratic' : 'Republican';
-      const loser = demPct > repPct ? 'Republican' : 'Democratic';
-      
-      // Get candidate names based on contest type and year
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      
-      if (contestType === 'president') {
-        if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
-        else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
-        else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
-        else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
-        else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
-      }
-      
+      // Use FL_CANDIDATE_LOOKUP for candidate names (statewide, so county code is 'ALL')
+      let demCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, 'ALL', 'DEM') || 'Democratic';
+      let repCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, 'ALL', 'REP') || 'Republican';
       statewideContent.innerHTML = `
         <div class="statewide-margin">
           <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'};">
@@ -1125,11 +1112,15 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
-      // Candidate names
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      if (countyData[`${contestType}_dem_name`]) demCandidate = countyData[`${contestType}_dem_name`];
-      if (countyData[`${contestType}_rep_name`]) repCandidate = countyData[`${contestType}_rep_name`];
+  // Candidate names
+  let demCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, countyName, 'DEM') || 'Democratic';
+  let repCandidate = FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.getCandidate(contestType, year, countyName, 'REP') || 'Republican';
+// --- Load candidate CSV at startup ---
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.FL_CANDIDATE_LOOKUP && FL_CANDIDATE_LOOKUP.loadCSV) {
+    FL_CANDIDATE_LOOKUP.loadCSV('/data/fl_candidates.csv');
+  }
+});
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
