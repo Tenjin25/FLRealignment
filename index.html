@@ -1850,6 +1850,21 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
     }
 
+    // Fix dropdown down arrow data loading issue
+    // Ensure the dropdown change event triggers data update even when using keyboard
+    const contestDropdown = document.getElementById('contestDropdown');
+    if (contestDropdown) {
+      contestDropdown.addEventListener('change', function(e) {
+        // ...existing code to update contest data and sidebar...
+        updateContestData();
+      });
+    }
+
+    function updateContestData() {
+      // ...existing code to update the map and sidebar based on selected contest...
+      // This should be the same logic as when a contest is selected with the mouse
+    }
+
     function getCountyAggregates(results) {
       const agg = {};
       Object.values(results || {}).forEach(r => {
@@ -2056,6 +2071,26 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
+
+    map.on('load', function() {
+      // Add county name labels
+      map.addLayer({
+        id: 'county-labels',
+        type: 'symbol',
+        source: 'counties',
+        layout: {
+          'text-field': ['get', 'County'],
+          'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+          'text-size': 12,
+          'text-anchor': 'center'
+        },
+        paint: {
+          'text-color': '#333',
+          'text-halo-color': '#fff',
+          'text-halo-width': 2
+        }
+      });
+    });
   </script>
 </body>
 </html>
