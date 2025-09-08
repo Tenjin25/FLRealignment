@@ -912,11 +912,7 @@ Papa.parse('data/fl_candidates.csv', {
         else if (year == 2014) { demCandidate = 'Crist'; repCandidate = 'Scott'; }
         else if (year == 2010) { demCandidate = 'Sink'; repCandidate = 'Scott'; }
       }
-      // Example: override for a specific county
-      if (contestType === 'president' && year == 2008 && countyName === 'Miami-Dade') {
-        demCandidate = 'Barack Obama';
-        repCandidate = 'John McCain';
-      }
+  // (Removed county-specific override; this logic belongs in county details, not statewide)
       
       statewideContent.innerHTML = `
         <div class="statewide-margin">
