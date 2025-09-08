@@ -621,6 +621,92 @@ body {
     let currentView = 'counties'; // 'counties', 'districts', 'state_house', 'state_senate'
     let currentElectionResults = null; // Current contest results for county details
 
+    // --- MANUAL CANDIDATE NAME OVERRIDE ---
+    // Map original candidate names to display names
+  const candidateNameOverride = {
+  // Example: 'BIDEN': 'Joseph R. Biden',
+  // 'TRUMP': 'Donald J. Trump',
+  'Obama': 'Barack Obama (D)',
+  'McCain': 'John McCain (R)',
+  // 2022 Florida Governor & Lt. Governor
+  'Ron DeSantis': 'Ron DeSantis (R)',
+  'Jeanette Nunez': 'Jeanette Nuñez (R)',
+  'Charlie Crist': 'Charlie Crist (D)',
+  'Karla Hernandez-Mats': 'Karla Hernández-Mats (D)',
+  // 2022 Attorney General
+  'Ashley Moody': 'Ashley Moody (R)',
+  'Aramis Ayala': 'Aramis Ayala (D)',
+  // 2022 Chief Financial Officer
+  'Jimmy Patronis': 'Jimmy Patronis (R)',
+  'Adam Hattersley': 'Adam Hattersley (D)',
+  // 2022 Commissioner of Agriculture
+  'Wilton Simpson': 'Wilton Simpson (R)',
+  'Naomi Blemur': 'Naomi Blemur (D)',
+  // 2018 Florida Governor
+  'Ron DeSantis': 'Ron DeSantis (R)',
+  'Andrew Gillum': 'Andrew Gillum (D)',
+  // 2018 Attorney General
+  'Ashley Moody': 'Ashley Moody (R)',
+  'Sean Shaw': 'Sean Shaw (D)',
+  // 2018 Chief Financial Officer
+  'Jimmy Patronis': 'Jimmy Patronis (R)',
+  'Jeremy Ring': 'Jeremy Ring (D)',
+  // 2018 Commissioner of Agriculture
+  'Matt Caldwell': 'Matt Caldwell (R)',
+  'Nicole Fried': 'Nikki Fried (D)',
+  // Add more as needed
+  // 2018 US Senate
+  'Bill Nelson': 'Bill Nelson (D)',
+  'Rick Scott': 'Rick Scott (R)',
+  // 2022 US Senate
+  'Val Demings': 'Val Demings (D)',
+  'Marco Rubio': 'Marco Rubio (R)',
+  // 2024 US Senate
+  'Debbie Mucarsel-Powell': 'Debbie Mucarsel-Powell (D)',
+  // Rick Scott already present above for 2018, but ensure 2024 context
+  'Rick Scott': 'Rick Scott (R)',
+  // 2016 US Senate
+  'Patrick Murphy': 'Patrick Murphy (D)',
+  'Marco Rubio': 'Marco Rubio (R)',
+  // 2012 US Senate
+  'Bill Nelson': 'Bill Nelson (D)',
+  'Connie Mack': 'Connie Mack IV (R)',
+  // 2010 US Senate
+  'Kendrick Meek': 'Kendrick Meek (D)',
+  // Marco Rubio already present above for 2016, 2022, 2010
+    // 2010 Statewide
+    // Governor
+    'Sink Smith': 'Alex Sink/Rod Smith (D, 2010 Governor)',
+    'Scott Carroll': 'Rick Scott/Jennifer Carroll (R, 2010 Governor)',
+    // Attorney General
+    'Dan Gelber': 'Dan Gelber (D, 2010 Attorney General)',
+    'Pam Bondi': 'Pam Bondi (R, 2010 Attorney General)',
+    // Chief Financial Officer
+    'Loranne Ausley': 'Loranne Ausley (D, 2010 CFO)',
+    'Jeff Atwater': 'Jeff Atwater (R, 2010 CFO)',
+    // Agriculture Commissioner
+    'Scott Maddox': 'Scott Maddox (D, 2010 Agriculture)',
+    'Adam Putnam': 'Adam Putnam (R, 2010 Agriculture)',
+
+    // 2014 Statewide
+    // Governor
+    'Charlie Crist': 'Charlie Crist (D, 2014 Governor)',
+    'Rick Scott': 'Rick Scott (R, 2014 Governor)',
+    // Attorney General
+    'George Sheldon': 'George Sheldon (D, 2014 Attorney General)',
+    'Pam Bondi': 'Pam Bondi (R, 2014 Attorney General)',
+    // Chief Financial Officer
+    'William Rankin': 'William Rankin (D, 2014 CFO)',
+    'Jeff Atwater': 'Jeff Atwater (R, 2014 CFO)',
+    // Agriculture Commissioner
+    'Thaddeus Hamilton': 'Thaddeus Hamilton (D, 2014 Agriculture)',
+    'Adam Putnam': 'Adam Putnam (R, 2014 Agriculture)',
+    };
+
+    function overrideCandidateName(name) {
+      return candidateNameOverride[name] || name;
+    }
+
     function setStatus(text, timeout = 4000) {
       const panel = document.getElementById('status-panel');
       const msg = document.getElementById('status-message');
@@ -857,11 +943,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       let repCandidate = 'Republican';
       
       if (contestType === 'president') {
-        if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
-        else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
-        else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
-        else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
-        else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+        if (year == 2024) { demCandidate = overrideCandidateName('Harris'); repCandidate = overrideCandidateName('Trump'); }
+        else if (year == 2020) { demCandidate = overrideCandidateName('Biden'); repCandidate = overrideCandidateName('Trump'); }
+        else if (year == 2016) { demCandidate = overrideCandidateName('Clinton'); repCandidate = overrideCandidateName('Trump'); }
+        else if (year == 2012) { demCandidate = overrideCandidateName('Obama'); repCandidate = overrideCandidateName('Romney'); }
+        else if (year == 2008) { demCandidate = overrideCandidateName('Obama'); repCandidate = overrideCandidateName('McCain'); }
       }
       
       statewideContent.innerHTML = `
@@ -1125,10 +1211,10 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
       // Candidate names
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      if (countyData[`${contestType}_dem_name`]) demCandidate = countyData[`${contestType}_dem_name`];
-      if (countyData[`${contestType}_rep_name`]) repCandidate = countyData[`${contestType}_rep_name`];
+  let demCandidate = 'Democratic';
+  let repCandidate = 'Republican';
+  if (countyData[`${contestType}_dem_name`]) demCandidate = overrideCandidateName(countyData[`${contestType}_dem_name`]);
+  if (countyData[`${contestType}_rep_name`]) repCandidate = overrideCandidateName(countyData[`${contestType}_rep_name`]);
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -1539,11 +1625,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
               
               // Get candidate names for recent years
               let candidateInfo = '';
-              if (year === 2024) candidateInfo = margin > 0 ? 'Harris' : 'Trump';
-              else if (year === 2020) candidateInfo = margin > 0 ? 'Biden' : 'Trump';
-              else if (year === 2016) candidateInfo = margin > 0 ? 'Clinton' : 'Trump';
-              else if (year === 2012) candidateInfo = margin > 0 ? 'Obama' : 'Romney';
-              else if (year === 2008) candidateInfo = margin > 0 ? 'Obama' : 'McCain';
+              if (year === 2024) candidateInfo = margin > 0 ? overrideCandidateName('Harris') : overrideCandidateName('Trump');
+              else if (year === 2020) candidateInfo = margin > 0 ? overrideCandidateName('Biden') : overrideCandidateName('Trump');
+              else if (year === 2016) candidateInfo = margin > 0 ? overrideCandidateName('Clinton') : overrideCandidateName('Trump');
+              else if (year === 2012) candidateInfo = margin > 0 ? overrideCandidateName('Obama') : overrideCandidateName('Romney');
+              else if (year === 2008) candidateInfo = margin > 0 ? overrideCandidateName('Obama') : overrideCandidateName('McCain');
               
               trends.push({
                 year: year,
