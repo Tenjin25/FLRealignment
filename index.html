@@ -832,12 +832,12 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     // --- Candidate Lookup from CSV ---
 let FL_CANDIDATE_LOOKUP = {};
 function buildCandidateLookupFromCSV(csvRows) {
-  // Build: FL_CANDIDATE_LOOKUP[contest_code][year][county_code][party] = candidate_name
+  // Build: FL_CANDIDATE_LOOKUP[contest_code][year][county][party] = candidate_name
   FL_CANDIDATE_LOOKUP = {};
   csvRows.forEach(row => {
     const contest = (row.contest_code || '').toUpperCase();
     const year = row.year;
-    const county = (row.county_code || '').toUpperCase();
+    const county = (row.county || '').toUpperCase(); // changed from county_code to county
     const party = (row.party || '').toUpperCase();
     const name = row.candidate_name;
     if (!contest || !year || !county || !party || !name) return;
@@ -847,17 +847,19 @@ function buildCandidateLookupFromCSV(csvRows) {
     FL_CANDIDATE_LOOKUP[contest][year][county][party] = name;
   });
 }
-function getCandidateFromLookup(contest, year, county, party) {
+function getCandidateFromLookup(contest, year, countyName, party) {
   contest = (contest || '').toUpperCase();
-  county = (county || '').toUpperCase();
   party = (party || '').toUpperCase();
+  // Convert full county name to code
+  let code = FL_COUNTY_NAME_TO_CODE[(countyName || '').toUpperCase()];
+  if (!code) return null;
   if (
     FL_CANDIDATE_LOOKUP[contest] &&
     FL_CANDIDATE_LOOKUP[contest][year] &&
-    FL_CANDIDATE_LOOKUP[contest][year][county] &&
-    FL_CANDIDATE_LOOKUP[contest][year][county][party]
+    FL_CANDIDATE_LOOKUP[contest][year][code] &&
+    FL_CANDIDATE_LOOKUP[contest][year][code][party]
   ) {
-    return FL_CANDIDATE_LOOKUP[contest][year][county][party];
+    return FL_CANDIDATE_LOOKUP[contest][year][code][party];
   }
   return null;
 }
@@ -968,6 +970,8 @@ Papa.parse('data/fl_candidates.csv', {
       // Add appropriate layers
       if (view === 'counties') {
         addCountyLayers();
+        // Add click handler for county polygons
+  // (Removed redundant handler; see addCountyLayers for unified logic)
       } else if (view === 'districts') {
         addDistrictLayers();
       } else if (view === 'state_house') {
@@ -1265,10 +1269,10 @@ Papa.parse('data/fl_candidates.csv', {
         if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
         else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
         else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
-        else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
-        else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
-        else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
-        else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
+        else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+        else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+        else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+        else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       sidebarContent += `<div class="competitiveness-section">`;
       sidebarContent += '<h5>🎯 Competitiveness</h5>';
@@ -1319,8 +1323,11 @@ Papa.parse('data/fl_candidates.csv', {
         // Add click handler for counties: show sidebar with details
         map.on('click', 'county-fill', (e) => {
           if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.County;
+            // Try to get county name from properties
+            const props = e.features[0].properties;
+            const countyName = props.County || props.COUNTYNAME || props.NAME;
             if (countyName) {
+              window.currentSelectedCounty = countyName;
               showCountyDetails(countyName);
               lastSelectedCounty = countyName;
               // Expand sidebar if minimized
@@ -2294,6 +2301,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
-  </script>
+    </script>
 </body>
 </html>
