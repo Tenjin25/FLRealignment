@@ -759,22 +759,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function populateContestSelectFromCSV(csvData) {
       const sel = document.getElementById('contestSelect');
-      const years = [...new Set(csvData.map(row => row.year))].sort();
+      sel.innerHTML = '';
       // Focus on non-gerrymandered statewide contests only (Cabinet offices + federal)
       const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
-      
+      // Preprocess: build a map of year -> contestType -> hasData
+      const contestMap = {};
+      csvData.forEach(row => {
+        // Normalize county names for St Lucie and St Johns
+        if (row.county === 'St. Lucie') row.county = 'St Lucie';
+        if (row.county === 'St. Johns') row.county = 'St Johns';
+        const year = row.year;
+        contestTypes.forEach(contestType => {
+          if (contestType === 'governor' && year == 2020) return;
+          if (!contestMap[year]) contestMap[year] = {};
+          if (!contestMap[year][contestType]) contestMap[year][contestType] = false;
+          if (row[`${contestType}_total`] > 0) {
+            contestMap[year][contestType] = true;
+          }
+        });
+      });
+      // Now build dropdown from contestMap
+      const years = Object.keys(contestMap).sort();
       years.forEach(year => {
         contestTypes.forEach(contestType => {
-          // Exclude Governor 2020 from dropdown
-          if (contestType === 'governor' && year == 2020) return;
-          // Check if this contest type has data for this year
-          const hasData = csvData.some(row => {
-            // Normalize county names for St Lucie and St Johns
-            if (row.county === 'St. Lucie') row.county = 'St Lucie';
-            if (row.county === 'St. Johns') row.county = 'St Johns';
-            return row.year == year && (row[`${contestType}_total`] > 0);
-          });
-          if (hasData) {
+          if (contestMap[year][contestType]) {
             const opt = document.createElement('option');
             opt.value = `${contestType}_${year}`;
             opt.textContent = `${formatContestName(contestType, year)} (${year})`;
