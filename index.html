@@ -658,6 +658,7 @@ body {
         console.error(err);
         return [];
       }
+    }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -679,7 +680,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -829,6 +829,47 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       sel.onchange = () => { applyContest(sel.value); };
     }
 
+    // --- Candidate Lookup from CSV ---
+let FL_CANDIDATE_LOOKUP = {};
+function buildCandidateLookupFromCSV(csvRows) {
+  // Build: FL_CANDIDATE_LOOKUP[contest_code][year][county_code][party] = candidate_name
+  FL_CANDIDATE_LOOKUP = {};
+  csvRows.forEach(row => {
+    const contest = (row.contest_code || '').toUpperCase();
+    const year = row.year;
+    const county = (row.county_code || '').toUpperCase();
+    const party = (row.party || '').toUpperCase();
+    const name = row.candidate_name;
+    if (!contest || !year || !county || !party || !name) return;
+    if (!FL_CANDIDATE_LOOKUP[contest]) FL_CANDIDATE_LOOKUP[contest] = {};
+    if (!FL_CANDIDATE_LOOKUP[contest][year]) FL_CANDIDATE_LOOKUP[contest][year] = {};
+    if (!FL_CANDIDATE_LOOKUP[contest][year][county]) FL_CANDIDATE_LOOKUP[contest][year][county] = {};
+    FL_CANDIDATE_LOOKUP[contest][year][county][party] = name;
+  });
+}
+function getCandidateFromLookup(contest, year, county, party) {
+  contest = (contest || '').toUpperCase();
+  county = (county || '').toUpperCase();
+  party = (party || '').toUpperCase();
+  if (
+    FL_CANDIDATE_LOOKUP[contest] &&
+    FL_CANDIDATE_LOOKUP[contest][year] &&
+    FL_CANDIDATE_LOOKUP[contest][year][county] &&
+    FL_CANDIDATE_LOOKUP[contest][year][county][party]
+  ) {
+    return FL_CANDIDATE_LOOKUP[contest][year][county][party];
+  }
+  return null;
+}
+// Load CSV and build lookup on page load
+Papa.parse('data/fl_candidates.csv', {
+  header: true,
+  download: true,
+  complete: function(results) {
+    buildCandidateLookupFromCSV(results.data);
+  }
+});
+
     function setAnalysisMode(mode) {
       // Update button states
       document.getElementById('county-mode').classList.toggle('active', mode === 'county');
@@ -855,13 +896,24 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Get candidate names based on contest type and year
       let demCandidate = 'Democratic';
       let repCandidate = 'Republican';
-      
+      // Manual candidate name overrides
       if (contestType === 'president') {
         if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
         else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
         else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
         else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
         else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+      }
+      if (contestType === 'governor') {
+        if (year == 2022) { demCandidate = 'Crist'; repCandidate = 'DeSantis'; }
+        else if (year == 2018) { demCandidate = 'Gillum'; repCandidate = 'DeSantis'; }
+        else if (year == 2014) { demCandidate = 'Crist'; repCandidate = 'Scott'; }
+        else if (year == 2010) { demCandidate = 'Sink'; repCandidate = 'Scott'; }
+      }
+      // Example: override for a specific county
+      if (contestType === 'president' && year == 2008 && countyName === 'Miami-Dade') {
+        demCandidate = 'Barack Obama';
+        repCandidate = 'John McCain';
       }
       
       statewideContent.innerHTML = `
@@ -1127,8 +1179,27 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Candidate names
       let demCandidate = 'Democratic';
       let repCandidate = 'Republican';
-      if (countyData[`${contestType}_dem_name`]) demCandidate = countyData[`${contestType}_dem_name`];
-      if (countyData[`${contestType}_rep_name`]) repCandidate = countyData[`${contestType}_rep_name`];
+      // Manual candidate name overrides
+      if (contestType === 'president') {
+        if (year == 2024) { demCandidate = 'Harris'; repCandidate = 'Trump'; }
+        else if (year == 2020) { demCandidate = 'Biden'; repCandidate = 'Trump'; }
+        else if (year == 2016) { demCandidate = 'Clinton'; repCandidate = 'Trump'; }
+        else if (year == 2012) { demCandidate = 'Obama'; repCandidate = 'Romney'; }
+        else if (year == 2008) { demCandidate = 'Obama'; repCandidate = 'McCain'; }
+      }
+      if (contestType === 'governor') {
+        if (year == 2022) { demCandidate = 'Crist'; repCandidate = 'DeSantis'; }
+        else if (year == 2018) { demCandidate = 'Gillum'; repCandidate = 'DeSantis'; }
+        else if (year == 2014) { demCandidate = 'Crist'; repCandidate = 'Scott'; }
+        else if (year == 2010) { demCandidate = 'Sink'; repCandidate = 'Scott'; }
+      }
+      // Example: override for a specific county
+      if (contestType === 'president' && year == 2008 && countyName === 'Miami-Dade') {
+        demCandidate = 'Barack Obama';
+        repCandidate = 'John McCain';
+      }
+      demCandidate = getCandidateFromLookup(contestType, year, countyName, 'DEM') || demCandidate;
+      repCandidate = getCandidateFromLookup(contestType, year, countyName, 'REP') || repCandidate;
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -1605,7 +1676,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
             return `<div style="color: #999; font-style: italic; margin: 6px 0; border-top: 1px solid #444; padding-top: 6px;">${t.display}</div>`;
           }
           
-          const color = t.margin > 0 ? '#3b82f6' : '#ef4444'; // Blue for Dem, Red for Rep
+          const color = t.margin >  0 ? '#3b82f6' : '#ef4444'; // Blue for Dem, Red for Rep
           return `<div style="color: ${color};">${t.display}</div>`;
         }).join('');
       } else {
@@ -1758,18 +1829,78 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       
       if (contestValue && electionData) {
         const [contestType, year] = contestValue.split('_');
-        const expectedType = chamber === 'house' ? 'state_house' : 'state_senate';
-        
-        if (contestType === expectedType) {
-          // For state legislative districts, we need to aggregate county data by district
-          // This is complex without a county-to-district mapping, so show general message
-          electionInfo = `
-            <div style="margin-bottom: 16px;">
-              <h5>📊 ${year} ${chamber === 'house' ? 'State House' : 'State Senate'}</h5>
-              <p style="color: #666; font-style: italic;">District-level results require county-to-district mapping. 
-              Click to see general trends for this contest type.</p>
-            </div>
-          `;
+        if (contestType === 'us_house') {
+          const result = congressionalData.find(row => 
+            row.year == year && row.district == districtNum
+          );
+          
+          if (result && result.us_house_total > 0) {
+            const demVotes = result.us_house_dem || 0;
+            const repVotes = result.us_house_rep || 0;
+            const totalVotes = result.us_house_total || 0;
+            
+            const demPct = totalVotes > 0 ? (demVotes / totalVotes) * 100 : 0;
+            const repPct = totalVotes > 0 ? (repVotes / totalVotes) * 100 : 0;
+            const marginPct = Math.abs(demPct - repPct);
+            const winner = demPct > repPct ? 'Democratic' : 'Republican';
+            
+            // Determine competitiveness
+            let competitiveness;
+            if (marginPct >= 40) {
+              competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
+            } else if (marginPct >= 30) {
+              competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
+            } else if (marginPct >= 20) {
+              competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
+            } else if (marginPct >= 10) {
+              competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
+            } else if (marginPct >= 5.5) {
+              competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
+            } else if (marginPct >= 1) {
+              competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
+            } else if (marginPct >= 0.5) {
+              competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
+            } else {
+              competitiveness = `Tossup (${winner} win)`;
+            }
+            let compColor = '#6b7280';
+            if (competitiveness.includes('Rep')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+              else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+              else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+              else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+              else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+              else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+              else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
+            } else if (competitiveness.includes('Dem')) {
+              if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+              else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+              else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+              else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+              else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+              else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+              else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+            }
+            
+            electionInfo = `
+              <div style="margin-bottom: 16px;">
+                <h5>🎯 Competitiveness</h5>
+                <p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <h5>📈 Margin</h5>
+                <p style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'}; font-weight: bold; font-size: 18px;">
+                  ${winner} +${marginPct.toFixed(1)}%
+                </p>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <h5>🗳️ Vote Breakdown</h5>
+                <p><span style="color: #1e40af; font-weight: bold;">Democratic: </span>${demPct.toFixed(1)}% (${demVotes.toLocaleString()})</p>
+                <p><span style="color: #dc2626; font-weight: bold;">Republican: </span>${repPct.toFixed(1)}% (${repVotes.toLocaleString()})</p>
+                <p><strong>Total Votes:</strong> ${totalVotes.toLocaleString()}</p>
+              </div>
+            `;
+          }
         }
       }
       
