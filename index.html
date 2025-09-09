@@ -719,8 +719,26 @@ body {
     'Adam Putnam': 'Adam Putnam (R)',
     };
 
+    function normalizeName(name) {
+      if (!name) return '';
+      return name
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/[.']/g, '') // remove periods and apostrophes
+        .normalize('NFD').replace(/[ -]/g, '') // remove accents
+        .replace(/\s+/g, ' '); // collapse whitespace
+    }
+
+    // Build a normalized override map for robust lookup
+    const normalizedCandidateNameOverride = {};
+    for (const key in candidateNameOverride) {
+      normalizedCandidateNameOverride[normalizeName(key)] = candidateNameOverride[key];
+    }
+
     function overrideCandidateName(name) {
-      return candidateNameOverride[name] || name;
+      const norm = normalizeName(name);
+      return normalizedCandidateNameOverride[norm] || name;
     }
 
     function setStatus(text, timeout = 4000) {
