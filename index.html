@@ -1227,10 +1227,10 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
       // Candidate names
-  let demCandidate = 'Democratic';
-  let repCandidate = 'Republican';
-  if (countyData[`${contestType}_dem_name`]) demCandidate = overrideCandidateName(countyData[`${contestType}_dem_name`]);
-  if (countyData[`${contestType}_rep_name`]) repCandidate = overrideCandidateName(countyData[`${contestType}_rep_name`]);
+  let demCandidateRaw = countyData[`${contestType}_dem_name`] || 'Democratic';
+  let repCandidateRaw = countyData[`${contestType}_rep_name`] || 'Republican';
+  let demCandidate = overrideCandidateName(demCandidateRaw);
+  let repCandidate = overrideCandidateName(repCandidateRaw);
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -2269,3 +2269,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
