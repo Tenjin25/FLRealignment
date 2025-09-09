@@ -639,6 +639,13 @@ body {
 
     // --- MANUAL CANDIDATE NAME OVERRIDE ---
     // Map original candidate names to display names
+// To ensure all manual overrides are present, check that the following names are included in candidateNameOverride:
+// PRESIDENT: 2024: Harris, Trump | 2020: Biden, Trump | 2016: Clinton, Trump | 2012: Obama, Romney | 2008: Obama, McCain
+// GOVERNOR: 2022: Charlie Crist, Ron DeSantis | 2018: Andrew Gillum, Ron DeSantis | 2014: Charlie Crist, Rick Scott
+// US SENATE: 2022: Val Demings, Marco Rubio | 2018: Bill Nelson, Rick Scott
+// ATTORNEY GENERAL: 2022: Aramis Ayala, Ashley Moody | 2018: Sean Shaw, Ashley Moody | 2014: George Sheldon, Pam Bondi
+// CFO: 2022: Adam Hattersley, Jimmy Patronis | 2018: Jeremy Ring, Jimmy Patronis | 2014: William Rankin, Jeff Atwater
+// AGRICULTURE COMMISSIONER: 2022: Naomi Blemur, Wilton Simpson | 2018: Nicole Fried, Matt Caldwell | 2014: Thaddeus Hamilton, Adam Putnam
   const candidateNameOverride = {
   // Example: 'BIDEN': 'Joseph R. Biden',
   // 'TRUMP': 'Donald J. Trump',
@@ -1224,13 +1231,84 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         detailsDiv.style.display = 'block';
         return;
       }
-      const demPct = (demVotes / totalVotes * 100);
-      const repPct = (repVotes / totalVotes * 100);
       // Candidate names
-  let demCandidate = 'Democratic';
-  let repCandidate = 'Republican';
-  if (countyData[`${contestType}_dem_name`]) demCandidate = overrideCandidateName(countyData[`${contestType}_dem_name`]);
-  if (countyData[`${contestType}_rep_name`]) repCandidate = overrideCandidateName(countyData[`${contestType}_rep_name`]);
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      if (countyData[`${contestType}_dem_name`]) {
+        demCandidate = overrideCandidateName(countyData[`${contestType}_dem_name`]);
+      } else if ({
+        'president': '2024',
+        'governor': '2022',
+        'us_senate': '2022',
+        'attorney_general': '2022',
+        'cfo': '2022',
+        'agriculture_commissioner': '2022'
+      }[contestType] === year) {
+        // Use manual override for known contests/years
+        if (contestType === 'president') {
+          if (year == 2024) demCandidate = overrideCandidateName('Harris');
+          else if (year == 2020) demCandidate = overrideCandidateName('Biden');
+          else if (year == 2016) demCandidate = overrideCandidateName('Clinton');
+          else if (year == 2012) demCandidate = overrideCandidateName('Obama');
+          else if (year == 2008) demCandidate = overrideCandidateName('Obama');
+        } else if (contestType === 'governor') {
+          if (year == 2022) demCandidate = overrideCandidateName('Charlie Crist');
+          else if (year == 2018) demCandidate = overrideCandidateName('Andrew Gillum');
+          else if (year == 2014) demCandidate = overrideCandidateName('Charlie Crist');
+        } else if (contestType === 'us_senate') {
+          if (year == 2022) demCandidate = overrideCandidateName('Val Demings');
+          else if (year == 2018) demCandidate = overrideCandidateName('Bill Nelson');
+        } else if (contestType === 'attorney_general') {
+          if (year == 2022) demCandidate = overrideCandidateName('Aramis Ayala');
+          else if (year == 2018) demCandidate = overrideCandidateName('Sean Shaw');
+          else if (year == 2014) demCandidate = overrideCandidateName('George Sheldon');
+        } else if (contestType === 'cfo') {
+          if (year == 2022) demCandidate = overrideCandidateName('Adam Hattersley');
+          else if (year == 2018) demCandidate = overrideCandidateName('Jeremy Ring');
+          else if (year == 2014) demCandidate = overrideCandidateName('William Rankin');
+        } else if (contestType === 'agriculture_commissioner') {
+          if (year == 2022) demCandidate = overrideCandidateName('Naomi Blemur');
+          else if (year == 2018) demCandidate = overrideCandidateName('Nicole Fried');
+          else if (year == 2014) demCandidate = overrideCandidateName('Thaddeus Hamilton');
+        }
+      }
+      if (countyData[`${contestType}_rep_name`]) {
+        repCandidate = overrideCandidateName(countyData[`${contestType}_rep_name`]);
+      } else if ({
+        'president': '2024',
+        'governor': '2022',
+        'us_senate': '2022',
+        'attorney_general': '2022',
+        'cfo': '2022',
+        'agriculture_commissioner': '2022'
+      }[contestType] === year) {
+        if (contestType === 'president') {
+          if (year == 2024) repCandidate = overrideCandidateName('Trump');
+          else if (year == 2020) repCandidate = overrideCandidateName('Trump');
+          else if (year == 2016) repCandidate = overrideCandidateName('Trump');
+          else if (year == 2012) repCandidate = overrideCandidateName('Romney');
+          else if (year == 2008) repCandidate = overrideCandidateName('McCain');
+        } else if (contestType === 'governor') {
+          if (year == 2022) repCandidate = overrideCandidateName('Ron DeSantis');
+          else if (year == 2018) repCandidate = overrideCandidateName('Ron DeSantis');
+          else if (year == 2014) repCandidate = overrideCandidateName('Rick Scott');
+        } else if (contestType === 'us_senate') {
+          if (year == 2022) repCandidate = overrideCandidateName('Marco Rubio');
+          else if (year == 2018) repCandidate = overrideCandidateName('Rick Scott');
+        } else if (contestType === 'attorney_general') {
+          if (year == 2022) repCandidate = overrideCandidateName('Ashley Moody');
+          else if (year == 2018) repCandidate = overrideCandidateName('Ashley Moody');
+          else if (year == 2014) repCandidate = overrideCandidateName('Pam Bondi');
+        } else if (contestType === 'cfo') {
+          if (year == 2022) repCandidate = overrideCandidateName('Jimmy Patronis');
+          else if (year == 2018) repCandidate = overrideCandidateName('Jimmy Patronis');
+          else if (year == 2014) repCandidate = overrideCandidateName('Jeff Atwater');
+        } else if (contestType === 'agriculture_commissioner') {
+          if (year == 2022) repCandidate = overrideCandidateName('Wilton Simpson');
+          else if (year == 2018) repCandidate = overrideCandidateName('Matt Caldwell');
+          else if (year == 2014) repCandidate = overrideCandidateName('Adam Putnam');
+        }
+      }
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -1861,8 +1939,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       
       if (contestValue && electionData) {
         const [contestType, year] = contestValue.split('_');
-        const expectedType = chamber === 'house' ? 'state_house' : 'state_senate';
-        
         if (contestType === expectedType) {
           // For state legislative districts, we need to aggregate county data by district
           // This is complex without a county-to-district mapping, so show general message
@@ -2266,6 +2342,31 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 });
+  </script>
+  <script>
+// Auto-add missing manual override names with placeholder values
+(function() {
+  const requiredNames = [
+    'Harris', 'Trump', 'Biden', 'Clinton', 'Obama', 'Romney', 'McCain',
+    'Charlie Crist', 'Ron DeSantis', 'Andrew Gillum', 'Rick Scott',
+    'Val Demings', 'Marco Rubio', 'Bill Nelson',
+    'Aramis Ayala', 'Ashley Moody', 'Sean Shaw', 'George Sheldon', 'Pam Bondi',
+    'Adam Hattersley', 'Jimmy Patronis', 'Jeremy Ring', 'William Rankin', 'Jeff Atwater',
+    'Naomi Blemur', 'Wilton Simpson', 'Nicole Fried', 'Matt Caldwell', 'Thaddeus Hamilton', 'Adam Putnam'
+  ];
+  let added = [];
+  requiredNames.forEach(n => {
+    if (!(n in candidateNameOverride)) {
+      candidateNameOverride[n] = n + ' (Override Me)';
+      added.push(n);
+    }
+  });
+  if (added.length) {
+    console.warn('Added placeholder manual override entries for:', added);
+  } else {
+    console.log('All manual override candidate names were already present.');
+  }
+})();
   </script>
 </body>
 </html>
