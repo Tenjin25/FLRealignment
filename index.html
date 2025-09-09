@@ -719,26 +719,8 @@ body {
     'Adam Putnam': 'Adam Putnam (R)',
     };
 
-    function normalizeName(name) {
-      if (!name) return '';
-      return name
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/[.']/g, '') // remove periods and apostrophes
-        .normalize('NFD').replace(/[ -]/g, '') // remove accents
-        .replace(/\s+/g, ' '); // collapse whitespace
-    }
-
-    // Build a normalized override map for robust lookup
-    const normalizedCandidateNameOverride = {};
-    for (const key in candidateNameOverride) {
-      normalizedCandidateNameOverride[normalizeName(key)] = candidateNameOverride[key];
-    }
-
     function overrideCandidateName(name) {
-      const norm = normalizeName(name);
-      return normalizedCandidateNameOverride[norm] || name;
+      return candidateNameOverride[name] || name;
     }
 
     function setStatus(text, timeout = 4000) {
@@ -1245,10 +1227,10 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
       // Candidate names
-  let demCandidateRaw = countyData[`${contestType}_dem_name`] || 'Democratic';
-  let repCandidateRaw = countyData[`${contestType}_rep_name`] || 'Republican';
-  let demCandidate = overrideCandidateName(demCandidateRaw);
-  let repCandidate = overrideCandidateName(repCandidateRaw);
+  let demCandidate = 'Democratic';
+  let repCandidate = 'Republican';
+  if (countyData[`${contestType}_dem_name`]) demCandidate = overrideCandidateName(countyData[`${contestType}_dem_name`]);
+  if (countyData[`${contestType}_rep_name`]) repCandidate = overrideCandidateName(countyData[`${contestType}_rep_name`]);
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
@@ -2287,4 +2269,3 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
-
