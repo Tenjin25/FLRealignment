@@ -30,29 +30,6 @@
     <meta name="twitter:card" content="summary_large_image">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
-/* Loading Spinner */
-#loading-spinner {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(255,255,255,0.85);
-  z-index: 20000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.3s;
-}
-#loading-spinner .spinner {
-  border: 8px solid #e5e7eb;
-  border-top: 8px solid #2563eb;
-  border-radius: 50%;
-  width: 70px;
-  height: 70px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 html, body {
   height: 100vh;
   margin: 0;
@@ -497,11 +474,6 @@ body {
     </style>
 </head>
 <body>
-
-  <div id="loading-spinner">
-    <div class="spinner"></div>
-    <div style="margin-left:32px;font-size:1.2em;color:#2563eb;font-weight:600;">Loading map data...</div>
-  </div>
   <div id="map"></div>
 
   <!-- Floating Sidebar Expand Button -->
@@ -664,7 +636,6 @@ body {
     let countyNameMap = {};
     let currentView = 'counties'; // 'counties', 'districts', 'state_house', 'state_senate'
     let currentElectionResults = null; // Current contest results for county details
-    let lastSelectedCounty = null;
 
     // --- MANUAL CANDIDATE NAME OVERRIDE ---
     // Map original candidate names to display names
@@ -748,88 +719,47 @@ body {
     'Adam Putnam': 'Adam Putnam (R)',
     };
 
-    function normalizeName(name) {
-      if (!name) return '';
-      return name
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/[.']/g, '') // remove periods and apostrophes
-        .normalize('NFD').replace(/[ -]/g, '') // remove accents
-        .replace(/\s+/g, ' '); // collapse whitespace
-    }
-
-    // Build a normalized override map for robust lookup
-    const normalizedCandidateNameOverride = {};
-    for (const key in candidateNameOverride) {
-      normalizedCandidateNameOverride[normalizeName(key)] = candidateNameOverride[key];
-    }
-
     function overrideCandidateName(name) {
-      const norm = normalizeName(name);
-      return normalizedCandidateNameOverride[norm] || name;
+      return candidateNameOverride[name] || name;
     }
 
-    function setStatus(text, timeout = 4000, isError = false) {
+    function setStatus(text, timeout = 4000) {
       const panel = document.getElementById('status-panel');
       const msg = document.getElementById('status-message');
       if (!panel || !msg) return;
-      msg.textContent = text;
-      panel.style.display = 'block';
-      if (isError) {
-        panel.style.background = '#fee2e2';
-        panel.style.color = '#b91c1c';
-      } else {
-        panel.style.background = 'white';
-        panel.style.color = '#34495e';
-      }
-      if (timeout > 0) {
-        setTimeout(() => { panel.style.display = 'none'; }, timeout);
-      }
+      // Only log status messages to the console; do not show the floating status panel
       console.log(text);
     }
 
     async function loadJSON(path) {
-      try {
-        const r = await fetch(path);
-        if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
-        return await r.json();
-      } catch (e) {
-        setStatus(`Error loading ${path}: ${e.message}`, 0, true);
-        throw e;
-      }
+      const r = await fetch(path);
+      if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
+      return r.json();
     }
 
     async function loadCSV(path) {
+  const r = await fetch(path);
+  if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
+  return r.text();
+    }
+
+    function parseCSV(csvText) {
       try {
-        const r = await fetch(path);
-        if (!r.ok) throw new Error(`${path} fetch failed: ${r.status}`);
-        return await r.text();
-      } catch (e) {
-        setStatus(`Error loading ${path}: ${e.message}`, 0, true);
-        throw e;
+        const result = Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true
+        });
+        if (result.errors.length) {
+          setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
+          console.error(result.errors);
+        }
+        return result.data;
+      } catch (err) {
+        setStatus('CSV Parse Exception: ' + err.message);
+        console.error(err);
+        return [];
       }
-    }
-
-function parseCSV(csvText) {
-  try {
-    const result = Papa.parse(csvText, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true
-    });
-    if (result.errors.length) {
-      setStatus('CSV Parse Error: ' + result.errors.map(e => e.message).join('; '));
-      console.error(result.errors);
-    }
-    return result.data;
-  } catch (err) {
-    setStatus('CSV Parse Exception: ' + err.message);
-    console.error(err);
-    return [];
-  }
-}
-
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -851,6 +781,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
+    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -2164,9 +2095,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function applyCountyContest(contestType, year) {
       // Filter data for this contest and year
       const contestData = electionData.filter(row => row.year == year);
-
+      
       console.log(`Applying ${contestType} for ${year}:`, contestData.length, 'counties found');
-
+      
       if (contestData.length === 0) {
         return setStatus('No data found for this contest');
       }
@@ -2177,56 +2108,50 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         currentElectionResults[row.county] = row;
       });
 
-      // Calculate statewide totals (FIXED: use total votes, not just dem+rep)
+      // Calculate statewide totals
       let statewidedemVotes = 0;
       let statewidrepVotes = 0;
       let statewidTotalVotes = 0;
-
+      
       contestData.forEach(row => {
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
-        const totalVotes = row[`${contestType}_total`] || (demVotes + repVotes);
         statewidedemVotes += demVotes;
         statewidrepVotes += repVotes;
-        statewidTotalVotes += totalVotes; // FIX: use totalVotes from data
+        statewidTotalVotes += demVotes + repVotes;
       });
-
+      
       // Update statewide results display
       updateStatewideResults(contestType, year, statewidedemVotes, statewidrepVotes, statewidTotalVotes);
 
       // Build expression for county coloring
       const expr = ['case'];
       let countiesProcessed = 0;
-
+      
       contestData.forEach(row => {
         const countyName = row.county;
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
         const totalVotes = row[`${contestType}_total`] || 0;
-
+        
         if (totalVotes === 0) return;
-
+        
         const demPct = (demVotes / totalVotes) * 100;
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-
+        
         expr.push(['==', ['get', 'County'], countyName]);
         expr.push(color);
         countiesProcessed++;
       });
-
+      
       expr.push('#e0e0e0'); // default color
-
+      
       console.log(`Color expression built for ${countiesProcessed} counties`);
-
-      // Layer safety check
-      if (map.getLayer('county-fill')) {
-        map.setPaintProperty('county-fill', 'fill-color', expr);
-      } else {
-        setStatus('County layer not found!', 5000, true);
-      }
+      
+      map.setPaintProperty('county-fill', 'fill-color', expr);
       document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year})`;
       setStatus(`Applied contest: ${formatContestName(contestType, year)} ${year}`);
     }
@@ -2266,11 +2191,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       
       expr.push('#e0e0e0'); // default color
       
-      if (map.getLayer('district-fill')) {
-        map.setPaintProperty('district-fill', 'fill-color', expr);
-      } else {
-        setStatus('District layer not found!', 5000, true);
-      }
+      map.setPaintProperty('district-fill', 'fill-color', expr);
       document.getElementById('statewide').textContent = `FL US House (${year})`;
       setStatus(`Applied contest: FL US House ${year}`);
     }
@@ -2317,11 +2238,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const layerName = currentView === 'districts' ? 'district-fill' : 
                        currentView === 'state_house' ? 'state-house-fill' : 'state-senate-fill';
       
-      if (map.getLayer(layerName)) {
-        map.setPaintProperty(layerName, 'fill-color', color);
-      } else {
-        setStatus('District layer not found!', 5000, true);
-      }
+      map.setPaintProperty(layerName, 'fill-color', color);
       
       document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
@@ -2331,14 +2248,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 // Floating sidebar expand button logic
 document.addEventListener('DOMContentLoaded', function() {
   const floatBtn = document.getElementById('sidebar-float-toggle');
-  // You may add logic here if you want to handle the floatBtn click, e.g.:
   if (floatBtn) {
-    floatBtn.addEventListener('click', function() {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar.classList.contains('minimized')) {
-        toggleSidebar();
-      }
-    });
+    floatBtn.onclick = function() {
+      toggleSidebar();
+    };
+  }
+  // Hide float button if sidebar is open on load
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar && !sidebar.classList.contains('minimized')) {
+    floatBtn.style.display = 'none';
+  }
+  // Status panel close button
+  const statusExit = document.getElementById('status-exit');
+  if (statusExit) {
+    statusExit.onclick = function() {
+      document.getElementById('status-panel').style.display = 'none';
+    };
   }
 });
+  </script>
+</body>
+</html>
 
