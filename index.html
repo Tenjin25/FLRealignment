@@ -1165,6 +1165,19 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 }
 
     function showCountyDetails(countyName) {
+      // DEBUG: Log candidate names before rendering
+      console.log('[DEBUG] Candidate names:', {
+        demCandidate,
+        repCandidate
+      });
+      // DEBUG: Log values used for sidebar rendering
+      console.log('[DEBUG] Sidebar values:', {
+        demVotes,
+        repVotes,
+        totalVotes,
+        demPct,
+        repPct
+      });
       // DEBUG: Log county data and vote fields
       setTimeout(() => {
         try {
