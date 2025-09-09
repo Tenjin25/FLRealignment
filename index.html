@@ -1231,6 +1231,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         detailsDiv.style.display = 'block';
         return;
       }
+  const demPct = totalVotes > 0 ? (demVotes / totalVotes * 100) : 0;
+  const repPct = totalVotes > 0 ? (repVotes / totalVotes * 100) : 0;
       // Candidate names
       let demCandidate = 'Democratic';
       let repCandidate = 'Republican';
