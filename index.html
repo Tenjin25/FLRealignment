@@ -2164,9 +2164,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function applyCountyContest(contestType, year) {
       // Filter data for this contest and year
       const contestData = electionData.filter(row => row.year == year);
-      
+
       console.log(`Applying ${contestType} for ${year}:`, contestData.length, 'counties found');
-      
+
       if (contestData.length === 0) {
         return setStatus('No data found for this contest');
       }
@@ -2177,49 +2177,50 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         currentElectionResults[row.county] = row;
       });
 
-      // Calculate statewide totals
+      // Calculate statewide totals (FIXED: use total votes, not just dem+rep)
       let statewidedemVotes = 0;
       let statewidrepVotes = 0;
       let statewidTotalVotes = 0;
-      
+
       contestData.forEach(row => {
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
+        const totalVotes = row[`${contestType}_total`] || (demVotes + repVotes);
         statewidedemVotes += demVotes;
         statewidrepVotes += repVotes;
-        statewidTotalVotes += demVotes + repVotes;
+        statewidTotalVotes += totalVotes; // FIX: use totalVotes from data
       });
-      
+
       // Update statewide results display
       updateStatewideResults(contestType, year, statewidedemVotes, statewidrepVotes, statewidTotalVotes);
 
       // Build expression for county coloring
       const expr = ['case'];
       let countiesProcessed = 0;
-      
+
       contestData.forEach(row => {
         const countyName = row.county;
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
         const totalVotes = row[`${contestType}_total`] || 0;
-        
+
         if (totalVotes === 0) return;
-        
+
         const demPct = (demVotes / totalVotes) * 100;
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-        
+
         expr.push(['==', ['get', 'County'], countyName]);
         expr.push(color);
         countiesProcessed++;
       });
-      
+
       expr.push('#e0e0e0'); // default color
-      
+
       console.log(`Color expression built for ${countiesProcessed} counties`);
-      
+
       // Layer safety check
       if (map.getLayer('county-fill')) {
         map.setPaintProperty('county-fill', 'fill-color', expr);
@@ -2330,55 +2331,14 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 // Floating sidebar expand button logic
 document.addEventListener('DOMContentLoaded', function() {
   const floatBtn = document.getElementById('sidebar-float-toggle');
+  // You may add logic here if you want to handle the floatBtn click, e.g.:
   if (floatBtn) {
-    async function init() {
-      const spinner = document.getElementById('loading-spinner');
-      try {
-        setStatus('Loading counties...');
-        const counties = await loadJSON(CONFIG.paths.counties);
-        map.addSource('counties', { type: 'geojson', data: counties });
-        countyNameMap = buildCountyNameMapFromGeoJSON(counties);
-        addCountyLayers();
-        setStatus('Counties loaded');
-
-        setStatus('Loading election data...');
-        const electionCSV = await loadCSV(CONFIG.paths.election);
-        electionData = parseCSV(electionCSV);
-        setStatus('Election data loaded');
-
-        setStatus('Loading congressional data...');
-        const congressionalCSV = await loadCSV(CONFIG.paths.congressional);
-        congressionalData = parseCSV(congressionalCSV);
-        const districtsCSV = await loadCSV(CONFIG.paths.districts_info);
-        districtsInfo = parseCSV(districtsCSV);
-        setStatus('Congressional data loaded');
-
-        setStatus('Loading congressional districts...');
-        const districtsGeoJSON = await loadJSON(CONFIG.paths.districts);
-        map.addSource('districts', { type: 'geojson', data: districtsGeoJSON });
-        setStatus('Congressional districts loaded');
-
-        setStatus('Loading state house districts...');
-        const stateHouseGeoJSON = await loadJSON(CONFIG.paths.state_house);
-        map.addSource('state-house', { type: 'geojson', data: stateHouseGeoJSON });
-        const stateHouseCSV = await loadCSV(CONFIG.paths.state_house_info);
-        stateHouseInfo = parseCSV(stateHouseCSV);
-        setStatus('State house districts loaded');
-
-        setStatus('Loading state senate districts...');
-        const stateSenateGeoJSON = await loadJSON(CONFIG.paths.state_senate);
-        map.addSource('state-senate', { type: 'geojson', data: stateSenateGeoJSON });
-        const stateSenateCSV = await loadCSV(CONFIG.paths.state_senate_info);
-        stateSenateInfo = parseCSV(stateSenateCSV);
-        setStatus('State senate districts loaded');
-
-        populateContestSelectFromElectionJSON(electionData);
-        map.fitBounds(CONFIG.fitBounds, { padding: 20 });
-        // Hide spinner
-        if (spinner) spinner.style.display = 'none';
-      } catch (e) {
-        setStatus('Error: ' + e.message, 0, true);
-        if (spinner) spinner.style.opacity = 0.5;
+    floatBtn.addEventListener('click', function() {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.classList.contains('minimized')) {
+        toggleSidebar();
       }
-    }
+    });
+  }
+});
 
