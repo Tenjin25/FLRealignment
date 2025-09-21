@@ -1647,11 +1647,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
               
               // Get candidate names for recent years
               let candidateInfo = '';
-              if (year === 2024) candidateInfo = margin > 0 ? overrideCandidateName('Harris') : overrideCandidateName('Trump');
-              else if (year === 2020) candidateInfo = margin > 0 ? overrideCandidateName('Biden') : overrideCandidateName('Trump');
-              else if (year === 2016) candidateInfo = margin > 0 ? overrideCandidateName('Clinton') : overrideCandidateName('Trump');
-              else if (year === 2012) candidateInfo = margin > 0 ? overrideCandidateName('Obama') : overrideCandidateName('Romney');
-              else if (year === 2008) candidateInfo = margin > 0 ? overrideCandidateName('Obama') : overrideCandidateName('McCain');
+              if (year === 2024) candidateInfo = margin > 0 ? getCandidateName(year, 'President of the United States', 'Democrat') : getCandidateName(year, 'President of the United States', 'Republican');
+              else if (year === 2020) candidateInfo = margin > 0 ? getCandidateName(year, 'President of the United States', 'Democrat') : getCandidateName(year, 'President of the United States', 'Republican');
+              else if (year === 2016) candidateInfo = margin > 0 ? getCandidateName(year, 'President of the United States', 'Democrat') : getCandidateName(year, 'President of the United States', 'Republican');
+              else if (year === 2012) candidateInfo = margin > 0 ? getCandidateName(year, 'President of the United States', 'Democrat') : getCandidateName(year, 'President of the United States', 'Republican');
+              else if (year === 2008) candidateInfo = margin > 0 ? getCandidateName(year, 'President of the United States', 'Democrat') : getCandidateName(year, 'President of the United States', 'Republican');
               
               trends.push({
                 year: year,
@@ -1674,6 +1674,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         }
         
         // State House trends (recent years only)
+        // Governor trends (recent years only)
+        governorYears.forEach(year => {
+          const data = electionData.find(row => 
+            row.year == year && row.county === countyName
+          );
+          if (data && data.governor_total > 0) {
+            const demVotes = data.governor_dem || 0;
+            const repVotes = data.governor_rep || 0;
+            const totalVotes = data.governor_total || 0;
+            const demPct = (demVotes / totalVotes) * 100;
+            const repPct = (repVotes / totalVotes) * 100;
+            const margin = demPct - repPct;
+            const winner = margin > 0 ? 'D' : 'R';
+            const marginAbs = Math.abs(margin);
+            let candidateInfo = '';
+            candidateInfo = margin > 0 ? getCandidateName(year, 'Governor', 'Democrat') : getCandidateName(year, 'Governor', 'Republican');
+            trends.push({
+              year: year,
+              display: `${year}: ${candidateInfo}+${marginAbs.toFixed(1)}`,
+              margin: margin,
+              type: 'governor'
+            });
+          }
+        });
         stateHouseYears.forEach(year => {
           const data = electionData.find(row => 
             row.year == year && row.county === countyName
