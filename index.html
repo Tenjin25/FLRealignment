@@ -41,11 +41,14 @@
           return window.candidateNameOverride[window.normalizeCandidateNameKey(overrideKey)];
         }
       }
-      // For President and Governor, show only main candidate (before ' / ')
-      if (office === 'President of the United States' || office === 'Governor') {
-        if (typeof name === 'string' && name.includes(' / ')) {
-          return name.split(' / ')[0].trim();
+      // For President and Governor, enforce first+last name only if running mate present
+      if ((office === 'President of the United States' || office === 'Governor') && typeof name === 'string' && name.includes(' / ')) {
+        const mainCandidate = name.split(' / ')[0].trim();
+        // If main candidate is a single word, warn in console
+        if (mainCandidate.split(' ').length < 2) {
+          console.warn(`Candidate name for ${key} may be missing first or last name:`, mainCandidate);
         }
+        return mainCandidate;
       }
       return name;
     }
