@@ -1194,11 +1194,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       sidebarContent += `</div>`;
       sidebarContent += `<div class="winner-section">`;
       sidebarContent += '<h5>🏆 Winner</h5>';
-      sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner.charAt(0)})</p>`;
+  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="margin-section">`;
       sidebarContent += '<h5>📈 Margin</h5>';
-      sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${marginText}</p>`;
+  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'}) +${Math.abs(marginPct)}%</p>`;
       sidebarContent += `<p style="color: #6b7280; font-size: 14px;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="vote-breakdown">`;
