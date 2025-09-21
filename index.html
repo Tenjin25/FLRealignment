@@ -1248,23 +1248,23 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
       // Card-style layout
       sidebarContent += '<div class="result-summary">';
-      sidebarContent += '<h5>📊 Election Results</h5>';
+  sidebarContent += '<h2 style="font-size: 1.5em; margin-bottom: 8px;">📊 Election Results</h2>';
       if (precincts) sidebarContent += `<div style="font-size:14px;"><b>Precincts:</b> ${precincts}</div>`;
       sidebarContent += `<div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="winner-section">`;
-      sidebarContent += '<h5>🏆 Winner</h5>';
+  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">🏆 Winner</h3>';
   // Always show full candidate name for winner (Governor/President/major races)
   sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="margin-section">`;
-      sidebarContent += '<h5>📈 Margin</h5>';
+  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">📈 Margin</h3>';
   // Margin: show D+ or R+ only, to match NC's map
   sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
       sidebarContent += `<p style="color: #6b7280; font-size: 14px;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="vote-breakdown">`;
-      sidebarContent += '<h5>🗳️ Vote Breakdown</h5>';
+  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">🗳️ Vote Breakdown</h3>';
   sidebarContent += `<p><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
   sidebarContent += `<p><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
       sidebarContent += `</div>`;
