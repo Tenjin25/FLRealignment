@@ -148,6 +148,73 @@ body {
   color: white;
   border: 1px solid #1d4ed8;
 }
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #374151;
+}
+.sidebar-content {
+  padding: 20px;
+}
+.minimize-btn {
+  background: #2563eb;
+  border: 1px solid #1d4ed8;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  transition: all 0.2s ease;
+}
+.minimize-btn:hover {
+  background: #1d4ed8;
+  border-color: #1e40af;
+  transform: scale(1.05);
+}
+
+/* Main Controls */
+.main-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  z-index: 1000;
+  min-width: 380px;
+  max-width: 420px;
+  transition: all 0.3s ease;
+}
+.main-controls.minimized {
+  min-width: 60px;
+  max-width: 60px;
+  padding: 15px;
+}
+.main-controls.minimized .controls-content {
+  display: none;
+}
+.controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 .controls-header h3 {
   margin: 0;
   color: #1f2937;
@@ -570,109 +637,6 @@ body {
     let currentView = 'counties'; // 'counties', 'districts', 'state_house', 'state_senate'
     let currentElectionResults = null; // Current contest results for county details
 
-    // --- MANUAL CANDIDATE NAME OVERRIDE ---
-    // Map original candidate names to display names
-  const candidateNameOverride = {
-  // Example: 'BIDEN': 'Joseph R. Biden',
-  // 'TRUMP': 'Donald J. Trump',
-  'Obama': 'Barack Obama (D)',
-  'McCain': 'John McCain (R)',
-  // 2022 Florida Governor & Lt. Governor
-  'Ron DeSantis': 'Ron DeSantis (R)',
-  'Jeanette Nunez': 'Jeanette Nuñez (R)',
-  'Charlie Crist': 'Charlie Crist (D)',
-  'Karla Hernandez-Mats': 'Karla Hernández-Mats (D)',
-  // 2022 Attorney General
-  'Ashley Moody': 'Ashley Moody (R)',
-  'Aramis Ayala': 'Aramis Ayala (D)',
-  // 2022 Chief Financial Officer
-  'Jimmy Patronis': 'Jimmy Patronis (R)',
-  'Adam Hattersley': 'Adam Hattersley (D)',
-  // 2022 Commissioner of Agriculture
-  'Wilton Simpson': 'Wilton Simpson (R)',
-  'Naomi Blemur': 'Naomi Blemur (D)',
-  // 2018 Florida Governor
-  'Ron DeSantis': 'Ron DeSantis (R)',
-  'Andrew Gillum': 'Andrew Gillum (D)',
-  // 2018 Attorney General
-  'Ashley Moody': 'Ashley Moody (R)',
-  'Sean Shaw': 'Sean Shaw (D)',
-  // 2018 Chief Financial Officer
-  'Jimmy Patronis': 'Jimmy Patronis (R)',
-  'Jeremy Ring': 'Jeremy Ring (D)',
-  // 2018 Commissioner of Agriculture
-  'Matt Caldwell': 'Matt Caldwell (R)',
-  'Nicole Fried': 'Nikki Fried (D)',
-  // Add more as needed
-  // 2018 US Senate
-  'Bill Nelson': 'Bill Nelson (D)',
-  'Rick Scott': 'Rick Scott (R)',
-  // 2022 US Senate
-  'Val Demings': 'Val Demings (D)',
-  'Marco Rubio': 'Marco Rubio (R)',
-  // 2024 US Senate
-  'Debbie Mucarsel-Powell': 'Debbie Mucarsel-Powell (D)',
-  // Rick Scott already present above for 2018, but ensure 2024 context
-  'Rick Scott': 'Rick Scott (R)',
-  // 2016 US Senate
-  'Patrick Murphy': 'Patrick Murphy (D)',
-  'Marco Rubio': 'Marco Rubio (R)',
-  // 2012 US Senate
-  'Bill Nelson': 'Bill Nelson (D)',
-  'Connie Mack': 'Connie Mack IV (R)',
-  // 2010 US Senate
-  'Kendrick Meek': 'Kendrick Meek (D)',
-  // Marco Rubio already present above for 2016, 2022, 2010
-    // 2010 Statewide
-    // Governor
-    'Sink Smith': 'Alex Sink/Rod Smith (D)',
-    'Scott Carroll': 'Rick Scott/Jennifer Carroll (R)',
-    // Attorney General
-    'Dan Gelber': 'Dan Gelber (D)',
-    'Pam Bondi': 'Pam Bondi (R)',
-    // Chief Financial Officer
-    'Loranne Ausley': 'Loranne Ausley (D)',
-    'Jeff Atwater': 'Jeff Atwater (R)',
-    // Agriculture Commissioner
-    'Scott Maddox': 'Scott Maddox (D)',
-    'Adam Putnam': 'Adam Putnam (R)',
-
-    // 2014 Statewide
-    // Governor
-    'Charlie Crist': 'Charlie Crist (D)',
-    'Rick Scott': 'Rick Scott (R)',
-    // Attorney General
-    'George Sheldon': 'George Sheldon (D)',
-    'Pam Bondi': 'Pam Bondi (R)',
-    // Chief Financial Officer
-    'William Rankin': 'William Rankin (D)',
-    'Jeff Atwater': 'Jeff Atwater (R)',
-    // Agriculture Commissioner
-    'Thaddeus Hamilton': 'Thaddeus Hamilton (D)',
-    'Adam Putnam': 'Adam Putnam (R)',
-    };
-
-    function normalizeName(name) {
-      if (!name) return '';
-      return name
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/[.']/g, '') // remove periods and apostrophes
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
-        .replace(/\s+/g, ' '); // collapse whitespace
-    }
-
-    // Build a normalized override map for robust lookup
-    const normalizedCandidateNameOverride = {};
-    for (const key in candidateNameOverride) {
-      normalizedCandidateNameOverride[normalizeName(key)] = candidateNameOverride[key];
-    }
-
-    function overrideCandidateName(name) {
-      const norm = normalizeName(name);
-      return normalizedCandidateNameOverride[norm] || name;
-    }
 
     function setStatus(text, timeout = 4000) {
       const panel = document.getElementById('status-panel');
@@ -711,7 +675,6 @@ body {
         console.error(err);
         return [];
       }
-    }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -733,6 +696,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
+    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -906,13 +870,19 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Get candidate names based on contest type and year
       let demCandidate = 'Democratic';
       let repCandidate = 'Republican';
-      
+      // Try to get candidate names from electionData
+      const contestData = electionData && Array.isArray(electionData) ? electionData.find(row => row.year == year) : null;
+      if (contestData) {
+        demCandidate = window.overrideCandidateName(contestData[`${contestType}_dem_name`] || 'Democratic');
+        repCandidate = window.overrideCandidateName(contestData[`${contestType}_rep_name`] || 'Republican');
+      }
+      // Fallback for presidential races if data doesn't contain names
       if (contestType === 'president') {
-        if (year == 2024) { demCandidate = overrideCandidateName('Harris'); repCandidate = overrideCandidateName('Trump'); }
-        else if (year == 2020) { demCandidate = overrideCandidateName('Biden'); repCandidate = overrideCandidateName('Trump'); }
-        else if (year == 2016) { demCandidate = overrideCandidateName('Clinton'); repCandidate = overrideCandidateName('Trump'); }
-        else if (year == 2012) { demCandidate = overrideCandidateName('Obama'); repCandidate = overrideCandidateName('Romney'); }
-        else if (year == 2008) { demCandidate = overrideCandidateName('Obama'); repCandidate = overrideCandidateName('McCain'); }
+        if (year == 2024) { demCandidate = window.overrideCandidateName('Harris'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2020) { demCandidate = window.overrideCandidateName('Biden'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2016) { demCandidate = window.overrideCandidateName('Clinton'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2012) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('Romney'); }
+        else if (year == 2008) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('McCain'); }
       }
       
       statewideContent.innerHTML = `
@@ -1041,10 +1011,69 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       detailsDiv.style.display = 'block';
     }
 
-function toggleLegend() {
-  const legend = document.getElementById('legend');
-  if (!legend) return;
-  legend.classList.toggle('minimized');
+    function toggleLegend() {
+      const legend = document.getElementById('legend');
+      const legendContent = document.getElementById('legend-content');
+      const minimizeBtn = document.getElementById('legend-minimize-btn');
+      
+      if (legend.classList.contains('minimized')) {
+        // Expand legend
+        legend.classList.remove('minimized');
+        legendContent.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize legend';
+      } else {
+        // Minimize legend
+        legend.classList.add('minimized');
+        legendContent.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand legend';
+      }
+    }
+
+    function toggleMainControls() {
+      const controls = document.getElementById('main-controls');
+      const controlsContent = document.getElementById('controls-content');
+      const minimizeBtn = document.getElementById('controls-minimize-btn');
+      
+      if (controls.classList.contains('minimized')) {
+        // Expand controls
+        controls.classList.remove('minimized');
+        controlsContent.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize controls';
+      } else {
+        // Minimize controls
+        controls.classList.add('minimized');
+        controlsContent.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand controls';
+      }
+    }
+
+    function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const sidebarContent = document.querySelector('.sidebar-content');
+  const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+  const mapElement = document.getElementById('map');
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (sidebar.classList.contains('minimized')) {
+    // Expand sidebar
+    sidebar.classList.remove('minimized');
+    mapElement.classList.remove('sidebar-minimized');
+    sidebarContent.style.display = 'block';
+    minimizeBtn.textContent = '−';
+    minimizeBtn.title = 'Minimize sidebar';
+    if (floatBtn) floatBtn.style.display = 'none';
+  } else {
+    // Minimize sidebar
+    sidebar.classList.add('minimized');
+    mapElement.classList.add('sidebar-minimized');
+    sidebarContent.style.display = 'none';
+    minimizeBtn.textContent = '+';
+    minimizeBtn.title = 'Expand sidebar';
+    if (floatBtn) floatBtn.style.display = 'flex';
+  }
 }
 
     function showCountyDetails(countyName) {
