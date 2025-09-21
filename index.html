@@ -34,9 +34,12 @@
       else {
         name = party;
       }
-      // Apply override if available
-      if (window.overrideCandidateName) {
-        return window.overrideCandidateName(name);
+      // Apply override if available (using year, office, party)
+      if (window.candidateNameOverride) {
+        const overrideKey = `${year}|${office}|${party}`;
+        if (window.candidateNameOverride[window.normalizeCandidateNameKey(overrideKey)]) {
+          return window.candidateNameOverride[window.normalizeCandidateNameKey(overrideKey)];
+        }
       }
       return name;
     }
@@ -1198,7 +1201,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       sidebarContent += `</div>`;
       sidebarContent += `<div class="margin-section">`;
       sidebarContent += '<h5>📈 Margin</h5>';
-  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'}) +${Math.abs(marginPct)}%</p>`;
+  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winnerParty === 'Republican' ? repCandidate + ' (R)' : demCandidate + ' (D)'} +${Math.abs(marginPct)}%</p>`;
       sidebarContent += `<p style="color: #6b7280; font-size: 14px;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="vote-breakdown">`;
