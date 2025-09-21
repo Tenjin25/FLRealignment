@@ -44,12 +44,12 @@
       // For President and Governor, enforce first+last name only if running mate present
       if ((office === 'President of the United States' || office === 'Governor') && typeof name === 'string' && name.includes(' / ')) {
         let mainCandidate = name.split(' / ')[0].trim();
-        // Remove any stray slashes or extra spaces
+        // Remove any stray slashes, extra spaces, and leading/trailing spaces
         mainCandidate = mainCandidate.replace(/\//g, '').replace(/\s+/g, ' ').trim();
         // If main candidate is a single word or still contains a slash, fallback to full string and warn
         if (mainCandidate.split(' ').length < 2 || mainCandidate.includes('/')) {
           console.warn(`Candidate name for ${key} may be missing first or last name:`, mainCandidate, '| Fallback to:', name);
-          return name.trim();
+          return name.split(' / ')[0].trim();
         }
         return mainCandidate;
       }
