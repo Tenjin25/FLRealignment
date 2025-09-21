@@ -41,6 +41,12 @@
           return window.candidateNameOverride[window.normalizeCandidateNameKey(overrideKey)];
         }
       }
+      // For President and Governor, show only main candidate (before ' / ')
+      if (office === 'President of the United States' || office === 'Governor') {
+        if (typeof name === 'string' && name.includes(' / ')) {
+          return name.split(' / ')[0].trim();
+        }
+      }
       return name;
     }
   </script>
@@ -542,12 +548,12 @@ document.addEventListener('DOMContentLoaded', function() {
   top: 20px;
   right: 20px;
   z-index: 10001;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   background: #2563eb;
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   font-size: 32px;
   display: flex;
@@ -953,8 +959,15 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const loser = demPct > repPct ? 'Republican' : 'Democratic';
       
       // Get candidate names using lookup
-      let demCandidate = getCandidateName(year, formatContestName(contestType, year), 'Democrat');
-      let repCandidate = getCandidateName(year, formatContestName(contestType, year), 'Republican');
+      let officeName = formatContestName(contestType, year);
+      let demKey = `${year}|${officeName}|Democrat`;
+      let repKey = `${year}|${officeName}|Republican`;
+      let demCandidate = getCandidateName(year, officeName, 'Democrat');
+      let repCandidate = getCandidateName(year, officeName, 'Republican');
+      // Debug log for 2008 President and 2010 Governor
+      if ((year == 2008 && officeName === 'President of the United States') || (year == 2010 && officeName === 'Governor')) {
+        console.log('DEBUG Candidate Lookup:', { demKey, demCandidate, repKey, repCandidate });
+      }
       
       statewideContent.innerHTML = `
         <div class="statewide-margin">
