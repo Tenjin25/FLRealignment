@@ -148,73 +148,6 @@ body {
   color: white;
   border: 1px solid #1d4ed8;
 }
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-.sidebar-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #374151;
-}
-.sidebar-content {
-  padding: 20px;
-}
-.minimize-btn {
-  background: #2563eb;
-  border: 1px solid #1d4ed8;
-  border-radius: 6px;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  transition: all 0.2s ease;
-}
-.minimize-btn:hover {
-  background: #1d4ed8;
-  border-color: #1e40af;
-  transform: scale(1.05);
-}
-
-/* Main Controls */
-.main-controls {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  z-index: 1000;
-  min-width: 380px;
-  max-width: 420px;
-  transition: all 0.3s ease;
-}
-.main-controls.minimized {
-  min-width: 60px;
-  max-width: 60px;
-  padding: 15px;
-}
-.main-controls.minimized .controls-content {
-  display: none;
-}
-.controls-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
 .controls-header h3 {
   margin: 0;
   color: #1f2937;
@@ -554,7 +487,7 @@ body {
           <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
           <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric">2024: R+11.45%</span></p>
           <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-          <p><strong>Impact:</strong> Massive 18.1-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+          <p><strong>Impact:</strong> Massive 18.7-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
         </div>
         <div class="finding-card">
           <h5>Orange County - Shrinking Democratic Margin</h5>
@@ -719,8 +652,26 @@ body {
     'Adam Putnam': 'Adam Putnam (R)',
     };
 
+    function normalizeName(name) {
+      if (!name) return '';
+      return name
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/[.']/g, '') // remove periods and apostrophes
+        .normalize('NFD').replace(/[ -]/g, '') // remove accents
+        .replace(/\s+/g, ' '); // collapse whitespace
+    }
+
+    // Build a normalized override map for robust lookup
+    const normalizedCandidateNameOverride = {};
+    for (const key in candidateNameOverride) {
+      normalizedCandidateNameOverride[normalizeName(key)] = candidateNameOverride[key];
+    }
+
     function overrideCandidateName(name) {
-      return candidateNameOverride[name] || name;
+      const norm = normalizeName(name);
+      return normalizedCandidateNameOverride[norm] || name;
     }
 
     function setStatus(text, timeout = 4000) {
@@ -760,6 +711,7 @@ body {
         console.error(err);
         return [];
       }
+    }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -781,7 +733,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -797,45 +748,43 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function formatContestName(contestType, year) {
       const nameMap = {
-        'president': 'FL President',
-        'governor': 'FL Governor', 
-        'us_senate': 'FL US Senate',
-        'attorney_general': 'FL Attorney General',
-        'cfo': 'FL Chief Financial Officer',
-        'agriculture_commissioner': 'FL Agriculture Commissioner',
-        'us_house': 'FL US House',
-        'state_senate': 'FL State Senate',
-        'state_house': 'FL State House',
-        'gov': 'FL Governor',
-        'pre': 'FL President', 
-        'uss': 'FL US Senator',
-        'usr': 'FL US Representative',
-        'agr': 'FL Agriculture Commissioner',
-        'atg': 'FL Attorney General',
-        'cfo': 'FL Chief Financial Officer',
-        'str': 'FL State Representative',
-        'sts': 'FL State Senator',
-        'ctj': 'FL Circuit Judge',
-        'sta': 'FL State Attorney',
-        'pub': 'FL Public Defender',
-        'sc1': 'FL Supreme Court Justice',
-        'sc2': 'FL Supreme Court Justice',
-        'sc3': 'FL Supreme Court Justice',
-        'sc4': 'FL Supreme Court Justice',
-        'sc5': 'FL Supreme Court Justice'
+        'president': 'President',
+        'governor': 'Governor', 
+        'us_senate': 'US Senate',
+        'attorney_general': 'Attorney General',
+        'cfo': 'Chief Financial Officer',
+        'agriculture_commissioner': 'Agriculture Commissioner',
+        'us_house': 'US House',
+        'state_senate': 'State Senate',
+        'state_house': 'State House',
+        'gov': 'Governor',
+        'pre': 'President', 
+        'uss': 'US Senator',
+        'usr': 'US Representative',
+        'agr': 'Agriculture Commissioner',
+        'atg': 'Attorney General',
+        'cfo': 'Chief Financial Officer',
+        'str': 'State Representative',
+        'sts': 'State Senator',
+        'ctj': 'Circuit Judge',
+        'sta': 'State Attorney',
+        'pub': 'Public Defender',
+        'sc1': 'Supreme Court Justice',
+        'sc2': 'Supreme Court Justice',
+        'sc3': 'Supreme Court Justice',
+        'sc4': 'Supreme Court Justice',
+        'sc5': 'Supreme Court Justice'
       };
       
-      // Handle amendments
       if (contestType.startsWith('a') && contestType.length <= 3) {
-        return `FL Amendment ${contestType.substring(1).toUpperCase()}`;
+        return `Amendment ${contestType.substring(1).toUpperCase()}`;
       }
       
-      // Handle judicial retention elections
       if (contestType.startsWith('d')) {
-        return `FL Judicial Retention ${contestType.toUpperCase()}`;
+        return `Judicial Retention ${contestType.toUpperCase()}`;
       }
       
-      return nameMap[contestType] || `FL ${contestType.toUpperCase()}`;
+      return nameMap[contestType] || contestType.toUpperCase();
     }
 
     function populateContestSelectFromElectionJSON(electionData) {
@@ -886,7 +835,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         if (hasData) {
           const opt = document.createElement('option');
           opt.value = `state_house_${year}`;
-          opt.textContent = `FL State House (${year})`;
+          opt.textContent = `${formatContestName('state_house', year)} (${year})`;
           sel.appendChild(opt);
         }
       });
@@ -905,7 +854,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         if (hasData) {
           const opt = document.createElement('option');
           opt.value = `state_senate_${year}`;
-          opt.textContent = `FL State Senate (${year})`;
+          opt.textContent = `${formatContestName('state_senate', year)} (${year})`;
           sel.appendChild(opt);
         }
       });
@@ -924,7 +873,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         if (hasData) {
           const opt = document.createElement('option');
           opt.value = `us_house_${year}`;
-          opt.textContent = `FL US House (${year})`;
+          opt.textContent = `${formatContestName('us_house', year)} (${year})`;
           sel.appendChild(opt);
         }
       });
@@ -1095,49 +1044,52 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function toggleLegend() {
       const legend = document.getElementById('legend');
       const legendContent = document.getElementById('legend-content');
-      const minimizeBtn = document.getElementById('legend-minimize-btn');
+      const statewideContent = document.getElementById('statewide-content');
       
-      if (legend.classList.contains('minimized')) {
-        // Expand legend
-        legend.classList.remove('minimized');
-        legendContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize legend';
-      } else {
-        // Minimize legend
-        legend.classList.add('minimized');
-        legendContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand legend';
+      if (totalVotes === 0) {
+        statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
+        return;
       }
-    }
-
-    function toggleMainControls() {
-      const controls = document.getElementById('main-controls');
-      const controlsContent = document.getElementById('controls-content');
-      const minimizeBtn = document.getElementById('controls-minimize-btn');
       
-      if (controls.classList.contains('minimized')) {
-        // Expand controls
-        controls.classList.remove('minimized');
-        controlsContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize controls';
-      } else {
-        // Minimize controls
-        controls.classList.add('minimized');
-        controlsContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand controls';
+      const demPct = (demVotes / totalVotes) * 100;
+      const repPct = (repVotes / totalVotes) * 100;
+      const marginPct = Math.abs(demPct - repPct);
+      const winner = demPct > repPct ? 'Democratic' : 'Republican';
+      
+      let demCandidate = 'Democratic';
+      let repCandidate = 'Republican';
+      
+      // Find candidate names from the data
+      const contestData = electionData.find(row => row.year == year);
+      if (contestData) {
+        demCandidate = window.overrideCandidateName(contestData[`${contestType}_dem_name`] || 'Democratic');
+        repCandidate = window.overrideCandidateName(contestData[`${contestType}_rep_name`] || 'Republican');
       }
-    }
 
-    function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const sidebarContent = document.querySelector('.sidebar-content');
-  const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-  const mapElement = document.getElementById('map');
-  const floatBtn = document.getElementById('sidebar-float-toggle');
+      // Fallback for presidential races if data doesn't contain names
+      if (contestType === 'president') {
+        if (year == 2024) { demCandidate = window.overrideCandidateName('Harris'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2020) { demCandidate = window.overrideCandidateName('Biden'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2016) { demCandidate = window.overrideCandidateName('Clinton'); repCandidate = window.overrideCandidateName('Trump'); }
+        else if (year == 2012) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('Romney'); }
+        else if (year == 2008) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('McCain'); }
+      }
+
+      const marginPrefix = demPct > repPct ? 'D+' : 'R+';
+      const winnerColor = winner === 'Republican' ? '#dc2626' : '#1e40af';
+      
+      statewideContent.innerHTML = `
+        <div class="statewide-margin">
+          <div class="margin-text" style="color: ${winnerColor};">
+            ${demPct > repPct ? demCandidate : repCandidate} +${marginPct.toFixed(2)}%
+          </div>
+          <div class="margin-details">
+            ${demCandidate} (D): ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
+            ${repCandidate} (R): ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
+            Total Votes: ${totalVotes.toLocaleString()}
+          </div>
+        </div>
+      `;
   if (sidebar.classList.contains('minimized')) {
     // Expand sidebar
     sidebar.classList.remove('minimized');
@@ -2269,5 +2221,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
-
 
