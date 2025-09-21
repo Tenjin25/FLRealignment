@@ -1197,7 +1197,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       sidebarContent += `</div>`;
       sidebarContent += `<div class="winner-section">`;
       sidebarContent += '<h5>🏆 Winner</h5>';
-  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
+  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winner === 'Republican' ? repCandidate + ' (R)' : demCandidate + ' (D)'}</p>`;
       sidebarContent += `</div>`;
       sidebarContent += `<div class="margin-section">`;
       sidebarContent += '<h5>📈 Margin</h5>';
