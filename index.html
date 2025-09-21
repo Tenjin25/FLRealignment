@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="data/candidateNameOverride.js"></script>
   <script src="data/candidateLookup.js"></script>
   <script>
@@ -17,19 +18,27 @@
       }
     });
 
-    // Helper: get candidate name from static JS or dynamic CSV
+    // Helper: get candidate name from static JS or dynamic CSV, then apply override
     function getCandidateName(year, office, party) {
       const key = `${year}|${office}|${party}`;
+      let name = null;
       // Try static JS first
       if (window.candidateLookup && window.candidateLookup[key]) {
-        return window.candidateLookup[key];
+        name = window.candidateLookup[key];
       }
       // Fallback to dynamic CSV
-      if (window.candidateLookupCSV && window.candidateLookupCSV[key]) {
-        return window.candidateLookupCSV[key];
+      else if (window.candidateLookupCSV && window.candidateLookupCSV[key]) {
+        name = window.candidateLookupCSV[key];
       }
       // Fallback to party name
-      return party;
+      else {
+        name = party;
+      }
+      // Apply override if available
+      if (window.overrideCandidateName) {
+        return window.overrideCandidateName(name);
+      }
+      return name;
     }
   </script>
   <script>
