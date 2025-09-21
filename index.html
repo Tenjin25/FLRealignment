@@ -2,11 +2,11 @@
 <html>
 <head>
   <script src="data/candidateNameOverride.js"></script>
-  <script src="candidateLookup.js"></script>
+  <script src="data/candidateLookup.js"></script>
   <script>
     // Option 2: Load candidate_lookup.csv dynamically
     window.candidateLookupCSV = {};
-    Papa.parse('candidate_lookup.csv', {
+    Papa.parse('data/candidate_lookup.csv', {
       download: true,
       header: true,
       complete: function(results) {
