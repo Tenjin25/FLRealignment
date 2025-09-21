@@ -917,8 +917,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
             ${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%
           </div>
           <div class="margin-details">
-            ${demCandidate}: ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
-            ${repCandidate}: ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
+            <span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span>: ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
+            <span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span>: ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
             Total Votes: ${totalVotes.toLocaleString()}
           </div>
         </div>
@@ -1203,8 +1203,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       sidebarContent += `</div>`;
       sidebarContent += `<div class="vote-breakdown">`;
       sidebarContent += '<h5>🗳️ Vote Breakdown</h5>';
-      sidebarContent += `<p><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
-      sidebarContent += `<p><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
+  sidebarContent += `<p><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
+  sidebarContent += `<p><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
       sidebarContent += `</div>`;
       // Competitiveness
       let competitiveness;
