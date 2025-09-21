@@ -43,10 +43,11 @@
       }
       // For President and Governor, enforce first+last name only if running mate present
       if ((office === 'President of the United States' || office === 'Governor') && typeof name === 'string' && name.includes(' / ')) {
-        const mainCandidate = name.split(' / ')[0].trim();
-        // If main candidate is a single word, warn in console
+        let mainCandidate = name.split(' / ')[0].trim();
+        // If main candidate is a single word, fallback to full string and warn
         if (mainCandidate.split(' ').length < 2) {
-          console.warn(`Candidate name for ${key} may be missing first or last name:`, mainCandidate);
+          console.warn(`Candidate name for ${key} may be missing first or last name:`, mainCandidate, '| Fallback to:', name);
+          return name.trim();
         }
         return mainCandidate;
       }
