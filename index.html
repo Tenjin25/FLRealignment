@@ -410,6 +410,33 @@ body {
   font-size: 16px !important;
   font-weight: 700 !important;
 }
+/* Sidebar Card Classes for Consistent Font Sizes */
+.sidebar-section-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  color: #222 !important;
+}
+.sidebar-winner {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+}
+.sidebar-margin {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+.sidebar-margin-details {
+  font-size: 13px !important;
+  color: #64748b !important;
+  margin-bottom: 8px !important;
+}
+.sidebar-breakdown {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+}
 .statewide-results {
   margin-bottom: 20px;
   padding: 16px;
@@ -1259,22 +1286,20 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (precincts) sidebarContent += `<div style="font-size:14px;"><b>Precincts:</b> ${precincts}</div>`;
       sidebarContent += `<div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>`;
       sidebarContent += `</div>`;
-      sidebarContent += `<div class="winner-section">`;
-  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">🏆 Winner</h3>';
-  // Always show full candidate name for winner (Governor/President/major races)
-  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 16px;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
-      sidebarContent += `</div>`;
-      sidebarContent += `<div class="margin-section">`;
-  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">📈 Margin</h3>';
-  // Margin: show D+ or R+ only, to match NC's map
-  sidebarContent += `<p style="color: ${winnerColor}; font-weight: bold; font-size: 18px;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
-      sidebarContent += `<p style="color: #6b7280; font-size: 14px;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
-      sidebarContent += `</div>`;
-      sidebarContent += `<div class="vote-breakdown">`;
-  sidebarContent += '<h3 style="font-size: 1.2em; margin-bottom: 6px;">🗳️ Vote Breakdown</h3>';
-  sidebarContent += `<p><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
-  sidebarContent += `<p><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
-      sidebarContent += `</div>`;
+    sidebarContent += `<div class="winner-section">`;
+  sidebarContent += '<h3 class="sidebar-section-title">🏆 Winner</h3>';
+  sidebarContent += `<p class="sidebar-winner" style="color: ${winnerColor}; font-weight: bold;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
+    sidebarContent += `</div>`;
+    sidebarContent += `<div class="margin-section">`;
+  sidebarContent += '<h3 class="sidebar-section-title">📈 Margin</h3>';
+  sidebarContent += `<p class="sidebar-margin" style="color: ${winnerColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
+    sidebarContent += `<p class="sidebar-margin-details" style="color: #6b7280;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
+    sidebarContent += `</div>`;
+    sidebarContent += `<div class="vote-breakdown">`;
+  sidebarContent += '<h3 class="sidebar-section-title">🗳️ Vote Breakdown</h3>';
+  sidebarContent += `<p class="sidebar-breakdown"><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
+  sidebarContent += `<p class="sidebar-breakdown"><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
+    sidebarContent += `</div>`;
       // Competitiveness
       let competitiveness;
       const actualMarginPct = parseFloat(marginPct);
