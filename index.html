@@ -2,6 +2,36 @@
 <html>
 <head>
   <script src="data/candidateNameOverride.js"></script>
+  <script src="candidateLookup.js"></script>
+  <script>
+    // Option 2: Load candidate_lookup.csv dynamically
+    window.candidateLookupCSV = {};
+    Papa.parse('candidate_lookup.csv', {
+      download: true,
+      header: true,
+      complete: function(results) {
+        results.data.forEach(row => {
+          const key = `${row.Year}|${row.Office}|${row.Party}`;
+          window.candidateLookupCSV[key] = row.CandidateName;
+        });
+      }
+    });
+
+    // Helper: get candidate name from static JS or dynamic CSV
+    function getCandidateName(year, office, party) {
+      const key = `${year}|${office}|${party}`;
+      // Try static JS first
+      if (window.candidateLookup && window.candidateLookup[key]) {
+        return window.candidateLookup[key];
+      }
+      // Fallback to dynamic CSV
+      if (window.candidateLookupCSV && window.candidateLookupCSV[key]) {
+        return window.candidateLookupCSV[key];
+      }
+      // Fallback to party name
+      return party;
+    }
+  </script>
   <script>
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
@@ -868,23 +898,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const winner = demPct > repPct ? 'Democratic' : 'Republican';
       const loser = demPct > repPct ? 'Republican' : 'Democratic';
       
-      // Get candidate names based on contest type and year
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      // Try to get candidate names from electionData
-      const contestData = electionData && Array.isArray(electionData) ? electionData.find(row => row.year == year) : null;
-      if (contestData) {
-        demCandidate = window.overrideCandidateName(contestData[`${contestType}_dem_name`] || 'Democratic');
-        repCandidate = window.overrideCandidateName(contestData[`${contestType}_rep_name`] || 'Republican');
-      }
-      // Fallback for presidential races if data doesn't contain names
-      if (contestType === 'president') {
-        if (year == 2024) { demCandidate = window.overrideCandidateName('Harris'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2020) { demCandidate = window.overrideCandidateName('Biden'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2016) { demCandidate = window.overrideCandidateName('Clinton'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2012) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('Romney'); }
-        else if (year == 2008) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('McCain'); }
-      }
+      // Get candidate names using lookup
+      let demCandidate = getCandidateName(year, formatContestName(contestType, year), 'Democrat');
+      let repCandidate = getCandidateName(year, formatContestName(contestType, year), 'Republican');
       
       statewideContent.innerHTML = `
         <div class="statewide-margin">
@@ -1147,10 +1163,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const demPct = (demVotes / totalVotes * 100);
       const repPct = (repVotes / totalVotes * 100);
       // Candidate names
-  let demCandidateRaw = countyData[`${contestType}_dem_name`] || 'Democratic';
-  let repCandidateRaw = countyData[`${contestType}_rep_name`] || 'Republican';
-  let demCandidate = window.overrideCandidateName(demCandidateRaw);
-  let repCandidate = window.overrideCandidateName(repCandidateRaw);
+  let demCandidate = getCandidateName(year, formatContestName(contestType, year), 'Democrat');
+  let repCandidate = getCandidateName(year, formatContestName(contestType, year), 'Republican');
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
