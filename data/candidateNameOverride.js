@@ -770,4 +770,8 @@ for (const key in candidateNameOverrideRaw) {
 if (typeof window !== 'undefined') {
   window.candidateNameOverride = candidateNameOverride;
   window.normalizeCandidateNameKey = normalizeCandidateNameKey;
+  window.overrideCandidateName = function(name) {
+    const key = normalizeCandidateNameKey(name);
+    return candidateNameOverride[key] || name;
+  };
 }
