@@ -1149,8 +1149,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Candidate names
   let demCandidateRaw = countyData[`${contestType}_dem_name`] || 'Democratic';
   let repCandidateRaw = countyData[`${contestType}_rep_name`] || 'Republican';
-  let demCandidate = overrideCandidateName(demCandidateRaw);
-  let repCandidate = overrideCandidateName(repCandidateRaw);
+  let demCandidate = window.overrideCandidateName(demCandidateRaw);
+  let repCandidate = window.overrideCandidateName(repCandidateRaw);
       // Margin
       const margin = demVotes - repVotes;
       const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
