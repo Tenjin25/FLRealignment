@@ -659,7 +659,7 @@ body {
         .trim()
         .toLowerCase()
         .replace(/[.']/g, '') // remove periods and apostrophes
-        .normalize('NFD').replace(/[ -]/g, '') // remove accents
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
         .replace(/\s+/g, ' '); // collapse whitespace
     }
 
@@ -1041,72 +1041,10 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       detailsDiv.style.display = 'block';
     }
 
-    function toggleLegend() {
-      const legend = document.getElementById('legend');
-      const legendContent = document.getElementById('legend-content');
-      const statewideContent = document.getElementById('statewide-content');
-      
-      if (totalVotes === 0) {
-        statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
-        return;
-      }
-      
-      const demPct = (demVotes / totalVotes) * 100;
-      const repPct = (repVotes / totalVotes) * 100;
-      const marginPct = Math.abs(demPct - repPct);
-      const winner = demPct > repPct ? 'Democratic' : 'Republican';
-      
-      let demCandidate = 'Democratic';
-      let repCandidate = 'Republican';
-      
-      // Find candidate names from the data
-      const contestData = electionData.find(row => row.year == year);
-      if (contestData) {
-        demCandidate = window.overrideCandidateName(contestData[`${contestType}_dem_name`] || 'Democratic');
-        repCandidate = window.overrideCandidateName(contestData[`${contestType}_rep_name`] || 'Republican');
-      }
-
-      // Fallback for presidential races if data doesn't contain names
-      if (contestType === 'president') {
-        if (year == 2024) { demCandidate = window.overrideCandidateName('Harris'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2020) { demCandidate = window.overrideCandidateName('Biden'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2016) { demCandidate = window.overrideCandidateName('Clinton'); repCandidate = window.overrideCandidateName('Trump'); }
-        else if (year == 2012) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('Romney'); }
-        else if (year == 2008) { demCandidate = window.overrideCandidateName('Obama'); repCandidate = window.overrideCandidateName('McCain'); }
-      }
-
-      const marginPrefix = demPct > repPct ? 'D+' : 'R+';
-      const winnerColor = winner === 'Republican' ? '#dc2626' : '#1e40af';
-      
-      statewideContent.innerHTML = `
-        <div class="statewide-margin">
-          <div class="margin-text" style="color: ${winnerColor};">
-            ${demPct > repPct ? demCandidate : repCandidate} +${marginPct.toFixed(2)}%
-          </div>
-          <div class="margin-details">
-            ${demCandidate} (D): ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
-            ${repCandidate} (R): ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
-            Total Votes: ${totalVotes.toLocaleString()}
-          </div>
-        </div>
-      `;
-  if (sidebar.classList.contains('minimized')) {
-    // Expand sidebar
-    sidebar.classList.remove('minimized');
-    mapElement.classList.remove('sidebar-minimized');
-    sidebarContent.style.display = 'block';
-    minimizeBtn.textContent = '−';
-    minimizeBtn.title = 'Minimize sidebar';
-    if (floatBtn) floatBtn.style.display = 'none';
-  } else {
-    // Minimize sidebar
-    sidebar.classList.add('minimized');
-    mapElement.classList.add('sidebar-minimized');
-    sidebarContent.style.display = 'none';
-    minimizeBtn.textContent = '+';
-    minimizeBtn.title = 'Expand sidebar';
-    if (floatBtn) floatBtn.style.display = 'flex';
-  }
+function toggleLegend() {
+  const legend = document.getElementById('legend');
+  if (!legend) return;
+  legend.classList.toggle('minimized');
 }
 
     function showCountyDetails(countyName) {
