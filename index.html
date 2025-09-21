@@ -47,6 +47,8 @@
         let mainCandidate = name.split(' / ')[0].trim();
         // Remove any stray slashes, extra spaces, and leading/trailing spaces
         mainCandidate = mainCandidate.replace(/\//g, '').replace(/\s+/g, ' ').trim();
+        // Debug: log raw name and extracted main candidate
+        console.log('DEBUG getCandidateName:', { key, raw: name, mainCandidate });
         // If main candidate is a single word or still contains a slash, fallback to all words before ' / '
         if (mainCandidate.split(' ').length < 2 || mainCandidate.includes('/')) {
           console.warn(`Candidate name for ${key} may be missing first or last name:`, mainCandidate, '| Fallback to:', name);
