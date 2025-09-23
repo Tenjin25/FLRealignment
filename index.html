@@ -920,21 +920,21 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const sel = document.getElementById('contestSelect');
       sel.innerHTML = '';
       const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
-      // Group contests by name
+      const options = [];
       contestTypes.forEach(contestType => {
-        const optgroup = document.createElement('optgroup');
-        optgroup.label = formatContestName(contestType, '');
-        // Get all years for this contestType
         const years = [...new Set(csvData.filter(row => row[`${contestType}_total`] > 0).map(row => row.year))].sort();
         years.forEach(year => {
           if (contestType === 'governor' && year == 2020) return;
           const opt = document.createElement('option');
           opt.value = `${contestType}_${year}`;
           opt.textContent = `${formatContestName(contestType, year)} (${year})`;
-          optgroup.appendChild(opt);
+          options.push(opt);
         });
-        if (optgroup.children.length > 0) sel.appendChild(optgroup);
       });
+      // Use document fragment for performance
+      const fragment = document.createDocumentFragment();
+      options.forEach(opt => fragment.appendChild(opt));
+      sel.appendChild(fragment);
       sel.onchange = () => {
         applyContest(sel.value);
         if (typeof lastSelectedCounty !== 'undefined' && lastSelectedCounty) {
