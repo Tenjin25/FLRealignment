@@ -550,25 +550,28 @@ body {
       display: none !important;
     }
     #sidebar-float-toggle {
-      display: none;
       position: fixed;
-      top: 16px;
-      right: 16px;
+      top: 20px;
+      right: 20px;
       z-index: 10001;
-      width: 56px;
-      height: 56px;
+      width: 40px;
+      height: 40px;
       background: #2563eb;
       color: #fff;
       border: none;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      font-size: 36px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      font-size: 24px;
+      display: none;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: background 0.2s;
     }
-    body.sidebar-minimized #sidebar-float-toggle {
+    #sidebar-float-toggle:hover {
+      background: #1746a0;
+    }
+    .sidebar.minimized ~ #sidebar-float-toggle {
       display: flex !important;
     }
   #map.sidebar-minimized {
@@ -578,44 +581,61 @@ body {
 </head>
   <body>
 <div id="map"></div>
-<!-- Floating Sidebar Expand/Collapse Button -->
-<button id="sidebar-float-toggle">
-// Ensure floating button shows when sidebar is minimized
-document.addEventListener('DOMContentLoaded', function() {
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  const sidebar = document.getElementById('sidebar');
-  const btn = document.getElementById('sidebar-minimize-btn');
-  function updateFloatBtn() {
-    if (sidebar.classList.contains('minimized')) {
-      document.body.classList.add('sidebar-minimized');
-    } else {
-      document.body.classList.remove('sidebar-minimized');
-    }
-  }
-  if (floatBtn && sidebar) {
-    floatBtn.addEventListener('click', function() {
-      sidebar.classList.remove('minimized');
-      btn.textContent = '−';
-      updateFloatBtn();
-    });
-    // Initial state
-    updateFloatBtn();
-    // Also update when sidebar is toggled
-    if (btn) {
-      btn.addEventListener('click', function() {
-        setTimeout(updateFloatBtn, 10);
-      });
-    }
-  }
-});
-  <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;">
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect y="7" width="32" height="4" rx="2" fill="white"/>
-      <rect y="14" width="32" height="4" rx="2" fill="white"/>
-      <rect y="21" width="32" height="4" rx="2" fill="white"/>
-    </svg>
-  </span>
-</button>
+  <!-- Sidebar for County Details and Analysis -->
+  <div class="sidebar minimized" id="sidebar">
+    <div class="sidebar-header" id="sidebar-header">
+      <h3>📊 County Analysis</h3>
+      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
+    </div>
+    <div class="sidebar-content">
+      <div class="county-details" id="county-details" style="display: none;">
+        <h4 id="county-name">Select a County</h4>
+        <div id="county-info-content">
+          Click on any county to see detailed election results and analysis.
+        </div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label for="county-search" style="font-weight:600;">Search County:</label>
+        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
+      </div>
+      <div class="statewide-results" id="statewide-results">
+        <h4 id="statewide">🏛️ Florida Statewide</h4>
+        <div id="statewide-content">
+         <p>Select a contest to see statewide results and margin.</p>
+         <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
+        </div>
+      </div>
+      <div class="findings-section">
+        <h4>🔍 Research Findings</h4>
+        <div class="finding-card">
+          <h5>Miami-Dade County - Historic Republican Flip</h5>
+          <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
+          <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;font-size:1.15em;border:2px solid #dc2626;padding:2px 8px;border-radius:6px;">2024: R+11.45%</span></p>
+          <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
+          <p><strong>Impact:</strong> Massive 18.1-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+        </div>
+        <div class="finding-card">
+          <h5>Orange County - Shrinking Democratic Margin</h5>
+          <p><strong>Trend:</strong> Orange County remains Democratic, but the margin narrowed sharply in 2024, dropping nearly 10 points in just four years.</p>
+          <p><strong>Metro Growth:</strong> Orlando's continued expansion and demographic change still favor Democrats, but Republican gains among some suburban and Hispanic voters have eroded the lead. <span class="metric">Population: +15.1% (2010-2020)</span></p>
+          <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.59%</span> — the largest Democratic margin drop in decades for the county.</p>
+          <p><strong>Strategic Importance:</strong> The narrowing gap signals new Republican competitiveness in the I-4 corridor and raises questions about future statewide trends.</p>
+        </div>
+        <div class="finding-card">
+          <h5>Statewide Patterns & I-4 Corridor</h5>
+          <p><strong>Rural-Urban Divide:</strong> Polarization continues to grow between urban coastal counties and rural interior counties, with Republicans consolidating rural support.</p>
+          <p><strong>I-4 Corridor Shift:</strong> The Tampa-Orlando corridor remains the key battleground, but 2024 saw Republicans make major gains. <span class="metric">Hillsborough County</span> voted for both Trump and Rick Scott, <span class="metric">Seminole County</span> voted for Trump by 3.55 points, <span class="metric">Orange</span> saw a sharply reduced Democratic margin, and <span class="metric">Polk</span> and <span class="metric">Volusia</span> Counties delivered landslide wins for Trump, each by over 20 points.</p>
+          <p><strong>Registration Trends:</strong> Unaffiliated voter growth continues to create volatile election dynamics, especially in swing counties.</p>
+          <p><strong>Demographics:</strong> Hispanic population growth in Central Florida is still reshaping the map, but recent cycles show more complex partisan shifts within these communities.</p>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-footer" style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+      Created by Shamar Davis
+    </div>
+  </div>
+  <!-- Floating Sidebar Expand/Collapse Button (smaller size) -->
+  <button id="sidebar-float-toggle" title="Expand Sidebar">+</button>
 
   <!-- Floating Status Panel -->
   <div class="status-panel" id="status-panel" style="display:none;position:fixed;top:20px;right:90px;z-index:10002;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);padding:18px 24px 18px 18px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border:1px solid #e5e7eb;max-width:340px;min-width:200px;font-size:15px;color:#34495e;">
@@ -1017,35 +1037,22 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if ((year == 2008 && officeName === 'President of the United States') || (year == 2010 && officeName === 'Governor')) {
         console.log('DEBUG Candidate Lookup:', { demKey, demCandidate, repKey, repCandidate });
       }
+      // Show only winner and margin, temperature bar replaces breakdown
       statewideContent.innerHTML = `
-        <div class="statewide-margin">
-          <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'};">
+        <div class="statewide-margin" style="margin-bottom:0;">
+          <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#2563eb'};font-size:18px;font-weight:700;text-align:center;">
             ${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%
-          </div>
-          <div class="margin-details">
-            <span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span>: ${demPct.toFixed(1)}% (${demVotes.toLocaleString()})<br>
-            <span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span>: ${repPct.toFixed(1)}% (${repVotes.toLocaleString()})<br>
-            Total Votes: ${totalVotes.toLocaleString()}
           </div>
         </div>
       `;
       // Render temperature bar
       if (tempBar) {
         tempBar.style.display = 'block';
-        // Gradient: blue (D) to red (R)
-        let percent = winner === 'Republican' ? repPct : demPct;
-        let colorLeft = '#2563eb';
-        let colorRight = '#dc2626';
-        let markerColor = winner === 'Republican' ? colorRight : colorLeft;
-        let markerPos = winner === 'Republican' ? repPct : demPct;
-        markerPos = Math.max(0, Math.min(100, markerPos));
+        // Solid color bar for winner
+        let barColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
         tempBar.innerHTML = `
-          <div style="position:relative;width:100%;height:24px;background:linear-gradient(90deg,${colorLeft} 0%,#eee 50%,${colorRight} 100%);border-radius:12px;">
-            <div style="position:absolute;top:0;left:${markerPos}%;width:4px;height:24px;background:${markerColor};border-radius:2px;box-shadow:0 0 6px ${markerColor};transition:left 0.3s;"></div>
-            <div style="position:absolute;top:0;left:0;width:100%;height:24px;pointer-events:none;">
-              <span style="position:absolute;left:0;top:2px;color:#2563eb;font-weight:bold;font-size:13px;">D</span>
-              <span style="position:absolute;right:0;top:2px;color:#dc2626;font-weight:bold;font-size:13px;">R</span>
-            </div>
+          <div style="width:100%;height:28px;background:${barColor};border-radius:14px;display:flex;align-items:center;justify-content:center;">
+            <span style="color:#fff;font-size:16px;font-weight:700;">${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%</span>
           </div>
         `;
       }
@@ -1226,6 +1233,15 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     minimizeBtn.title = 'Expand sidebar';
     if (floatBtn) floatBtn.style.display = 'flex';
   }
+// Floating sidebar button click toggles sidebar open
+document.addEventListener('DOMContentLoaded', function() {
+  var floatBtn = document.getElementById('sidebar-float-toggle');
+  if (floatBtn) {
+    floatBtn.addEventListener('click', function() {
+      toggleSidebar();
+    });
+  }
+});
 }
 
     function showCountyDetails(countyName) {
