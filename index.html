@@ -1041,6 +1041,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Calculate competitiveness
       let compLabel = '';
       let compColor = '#6b7280';
+      // NC map color scheme for competitiveness
       if (marginPct >= 40) {
         compLabel = winner === 'Republican' ? "Annihilation Republican (40%+)" : "Annihilation Democratic (40%+)";
         compColor = winner === 'Republican' ? '#67000d' : '#08306b';
@@ -1063,8 +1064,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         compLabel = winner === 'Republican' ? "Tilt Republican (0.5-1%)" : "Tilt Democratic (0.5-1%)";
         compColor = winner === 'Republican' ? '#fee8c8' : '#e1f5fe';
       } else {
-        compLabel = `Tossup (±0.5%)`;
-        compColor = '#f7f7f7';
+  compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win)' : 'Tossup (Republican Win)';
+        // Match NC map county analysis tossup color style (light gray border, neutral background)
+        compColor = '#cccccc'; // Use same tossup color as county analysis section
       }
       statewideContent.innerHTML = `
         <div class="statewide-margin" style="margin-bottom:0;">
