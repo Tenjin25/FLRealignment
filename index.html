@@ -837,17 +837,24 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   // Returns a new GeoJSON with election results merged into feature properties
   if (!boundaryGeoJSON || !boundaryGeoJSON.features || !electionData) return boundaryGeoJSON;
   const electionMap = {};
+  function normalizeCountyName(name) {
+    return (name || '')
+      .replace(/St\.? Lucie/i, 'St Lucie')
+      .replace(/St\.? Johns/i, 'St Johns')
+      .replace(/[^a-z0-9 ]/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toUpperCase();
+  }
   electionData.forEach(row => {
-    // Normalize county names for matching
-    let name = (row[countyNameKey] || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
-    electionMap[name.toUpperCase()] = row;
+    let name = normalizeCountyName(row[countyNameKey]);
+    electionMap[name] = row;
   });
   boundaryGeoJSON.features.forEach(f => {
     const p = f.properties || {};
-    let name = (p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '').toString().replace(/St\. Lucie/, 'St Lucie').replace(/St\. Johns/, 'St Johns').trim();
-    const electionRow = electionMap[name.toUpperCase()];
+    let name = normalizeCountyName(p[countyKey] || p.COUNTYNAME || p.NAME || p.County || p.name || '');
+    const electionRow = electionMap[name];
     if (electionRow) {
-      // Merge election data into properties
       Object.assign(f.properties, electionRow);
     }
   });
@@ -858,11 +865,19 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
       if (!geojson || !geojson.features) return map;
+      function normalizeCountyName(name) {
+        return (name || '')
+          .replace(/St\.? Lucie/i, 'St Lucie')
+          .replace(/St\.? Johns/i, 'St Johns')
+          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toUpperCase();
+      }
       geojson.features.forEach(f => {
         const p = f.properties || {};
-        // Try common FDOT property names: COUNTYNAME, NAME, County
-        const name = (p.COUNTYNAME || p.NAME || p.County || p.name || p.NAMELSAD || '').toString().trim();
-        if (name) map[name.toUpperCase()] = name;
+        const name = normalizeCountyName(p.COUNTYNAME || p.NAME || p.County || p.name || p.NAMELSAD || '');
+        if (name) map[name] = name;
       });
       return map;
     }
@@ -921,9 +936,21 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (sel.dataset.populated === 'true') return; // Only populate once per data load
       sel.innerHTML = '';
       const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
+      // Precompute contest/year pairs in a single pass
+      const contestYearPairs = {};
+      csvData.forEach(row => {
+        contestTypes.forEach(contestType => {
+          if (row[`${contestType}_total`] > 0) {
+            if (!contestYearPairs[contestType]) contestYearPairs[contestType] = new Set();
+            contestYearPairs[contestType].add(row.year);
+          }
+        });
+      });
+      // Build options array
       const options = [];
       contestTypes.forEach(contestType => {
-        const years = [...new Set(csvData.filter(row => row[`${contestType}_total`] > 0).map(row => row.year))].sort();
+        if (!contestYearPairs[contestType]) return;
+        const years = Array.from(contestYearPairs[contestType]).sort();
         years.forEach(year => {
           if (contestType === 'governor' && year == 2020) return;
           const opt = document.createElement('option');
@@ -1311,9 +1338,9 @@ document.addEventListener('DOMContentLoaded', function() {
           .trim()
           .toUpperCase();
       }
-      let countyData = currentElectionResults[countyName];
+      let norm = normalizeCountyName(countyName);
+      let countyData = currentElectionResults[norm];
       if (!countyData) {
-        const norm = normalizeCountyName(countyName);
         for (const key in currentElectionResults) {
           if (normalizeCountyName(key) === norm) {
             countyData = currentElectionResults[key];
