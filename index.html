@@ -2273,10 +2273,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return setStatus('No data found for this contest');
       }
 
-      // Store current results for county details
+      // Store current results for county details using normalized county names
+      function normalizeCountyName(name) {
+        return (name || '')
+          .replace(/St\.? Lucie/i, 'St Lucie')
+          .replace(/St\.? Johns/i, 'St Johns')
+          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toUpperCase();
+      }
       currentElectionResults = {};
       contestData.forEach(row => {
-        currentElectionResults[row.county] = row;
+        const norm = normalizeCountyName(row.county);
+        currentElectionResults[norm] = row;
       });
 
       // Calculate statewide totals
@@ -2295,25 +2305,23 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update statewide results display
       updateStatewideResults(contestType, year, statewidedemVotes, statewidrepVotes, statewidTotalVotes);
 
-      // Build expression for county coloring
+      // Build expression for county coloring using normalized county names
       const expr = ['case'];
       let countiesProcessed = 0;
-      
       contestData.forEach(row => {
-        const countyName = row.county;
+        const norm = normalizeCountyName(row.county);
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
         const totalVotes = row[`${contestType}_total`] || 0;
-        
         if (totalVotes === 0) return;
-        
         const demPct = (demVotes / totalVotes) * 100;
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-        
-        expr.push(['==', ['get', 'County'], countyName]);
+        expr.push(['==', ['get', 'County'], row.county]); // keep for compatibility
+        expr.push(color);
+        expr.push(['==', ['get', 'County'], norm]); // match normalized name too
         expr.push(color);
         countiesProcessed++;
       });
