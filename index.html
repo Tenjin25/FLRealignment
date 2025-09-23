@@ -1037,38 +1037,59 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if ((year == 2008 && officeName === 'President of the United States') || (year == 2010 && officeName === 'Governor')) {
         console.log('DEBUG Candidate Lookup:', { demKey, demCandidate, repKey, repCandidate });
       }
-      // Show winner, margin, and split temperature bar with percentages
+      // Show winner, margin, total votes, competitiveness, and split temperature bar styled like Georgia example
+      // Calculate competitiveness
+      let compLabel = '';
+      let compColor = '#6b7280';
+      if (marginPct >= 40) {
+        compLabel = winner === 'Republican' ? "Annihilation Republican (40%+)" : "Annihilation Democratic (40%+)";
+        compColor = winner === 'Republican' ? '#67000d' : '#08306b';
+      } else if (marginPct >= 30) {
+        compLabel = winner === 'Republican' ? "Dominant Republican (30-40%)" : "Dominant Democratic (30-40%)";
+        compColor = winner === 'Republican' ? '#a50f15' : '#08519c';
+      } else if (marginPct >= 20) {
+        compLabel = winner === 'Republican' ? "Stronghold Republican (20-30%)" : "Stronghold Democratic (20-30%)";
+        compColor = winner === 'Republican' ? '#cb181d' : '#3182bd';
+      } else if (marginPct >= 10) {
+        compLabel = winner === 'Republican' ? "Safe Republican (10-20%)" : "Safe Democratic (10-20%)";
+        compColor = winner === 'Republican' ? '#ef3b2c' : '#6baed6';
+      } else if (marginPct >= 5.5) {
+        compLabel = winner === 'Republican' ? "Likely Republican (5.5-10%)" : "Likely Democratic (5.5-10%)";
+        compColor = winner === 'Republican' ? '#fb6a4a' : '#9ecae1';
+      } else if (marginPct >= 1) {
+        compLabel = winner === 'Republican' ? "Lean Republican (1-5.5%)" : "Lean Democratic (1-5.5%)";
+        compColor = winner === 'Republican' ? '#fcae91' : '#c6dbef';
+      } else if (marginPct >= 0.5) {
+        compLabel = winner === 'Republican' ? "Tilt Republican (0.5-1%)" : "Tilt Democratic (0.5-1%)";
+        compColor = winner === 'Republican' ? '#fee8c8' : '#e1f5fe';
+      } else {
+        compLabel = `Tossup (±0.5%)`;
+        compColor = '#f7f7f7';
+      }
       statewideContent.innerHTML = `
         <div class="statewide-margin" style="margin-bottom:0;">
-          <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#2563eb'};font-size:18px;font-weight:700;text-align:center;">
+          <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#2563eb'};font-size:18px;font-weight:700;text-align:left;">
             Winner: <span style="color:${winner === 'Republican' ? '#dc2626' : '#2563eb'}">${winner === 'Republican' ? repCandidate : demCandidate} (${winner === 'Republican' ? 'R' : 'D'})</span><br>
-            Margin: ${winner === 'Republican' ? 'R+' : 'D+'}${marginPct.toFixed(2)}% <span style="color:#64748b;font-size:14px;">(${Math.abs(repVotes-demVotes).toLocaleString()} votes)</span>
+            Margin: <span style="color:${winner === 'Republican' ? '#dc2626' : '#2563eb'}">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct.toFixed(2)}%</span> <span style="color:#64748b;font-size:14px;">(${Math.abs(repVotes-demVotes).toLocaleString()} votes)</span>
+          </div>
+          <div style="margin-top:8px;">
+            <div id="statewide-temperature-bar" style="width:100%;height:32px;border-radius:16px;display:flex;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+              <div style="width:${demPct}%;background:#2563eb;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;">
+                <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">D: ${demVotes.toLocaleString()} (${demPct.toFixed(2)}%)</span>
+              </div>
+              <div style="width:${repPct}%;background:#dc2626;display:flex;align-items:center;justify-content:flex-start;padding-left:8px;">
+                <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">R: ${repVotes.toLocaleString()} (${repPct.toFixed(2)}%)</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:15px;color:#374151;font-weight:600;">
+            Total Votes: ${totalVotes.toLocaleString()}
+          </div>
+          <div style="margin-top:4px;font-size:15px;font-weight:600;color:${compColor};">
+            Competitiveness: ${compLabel}
           </div>
         </div>
       `;
-      // Render split temperature bar
-      if (tempBar) {
-        tempBar.style.display = 'block';
-        // Calculate bar widths
-        let demWidth = demPct;
-        let repWidth = repPct;
-        // Clamp to avoid rounding errors
-        if (demWidth + repWidth > 100) {
-          let total = demWidth + repWidth;
-          demWidth = (demWidth / total) * 100;
-          repWidth = (repWidth / total) * 100;
-        }
-        tempBar.innerHTML = `
-          <div style="width:100%;height:28px;border-radius:14px;display:flex;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-            <div style="width:${demWidth}%;background:#2563eb;display:flex;align-items:center;justify-content:${demWidth>15?'flex-end':'center'};padding-right:8px;">
-              <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">${demCandidate} (D): ${demPct.toFixed(2)}%<br><span style='font-size:13px;font-weight:400;'>${demVotes.toLocaleString()}</span></span>
-            </div>
-            <div style="width:${repWidth}%;background:#dc2626;display:flex;align-items:center;justify-content:${repWidth>15?'flex-start':'center'};padding-left:8px;">
-              <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">${repCandidate} (R): ${repPct.toFixed(2)}%<br><span style='font-size:13px;font-weight:400;'>${repVotes.toLocaleString()}</span></span>
-            </div>
-          </div>
-        `;
-      }
     }
 
     function setMapView(view) {
@@ -1342,8 +1363,8 @@ document.addEventListener('DOMContentLoaded', function() {
         precincts = countyData.precincts || countyData.Precincts || countyData.PRECINCTS;
       }
       // Card-style layout
-      sidebarContent += '<div class="result-summary">';
-      sidebarContent += '<h2 style="font-size: 1.5em; margin-bottom: 8px;">📊 Election Results</h2>';
+  sidebarContent += '<div class="result-summary">';
+  sidebarContent += '<h3 class="sidebar-section-title">📊 Election Results</h3>';
       if (precincts) sidebarContent += `<div style="font-size:14px;"><b>Precincts:</b> ${precincts}</div>`;
       sidebarContent += `<div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>`;
       sidebarContent += `</div>`;
