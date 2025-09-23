@@ -1037,22 +1037,35 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if ((year == 2008 && officeName === 'President of the United States') || (year == 2010 && officeName === 'Governor')) {
         console.log('DEBUG Candidate Lookup:', { demKey, demCandidate, repKey, repCandidate });
       }
-      // Show only winner and margin, temperature bar replaces breakdown
+      // Show winner, margin, and split temperature bar with percentages
       statewideContent.innerHTML = `
         <div class="statewide-margin" style="margin-bottom:0;">
           <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#2563eb'};font-size:18px;font-weight:700;text-align:center;">
-            ${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%
+            Winner: <span style="color:${winner === 'Republican' ? '#dc2626' : '#2563eb'}">${winner === 'Republican' ? repCandidate : demCandidate} (${winner === 'Republican' ? 'R' : 'D'})</span><br>
+            Margin: ${winner === 'Republican' ? 'R+' : 'D+'}${marginPct.toFixed(2)}% <span style="color:#64748b;font-size:14px;">(${Math.abs(repVotes-demVotes).toLocaleString()} votes)</span>
           </div>
         </div>
       `;
-      // Render temperature bar
+      // Render split temperature bar
       if (tempBar) {
         tempBar.style.display = 'block';
-        // Solid color bar for winner
-        let barColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
+        // Calculate bar widths
+        let demWidth = demPct;
+        let repWidth = repPct;
+        // Clamp to avoid rounding errors
+        if (demWidth + repWidth > 100) {
+          let total = demWidth + repWidth;
+          demWidth = (demWidth / total) * 100;
+          repWidth = (repWidth / total) * 100;
+        }
         tempBar.innerHTML = `
-          <div style="width:100%;height:28px;background:${barColor};border-radius:14px;display:flex;align-items:center;justify-content:center;">
-            <span style="color:#fff;font-size:16px;font-weight:700;">${winner === 'Republican' ? repCandidate : demCandidate} +${marginPct.toFixed(2)}%</span>
+          <div style="width:100%;height:28px;border-radius:14px;display:flex;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+            <div style="width:${demWidth}%;background:#2563eb;display:flex;align-items:center;justify-content:${demWidth>15?'flex-end':'center'};padding-right:8px;">
+              <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">${demCandidate} (D): ${demPct.toFixed(2)}%<br><span style='font-size:13px;font-weight:400;'>${demVotes.toLocaleString()}</span></span>
+            </div>
+            <div style="width:${repWidth}%;background:#dc2626;display:flex;align-items:center;justify-content:${repWidth>15?'flex-start':'center'};padding-left:8px;">
+              <span style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;">${repCandidate} (R): ${repPct.toFixed(2)}%<br><span style='font-size:13px;font-weight:400;'>${repVotes.toLocaleString()}</span></span>
+            </div>
           </div>
         `;
       }
