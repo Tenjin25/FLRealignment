@@ -558,6 +558,28 @@ body {
   }
     </style>
 </head>
+  <body>
+  <div id="map"></div>
+  <!-- Floating Sidebar Expand Button: placed after map and before sidebar -->
+  <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</button>
+    <!-- ...existing code... -->
+// Floating button toggles sidebar
+document.addEventListener('DOMContentLoaded', function() {
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  floatBtn.addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const btn = document.getElementById('sidebar-minimize-btn');
+    if (sidebar.classList.contains('minimized')) {
+      sidebar.classList.remove('minimized');
+      btn.textContent = '−';
+      floatBtn.style.display = 'none';
+    } else {
+      sidebar.classList.add('minimized');
+      btn.textContent = '+';
+      floatBtn.style.display = 'flex';
+    }
+  });
+});
 <body>
   <div id="map"></div>
   <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:56px;height:56px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</button>
@@ -581,26 +603,44 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Floating expand/collapse button for sidebar */
 #sidebar-float-toggle {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  left: 16px;
   z-index: 10001;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   background: #2563eb;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  font-size: 32px;
+  font-size: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+@media (max-width: 600px) {
+  #sidebar-float-toggle {
+    width: 64px;
+    height: 64px;
+    font-size: 40px;
+    top: 12px;
+    left: 12px;
+    border-radius: 20px;
+  }
+}
 }
 
   <!-- Floating Sidebar Expand Button -->
   <button id="sidebar-float-toggle" class="minimize-btn" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:none;align-items:center;justify-content:center;cursor:pointer;">
-    +
+    <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect y="7" width="32" height="4" rx="2" fill="white"/>
+        <rect y="14" width="32" height="4" rx="2" fill="white"/>
+        <rect y="21" width="32" height="4" rx="2" fill="white"/>
+      </svg>
+    </span>
   </button>
 
   <!-- Floating Status Panel -->
@@ -666,7 +706,8 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="statewide-results" id="statewide-results">
         <h4 id="statewide">🏛️ Florida Statewide</h4>
         <div id="statewide-content">
-          <p>Select a contest to see statewide results and margin.</p>
+         <p>Select a contest to see statewide results and margin.</p>
+         <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
         </div>
       </div>
       <div class="findings-section">
@@ -982,29 +1023,26 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function updateStatewideResults(contestType, year, demVotes, repVotes, totalVotes) {
       const statewideContent = document.getElementById('statewide-content');
-      
+      const tempBar = document.getElementById('statewide-temperature-bar');
+      if (!statewideContent) return;
       if (totalVotes === 0) {
         statewideContent.innerHTML = '<p>No statewide data available for this contest.</p>';
+        if (tempBar) tempBar.style.display = 'none';
         return;
       }
-      
       const demPct = (demVotes / totalVotes) * 100;
       const repPct = (repVotes / totalVotes) * 100;
       const marginPct = Math.abs(demPct - repPct);
       const winner = demPct > repPct ? 'Democratic' : 'Republican';
       const loser = demPct > repPct ? 'Republican' : 'Democratic';
-      
-      // Get candidate names using lookup
       let officeName = formatContestName(contestType, year);
       let demKey = `${year}|${officeName}|Democrat`;
       let repKey = `${year}|${officeName}|Republican`;
       let demCandidate = getCandidateName(year, officeName, 'Democrat');
       let repCandidate = getCandidateName(year, officeName, 'Republican');
-      // Debug log for 2008 President and 2010 Governor
       if ((year == 2008 && officeName === 'President of the United States') || (year == 2010 && officeName === 'Governor')) {
         console.log('DEBUG Candidate Lookup:', { demKey, demCandidate, repKey, repCandidate });
       }
-      
       statewideContent.innerHTML = `
         <div class="statewide-margin">
           <div class="margin-text" style="color: ${winner === 'Republican' ? '#dc2626' : '#1e40af'};">
@@ -1017,6 +1055,26 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           </div>
         </div>
       `;
+      // Render temperature bar
+      if (tempBar) {
+        tempBar.style.display = 'block';
+        // Gradient: blue (D) to red (R)
+        let percent = winner === 'Republican' ? repPct : demPct;
+        let colorLeft = '#2563eb';
+        let colorRight = '#dc2626';
+        let markerColor = winner === 'Republican' ? colorRight : colorLeft;
+        let markerPos = winner === 'Republican' ? repPct : demPct;
+        markerPos = Math.max(0, Math.min(100, markerPos));
+        tempBar.innerHTML = `
+          <div style="position:relative;width:100%;height:24px;background:linear-gradient(90deg,${colorLeft} 0%,#eee 50%,${colorRight} 100%);border-radius:12px;">
+            <div style="position:absolute;top:0;left:${markerPos}%;width:4px;height:24px;background:${markerColor};border-radius:2px;box-shadow:0 0 6px ${markerColor};transition:left 0.3s;"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:24px;pointer-events:none;">
+              <span style="position:absolute;left:0;top:2px;color:#2563eb;font-weight:bold;font-size:13px;">D</span>
+              <span style="position:absolute;right:0;top:2px;color:#dc2626;font-weight:bold;font-size:13px;">R</span>
+            </div>
+          </div>
+        `;
+      }
     }
 
     function setMapView(view) {
@@ -2330,5 +2388,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
-
 
