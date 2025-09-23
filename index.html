@@ -81,6 +81,9 @@
     <meta name="twitter:card" content="summary_large_image">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
+/* Show floating button only when sidebar is minimized */
+#sidebar-float-toggle { display: none; }
+.sidebar.minimized ~ #sidebar-float-toggle { display: flex !important; }
 html, body {
   height: 100vh;
   margin: 0;
@@ -395,20 +398,19 @@ body {
   margin-right: 10px;
   flex-shrink: 0;
 }
-
 /* County Details */
 .county-details {
-  margin-bottom: 20px !important;
-  padding: 16px !important;
-  background: #f9fafb !important;
-  border-radius: 8px !important;
-  border: 1px solid #e7eaf3 !important;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 .county-details h4 {
-  margin: 0 0 12px 0 !important;
-  color: #374151 !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
+  margin: 0 0 12px 0;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 700;
 }
 /* Sidebar Card Classes for Consistent Font Sizes */
 .sidebar-section-title {
@@ -548,100 +550,72 @@ body {
       display: none !important;
     }
     #sidebar-float-toggle {
-    display: none;
-  }
-  .sidebar.minimized ~ #sidebar-float-toggle {
-    display: flex !important;
-  }
+      display: none;
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10001;
+      width: 56px;
+      height: 56px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      font-size: 36px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    body.sidebar-minimized #sidebar-float-toggle {
+      display: flex !important;
+    }
   #map.sidebar-minimized {
     width: 100vw !important;
   }
     </style>
 </head>
   <body>
-  <div id="map"></div>
-  <!-- Floating Sidebar Expand Button: placed after map and before sidebar -->
-  <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</button>
-    <!-- ...existing code... -->
-// Floating button toggles sidebar
+<div id="map"></div>
+<!-- Floating Sidebar Expand/Collapse Button -->
+<button id="sidebar-float-toggle">
+// Ensure floating button shows when sidebar is minimized
 document.addEventListener('DOMContentLoaded', function() {
   const floatBtn = document.getElementById('sidebar-float-toggle');
-  floatBtn.addEventListener('click', function() {
-    const sidebar = document.getElementById('sidebar');
-    const btn = document.getElementById('sidebar-minimize-btn');
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebar-minimize-btn');
+  function updateFloatBtn() {
     if (sidebar.classList.contains('minimized')) {
-      sidebar.classList.remove('minimized');
-      btn.textContent = '−';
-      floatBtn.style.display = 'none';
+      document.body.classList.add('sidebar-minimized');
     } else {
-      sidebar.classList.add('minimized');
-      btn.textContent = '+';
-      floatBtn.style.display = 'flex';
+      document.body.classList.remove('sidebar-minimized');
     }
-  });
-});
-<body>
-  <div id="map"></div>
-  <button id="sidebar-float-toggle" style="position:fixed;top:20px;right:20px;z-index:10001;width:56px;height:56px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">+</button>
-// Floating button toggles sidebar
-document.addEventListener('DOMContentLoaded', function() {
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  floatBtn.addEventListener('click', function() {
-    const sidebar = document.getElementById('sidebar');
-    const btn = document.getElementById('sidebar-minimize-btn');
-    if (sidebar.classList.contains('minimized')) {
-      sidebar.classList.remove('minimized');
-      btn.textContent = '−';
-      floatBtn.style.display = 'none';
-    } else {
-      sidebar.classList.add('minimized');
-      btn.textContent = '+';
-      floatBtn.style.display = 'flex';
-    }
-  });
-});
-/* Floating expand/collapse button for sidebar */
-#sidebar-float-toggle {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 10001;
-  width: 56px;
-  height: 56px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  font-size: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-@media (max-width: 600px) {
-  #sidebar-float-toggle {
-    width: 64px;
-    height: 64px;
-    font-size: 40px;
-    top: 12px;
-    left: 12px;
-    border-radius: 20px;
   }
-}
-}
-
-  <!-- Floating Sidebar Expand Button -->
-  <button id="sidebar-float-toggle" class="minimize-btn" style="position:fixed;top:20px;right:20px;z-index:10001;width:48px;height:48px;background:#2563eb;color:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);font-size:32px;display:none;align-items:center;justify-content:center;cursor:pointer;">
-    <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect y="7" width="32" height="4" rx="2" fill="white"/>
-        <rect y="14" width="32" height="4" rx="2" fill="white"/>
-        <rect y="21" width="32" height="4" rx="2" fill="white"/>
-      </svg>
-    </span>
-  </button>
+  if (floatBtn && sidebar) {
+    floatBtn.addEventListener('click', function() {
+      sidebar.classList.remove('minimized');
+      btn.textContent = '−';
+      updateFloatBtn();
+    });
+    // Initial state
+    updateFloatBtn();
+    // Also update when sidebar is toggled
+    if (btn) {
+      btn.addEventListener('click', function() {
+        setTimeout(updateFloatBtn, 10);
+      });
+    }
+  }
+});
+  <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect y="7" width="32" height="4" rx="2" fill="white"/>
+      <rect y="14" width="32" height="4" rx="2" fill="white"/>
+      <rect y="21" width="32" height="4" rx="2" fill="white"/>
+    </svg>
+  </span>
+</button>
 
   <!-- Floating Status Panel -->
   <div class="status-panel" id="status-panel" style="display:none;position:fixed;top:20px;right:90px;z-index:10002;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);padding:18px 24px 18px 18px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);border:1px solid #e5e7eb;max-width:340px;min-width:200px;font-size:15px;color:#34495e;">
