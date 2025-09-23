@@ -930,7 +930,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           if (contestType === 'governor' && year == 2020) return;
           const opt = document.createElement('option');
           opt.value = `${contestType}_${year}`;
-          opt.textContent = `${year}`;
+          opt.textContent = `${formatContestName(contestType, year)} (${year})`;
           optgroup.appendChild(opt);
         });
         if (optgroup.children.length > 0) sel.appendChild(optgroup);
