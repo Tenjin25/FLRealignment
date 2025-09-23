@@ -58,11 +58,21 @@
       const countiesSource = map.getSource('counties');
       if (!countiesSource || !countiesSource._data || !countiesSource._data.features) return;
       const counties = countiesSource._data.features;
-      // Try to match by various property names
+      // Normalize county names for matching
+      function normalizeCountyName(name) {
+        return (name || '')
+          .replace(/St\.? Lucie/i, 'St Lucie')
+          .replace(/St\.? Johns/i, 'St Johns')
+          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toUpperCase();
+      }
+      const normTarget = normalizeCountyName(countyName);
       const countyFeature = counties.find(f => {
         const props = f.properties || {};
-        const name = (props.County || props.COUNTYNAME || props.NAME || '').toString().toLowerCase();
-        return name === countyName.toLowerCase();
+        const name = normalizeCountyName(props.County || props.COUNTYNAME || props.NAME || '');
+        return name === normTarget;
       });
       if (!countyFeature) return;
       const bbox = turf.bbox(countyFeature);
