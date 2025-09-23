@@ -918,28 +918,22 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
     function populateContestSelectFromCSV(csvData) {
       const sel = document.getElementById('contestSelect');
-      const years = [...new Set(csvData.map(row => row.year))].sort();
-      // Focus on non-gerrymandered statewide contests only (Cabinet offices + federal)
+      sel.innerHTML = '';
       const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
-      
-      years.forEach(year => {
-        contestTypes.forEach(contestType => {
-          // Exclude Governor 2020 from dropdown
+      // Group contests by name
+      contestTypes.forEach(contestType => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = formatContestName(contestType, '');
+        // Get all years for this contestType
+        const years = [...new Set(csvData.filter(row => row[`${contestType}_total`] > 0).map(row => row.year))].sort();
+        years.forEach(year => {
           if (contestType === 'governor' && year == 2020) return;
-          // Check if this contest type has data for this year
-          const hasData = csvData.some(row => {
-            // Normalize county names for St Lucie and St Johns
-            if (row.county === 'St. Lucie') row.county = 'St Lucie';
-            if (row.county === 'St. Johns') row.county = 'St Johns';
-            return row.year == year && (row[`${contestType}_total`] > 0);
-          });
-          if (hasData) {
-            const opt = document.createElement('option');
-            opt.value = `${contestType}_${year}`;
-            opt.textContent = `${formatContestName(contestType, year)} (${year})`;
-            sel.appendChild(opt);
-          }
+          const opt = document.createElement('option');
+          opt.value = `${contestType}_${year}`;
+          opt.textContent = `${year}`;
+          optgroup.appendChild(opt);
         });
+        if (optgroup.children.length > 0) sel.appendChild(optgroup);
       });
       sel.onchange = () => {
         applyContest(sel.value);
@@ -1064,9 +1058,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         compLabel = winner === 'Republican' ? "Tilt Republican (0.5-1%)" : "Tilt Democratic (0.5-1%)";
         compColor = winner === 'Republican' ? '#fee8c8' : '#e1f5fe';
       } else {
-       compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win)' : 'Tossup (Republican Win)';
-        // Match NC map county analysis tossup color style (light gray border, neutral background)
-        compColor = '#cccccc'; // Use same tossup color as county analysis section
+        compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win)' : 'Tossup (Republican Win)';
+        compColor = winner === 'Democratic' ? '#2563eb' : '#dc2626'; // Blue for Dem win, Red for Rep win
       }
       statewideContent.innerHTML = `
         <div class="statewide-margin" style="margin-bottom:0;">
@@ -2418,5 +2411,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
-
 
