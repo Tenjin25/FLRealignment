@@ -1762,27 +1762,27 @@ document.addEventListener('DOMContentLoaded', function() {
       compColor = '#cccccc';
     }
   } else {
-    // Default palette (original legend mapping)
+    // Use the specified palette for competitiveness category
     if (winner === 'Republican') {
-      if (actualMarginPct >= 40) compColor = '#67000d';
-      else if (actualMarginPct >= 30) compColor = '#a50f15';
-      else if (actualMarginPct >= 20) compColor = '#cb181d';
-      else if (actualMarginPct >= 10) compColor = '#ef3b2c';
-      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a';
-      else if (actualMarginPct >= 1) compColor = '#fcae91';
-      else if (actualMarginPct >= 0.5) compColor = '#fee8c8';
-      else compColor = '#f7f7f7';
+      if (actualMarginPct >= 40) compColor = '#67000d'; // Annihilation
+      else if (actualMarginPct >= 30) compColor = '#a50f15'; // Dominant
+      else if (actualMarginPct >= 20) compColor = '#cb181d'; // Stronghold
+      else if (actualMarginPct >= 10) compColor = '#ef3b2c'; // Safe
+      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a'; // Likely
+      else if (actualMarginPct >= 1) compColor = '#fcae91'; // Lean
+      else if (actualMarginPct >= 0.5) compColor = '#fee8c8'; // Tilt
+      else compColor = '#f7f7f7'; // Tossup
     } else if (winner === 'Democratic') {
-      if (actualMarginPct >= 40) compColor = '#08306b';
-      else if (actualMarginPct >= 30) compColor = '#08519c';
-      else if (actualMarginPct >= 20) compColor = '#3182bd';
-      else if (actualMarginPct >= 10) compColor = '#6baed6';
-      else if (actualMarginPct >= 5.5) compColor = '#9ecae1';
-      else if (actualMarginPct >= 1) compColor = '#c6dbef';
-      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe';
-      else compColor = '#f7f7f7';
+      if (actualMarginPct >= 40) compColor = '#08306b'; // Annihilation
+      else if (actualMarginPct >= 30) compColor = '#08519c'; // Dominant
+      else if (actualMarginPct >= 20) compColor = '#3182bd'; // Stronghold
+      else if (actualMarginPct >= 10) compColor = '#6baed6'; // Safe
+      else if (actualMarginPct >= 5.5) compColor = '#9ecae1'; // Likely
+      else if (actualMarginPct >= 1) compColor = '#c6dbef'; // Lean
+      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe'; // Tilt
+      else compColor = '#f7f7f7'; // Tossup
     } else {
-      compColor = '#f7f7f7';
+      compColor = '#f7f7f7'; // Tossup
     }
   }
   sidebarContent += `<div class="competitiveness-section">`;
