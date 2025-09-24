@@ -27,13 +27,13 @@ Florida was the nation’s ultimate swing state from 2008–2016, with razor-thi
 
 | Year | Republican Candidate | Democratic Candidate | GOP Margin |
 |------|---------------------|---------------------|------------|
-| 2008 | John McCain         | Barack Obama        | +2.8%      |
-| 2012 | Mitt Romney         | Barack Obama        | +0.9%      |
-| 2016 | Donald Trump        | Hillary Clinton     | -1.2%      |
-| 2020 | Donald Trump        | Joe Biden           | -3.4%      |
-| 2024 | Donald Trump        | Kamala Harris       | -13%       |
+| 2008 | John McCain         | Barack Obama        | -2.8%      |
+| 2012 | Mitt Romney         | Barack Obama        | -0.9%      |
+| 2016 | Donald Trump        | Hillary Clinton     | +1.2%      |
+| 2020 | Donald Trump        | Joe Biden           | +3.4%      |
+| 2024 | Donald Trump        | (Dem. Nominee)      | +13%       |
 
-*Negative margin indicates Republican win. 2024 margin is illustrative for case study purposes.*
+*Negative margin indicates Democratic win. 2024 margin is illustrative for case study purposes.*
 
 #### County-Level Margin Shifts (2016–2024)
 
@@ -249,9 +249,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
    - Robust normalization for county names ensures correct color mapping, fixing issues for counties like St Johns and St Lucie.
    - Map coloring logic refactored for accuracy and consistency.
 
+## 🆕 Recent Updates (September 24, 2025)
+
+- **Contest Controls UX & Accessibility:**
+   - Contest controls panel now uses a floating toggle button on mobile, keeping desktop layout unchanged.
+   - Contest selector dropdown and accessibility (♿) button are grouped for better visibility and context.
+   - Accessibility button toggles color blindness mode and is placed next to the contest dropdown for easy access.
+   - Improved mobile experience: contest controls are hidden by default and can be opened with the toggle button.
+
+## ♿ Accessibility: Color Blindness Mode
+
+This app includes a color blindness accessibility mode to help users with color vision deficiencies distinguish map and legend colors more easily.
+
+- To activate, click the ♿ button next to the "Contest Type" dropdown in the contest controls panel.
+- The mode updates legend colors and styles for high contrast and clarity.
+- You can toggle the mode on/off at any time.
+
+This feature is available on both desktop and mobile layouts.
+
 - **Performance Optimizations:**
    - Contest selector population logic profiled and optimized to reduce delay.
    - Efficient dropdown population using document fragments and precomputed contest/year pairs.
 
-**📅 Last Updated**: September 23, 2025
-
+**📅 Last Updated**: September 24, 2025
