@@ -65,6 +65,29 @@
     .spinner svg circle {
       animation: spinner-rotate 0.8s linear infinite;
     }
+  /* Colorblind mode legend overrides - must be last in style block */
+  body.colorblind-mode .legend-color {
+    border: 2px dashed #333 !important;
+  }
+  body.colorblind-mode .legend-item {
+    font-weight: bold;
+    text-decoration: underline wavy #333;
+  }
+  body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #ff9900 !important; }
+  body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ffb84d !important; }
+  body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ffd699 !important; }
+  body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffe5cc !important; }
+  body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #fff2e6 !important; }
+  body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffe5cc !important; }
+  body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #fff2e6 !important; }
+  body.colorblind-mode .legend-color[style*="background: #f7f7f7"] { background: #cccccc !important; }
+  body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #3399ff !important; }
+  body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #66b3ff !important; }
+  body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #99ccff !important; }
+  body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #b3d1ff !important; }
+  body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #3366cc !important; }
+  body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #003399 !important; }
+  body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #001f4d !important; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="data/candidateNameOverride.js"></script>
@@ -684,11 +707,50 @@ body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #
 // Accessibility: Color Blind Mode Toggle
 document.addEventListener('DOMContentLoaded', function() {
   var accBtn = document.getElementById('accessibility-toggle');
+  function updateLegendColors() {
+    var colorblind = document.body.classList.contains('colorblind-mode');
+    var legendColors = document.querySelectorAll('.legend-color');
+    legendColors.forEach(function(el) {
+      var orig = el.getAttribute('data-orig-bg');
+      if (!orig) {
+        orig = el.style.background;
+        el.setAttribute('data-orig-bg', orig);
+      }
+      if (colorblind) {
+        // Map original color to colorblind-friendly color
+        var cbMap = {
+          '#67000d': '#ff9900',
+          '#a50f15': '#ffb84d',
+          '#cb181d': '#ffd699',
+          '#ef3b2c': '#ffe5cc',
+          '#fb6a4a': '#fff2e6',
+          '#fcae91': '#ffe5cc',
+          '#fee8c8': '#fff2e6',
+          '#f7f7f7': '#cccccc',
+          '#e1f5fe': '#3399ff',
+          '#c6dbef': '#66b3ff',
+          '#9ecae1': '#99ccff',
+          '#6baed6': '#b3d1ff',
+          '#3182bd': '#3366cc',
+          '#08519c': '#003399',
+          '#08306b': '#001f4d'
+        };
+        var match = orig.match(/#([0-9a-fA-F]{6})/);
+        if (match && cbMap[match[0]]) {
+          el.style.background = cbMap[match[0]];
+        }
+      } else {
+        el.style.background = orig;
+      }
+    });
+  }
   if (accBtn) {
     accBtn.onclick = function() {
       document.body.classList.toggle('colorblind-mode');
+      updateLegendColors();
     };
   }
+  updateLegendColors(); // Ensure correct colors on load
 });
 </script>
 <div id="map"></div>
@@ -1567,31 +1629,9 @@ document.addEventListener('DOMContentLoaded', function() {
             'text-size': 13,
             'text-anchor': 'center',
             'text-offset': [0, 0]
-          },
-          paint: {
-            'text-color': '#374151',
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.2
           }
         });
-        // Add click handler for counties: show sidebar with details
-        map.on('click', 'county-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.County;
-            if (countyName) {
-              showCountyDetails(countyName);
-              lastSelectedCounty = countyName;
-              // Expand sidebar if minimized
-              const sidebar = document.getElementById('sidebar');
-              if (sidebar.classList.contains('minimized')) {
-                toggleSidebar();
-              }
-            }
-          }
-        });
-        map.on('mouseenter', 'county-fill', (e) => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
+        // Add mouseleave event handler
         map.on('mouseleave', 'county-fill', () => {
           map.getCanvas().style.cursor = '';
         });
