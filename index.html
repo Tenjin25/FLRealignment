@@ -1728,57 +1728,33 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     competitiveness = `Tossup (${winner} win)`;
   }
-  let compColor;
-  if (isColorblind) {
-    // Accessibility palette (fully separated)
-    if (winner === 'Republican') {
-      if (actualMarginPct >= 40) compColor = '#ff9900';
-      else if (actualMarginPct >= 30) compColor = '#ffb84d';
-      else if (actualMarginPct >= 20) compColor = '#ffd699';
-      else if (actualMarginPct >= 10) compColor = '#ffe5cc';
-      else if (actualMarginPct >= 5.5) compColor = '#fff2e6';
-      else if (actualMarginPct >= 1) compColor = '#ffe5cc';
-      else if (actualMarginPct >= 0.5) compColor = '#fff2e6';
-      else compColor = '#cccccc';
-    } else if (winner === 'Democratic') {
-      if (actualMarginPct >= 40) compColor = '#0074d9';
-      else if (actualMarginPct >= 30) compColor = '#339af0';
-      else if (actualMarginPct >= 20) compColor = '#5dade2';
-      else if (actualMarginPct >= 10) compColor = '#74c0fc';
-      else if (actualMarginPct >= 5.5) compColor = '#a5d8ff';
-      else if (actualMarginPct >= 1) compColor = '#d0ebff';
-      else if (actualMarginPct >= 0.5) compColor = '#e7f5ff';
-      else compColor = '#cccccc';
-    } else {
-      compColor = '#cccccc';
-    }
-  } else {
-    // Use custom palette for competitiveness category (Tailwind-inspired)
-    let compColor = '#6b7280';
-    if (competitiveness.includes('Rep')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
-      else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
-      else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
-      else if (competitiveness.includes('Safe')) compColor = '#dc2626';
-      else if (competitiveness.includes('Likely')) compColor = '#ef4444';
-      else if (competitiveness.includes('Lean')) compColor = '#f87171';
-      else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
-    } else if (competitiveness.includes('Dem')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
-      else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
-      else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
-      else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
-      else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
-      else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
-      else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
-    } else if (competitiveness.startsWith('Tossup')) {
-      compColor = '#f7f7f7';
-    }
-      console.log('Sidebar Competitiveness Color:', compColor, 'for', competitiveness);
+  let compColor = '#6b7280';
+  if (competitiveness.includes('Rep')) {
+    if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
+    else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
+    else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
+    else if (competitiveness.includes('Safe')) compColor = '#dc2626';
+    else if (competitiveness.includes('Likely')) compColor = '#ef4444';
+    else if (competitiveness.includes('Lean')) compColor = '#f87171';
+    else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
+  } else if (competitiveness.includes('Dem')) {
+    if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
+    else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
+    else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
+    else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
+    else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
+    else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
+    else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
   }
   sidebarContent += `<div class="competitiveness-section">`;
   sidebarContent += '<h5>🎯 Competitiveness</h5>';
   sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
+  if (actualMarginPct <= 0.5) {
+    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
+  } else if (actualMarginPct <= 1) {
+    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
+  }
+  sidebarContent += `</div>`;
   if (actualMarginPct <= 0.5) {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
   } else if (actualMarginPct <= 1) {
