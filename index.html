@@ -724,6 +724,51 @@ document.addEventListener('DOMContentLoaded', function() {
     accBtn.onclick = function() {
       document.body.classList.toggle('colorblind-mode');
       updateLegendColors();
+      // Update map colors for accessibility mode
+      if (document.body.classList.contains('colorblind-mode')) {
+        // Blue/orange for colorblind mode
+        const expr = ['case'];
+        const contestSelect = document.getElementById('contestSelect');
+        const contestKey = contestSelect && contestSelect.value;
+        if (contestKey && electionData) {
+          const lastUnderscoreIndex = contestKey.lastIndexOf('_');
+          const contestType = contestKey.substring(0, lastUnderscoreIndex);
+          const year = contestKey.substring(lastUnderscoreIndex + 1);
+          const contestData = electionData.filter(row => row.year == year);
+          function normalizeCountyName(name) {
+            return (name || '')
+              .replace(/St\.? Lucie/i, 'St Lucie')
+              .replace(/St\.? Johns/i, 'St Johns')
+              .replace(/[^a-z0-9 ]/gi, '')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .toUpperCase();
+          }
+          contestData.forEach(row => {
+            const countyName = normalizeCountyName(row.county);
+            const demVotes = row[`${contestType}_dem`] || 0;
+            const repVotes = row[`${contestType}_rep`] || 0;
+            const totalVotes = row[`${contestType}_total`] || 0;
+            if (totalVotes === 0) return;
+            const demPct = (demVotes / totalVotes) * 100;
+            const repPct = (repVotes / totalVotes) * 100;
+            const winner = repPct > demPct ? 'R' : 'D';
+            // Blue for Dem, Orange for Rep
+            const color = winner === 'R' ? '#ff9900' : '#0074d9';
+            expr.push(['==', ['upcase', ['get', 'County']], countyName]);
+            expr.push(color);
+          });
+          expr.push('#e0e0e0'); // default color
+          if (map.getLayer('county-fill')) {
+            map.setPaintProperty('county-fill', 'fill-color', expr);
+          }
+        }
+      } else {
+        // Restore normal contest colors
+        const contestSelect = document.getElementById('contestSelect');
+        const contestKey = contestSelect && contestSelect.value;
+        if (contestKey) applyContest(contestKey);
+      }
     };
   }
   updateLegendColors(); // Ensure correct colors on load
@@ -936,6 +981,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error(err);
         return [];
       }
+    }
 // Merge JSONs (e.g., boundaries + election results)
 function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County', countyNameKey='county') {
   // Returns a new GeoJSON with election results merged into feature properties
@@ -964,7 +1010,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   });
   return boundaryGeoJSON;
 }
-    }
 
     function buildCountyNameMapFromGeoJSON(geojson) {
       const map = {};
@@ -1550,21 +1595,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       let compColor = '#6b7280';
       if (competitiveness.includes('Rep')) {
-        if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
-        else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
-        else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
-        else if (competitiveness.includes('Safe')) compColor = '#dc2626';
-        else if (competitiveness.includes('Likely')) compColor = '#ef4444';
-        else if (competitiveness.includes('Lean')) compColor = '#f87171';
-        else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
+        if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+        else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+        else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+        else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+        else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+        else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+        else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
       } else if (competitiveness.includes('Dem')) {
-        if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
-        else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
-        else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
-        else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
-        else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
-        else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
-        else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
+        if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+        else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+        else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+        else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+        else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+        else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+        else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
       }
       sidebarContent += `<div class="competitiveness-section">`;
       sidebarContent += '<h5>🎯 Competitiveness</h5>';
@@ -1594,7 +1639,6 @@ document.addEventListener('DOMContentLoaded', function() {
           source: 'counties', 
           paint: { 'line-color': '#333', 'line-width': 1 } 
         });
-        // Add county label layer
         map.addLayer({
           id: 'county-label',
           type: 'symbol',
@@ -1610,6 +1654,34 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add mouseleave event handler
         map.on('mouseleave', 'county-fill', () => {
           map.getCanvas().style.cursor = '';
+        });
+        // Add county click event handler
+        map.on('click', 'county-fill', (e) => {
+          if (e.features && e.features[0] && e.features[0].properties) {
+            const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || e.features[0].properties.name;
+            if (countyName) {
+              zoomToCounty(countyName);
+              showCountyDetails(countyName);
+              lastSelectedCounty = countyName;
+            }
+          }
+        });
+        // Quick hover tooltip with basic info
+        map.on('mouseenter', 'county-fill', (e) => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mousemove', 'county-fill', (e) => {
+          if (e.features && e.features[0] && e.features[0].properties) {
+            const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || e.features[0].properties.name;
+            if (countyName) {
+              const quickInfo = getQuickCountyInfo(countyName);
+              showHoverTooltip(e.point.x, e.point.y, quickInfo);
+            }
+          }
+        });
+        map.on('mouseleave', 'county-fill', () => {
+          map.getCanvas().style.cursor = '';
+          hideHoverTooltip();
         });
       }
     }
@@ -2128,8 +2200,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (contestValue && electionData) {
         const [contestType, year] = contestValue.split('_');
-        const expectedType = chamber === 'house' ? 'state_house' : 'state_senate';
-        
         if (contestType === expectedType) {
           // For state legislative districts, we need to aggregate county data by district
           // This is complex without a county-to-district mapping, so show general message
