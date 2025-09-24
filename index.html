@@ -1950,6 +1950,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (val) {
             zoomToCounty(val);
             showCountyDetails(val);
+            lastSelectedCounty = val;
             const sidebar = document.getElementById('sidebar');
             if (sidebar.classList.contains('minimized')) {
               toggleSidebar();
