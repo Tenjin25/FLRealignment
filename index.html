@@ -2286,11 +2286,22 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update statewide results display
       updateStatewideResults(contestType, year, statewidedemVotes, statewidrepVotes, statewidTotalVotes);
 
-      // Build expression for county coloring using normalized county names
+      // Build expression for county coloring using normalized, uppercase names
       const expr = ['case'];
       let countiesProcessed = 0;
+      // Normalization function (same as mergeGeoElectionData)
+      function normalizeCountyName(name) {
+        if (!name) return '';
+        return name
+          .replace(/St[\.]?\s*Lucie/i, 'St Lucie')
+          .replace(/St[\.]?\s*Johns/i, 'St Johns')
+          .replace(/\./g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toUpperCase();
+      }
       contestData.forEach(row => {
-        const norm = normalizeCountyName(row.county);
+        const countyName = normalizeCountyName(row.county);
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
         const totalVotes = row[`${contestType}_total`] || 0;
@@ -2300,11 +2311,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-        expr.push(['==', ['get', 'County'], norm]);
+        // Match on normalized, uppercase name from GeoJSON
+        expr.push(['==', ['upcase', ['get', 'County']], countyName]);
         expr.push(color);
         countiesProcessed++;
       });
-      
       expr.push('#e0e0e0'); // default color
       
       console.log(`Color expression built for ${countiesProcessed} counties`);
