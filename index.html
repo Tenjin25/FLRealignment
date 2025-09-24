@@ -1753,32 +1753,39 @@ document.addEventListener('DOMContentLoaded', function() {
       compColor = '#cccccc';
     }
   } else {
-    // Use the specified palette for competitiveness category (exact match)
-    if (winner === 'Republican') {
-      if (actualMarginPct >= 40) compColor = '#67000d'; // Annihilation Republican
-      else if (actualMarginPct >= 30) compColor = '#a50f15'; // Dominant Republican
-      else if (actualMarginPct >= 20) compColor = '#cb181d'; // Stronghold Republican
-      else if (actualMarginPct >= 10) compColor = '#ef3b2c'; // Safe Republican
-      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a'; // Likely Republican
-      else if (actualMarginPct >= 1) compColor = '#fcae91'; // Lean Republican
-      else if (actualMarginPct >= 0.5) compColor = '#fee8c8'; // Tilt Republican
-      else compColor = '#f7f7f7'; // Tossup
-    } else if (winner === 'Democratic') {
-      if (actualMarginPct >= 40) compColor = '#08306b'; // Annihilation Democratic
-      else if (actualMarginPct >= 30) compColor = '#08519c'; // Dominant Democratic
-      else if (actualMarginPct >= 20) compColor = '#3182bd'; // Stronghold Democratic
-      else if (actualMarginPct >= 10) compColor = '#6baed6'; // Safe Democratic
-      else if (actualMarginPct >= 5.5) compColor = '#9ecae1'; // Likely Democratic
-      else if (actualMarginPct >= 1) compColor = '#c6dbef'; // Lean Democratic
-      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe'; // Tilt Democratic
-      else compColor = '#f7f7f7'; // Tossup
-    } else {
-      compColor = '#f7f7f7'; // Tossup
+    // Use custom palette for competitiveness category (Tailwind-inspired)
+    let compColor = '#6b7280';
+    if (competitiveness.includes('Rep')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
+      else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
+      else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
+      else if (competitiveness.includes('Safe')) compColor = '#dc2626';
+      else if (competitiveness.includes('Likely')) compColor = '#ef4444';
+      else if (competitiveness.includes('Lean')) compColor = '#f87171';
+      else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
+    } else if (competitiveness.includes('Dem')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
+      else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
+      else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
+      else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
+      else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
+      else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
+      else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
+    } else if (competitiveness.startsWith('Tossup')) {
+      compColor = '#f7f7f7';
     }
   }
   sidebarContent += `<div class="competitiveness-section">`;
   sidebarContent += '<h5>🎯 Competitiveness</h5>';
-  sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
+  // Force Lean Republican color to #fcae91 with inline style override
+  let compStyle = `color: ${compColor}; font-weight: bold; font-size: 16px;`;
+  if (competitiveness === 'Lean Republican') {
+    compStyle = 'color: #fcae91 !important; font-weight: bold; font-size: 16px;';
+  }
+  if (competitiveness.startsWith('Tossup')) {
+    compStyle = 'color: #222; background: #f7f7f7; border: 2px solid #999; border-radius: 6px; font-weight: bold; font-size: 16px; padding: 2px 8px;';
+  }
+  sidebarContent += `<p style="${compStyle}">${competitiveness}</p>`;
   if (actualMarginPct <= 0.5) {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
   } else if (actualMarginPct <= 1) {
