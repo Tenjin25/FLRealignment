@@ -1755,12 +1755,6 @@ document.addEventListener('DOMContentLoaded', function() {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
   }
   sidebarContent += `</div>`;
-  if (actualMarginPct <= 0.5) {
-    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
-  } else if (actualMarginPct <= 1) {
-    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
-  }
-  sidebarContent += `</div>`;
   contentEl.innerHTML = sidebarContent;
   detailsDiv.style.display = 'block';
   detailsDiv.style.display = 'block';
@@ -2736,4 +2730,5 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
 
