@@ -27,13 +27,13 @@ Florida was the nation’s ultimate swing state from 2008–2016, with razor-thi
 
 | Year | Republican Candidate | Democratic Candidate | GOP Margin |
 |------|---------------------|---------------------|------------|
-| 2008 | John McCain         | Barack Obama        | -2.8%      |
-| 2012 | Mitt Romney         | Barack Obama        | -0.9%      |
-| 2016 | Donald Trump        | Hillary Clinton     | +1.2%      |
-| 2020 | Donald Trump        | Joe Biden           | +3.4%      |
-| 2024 | Donald Trump        | (Dem. Nominee)      | +13%       |
+| 2008 | John McCain         | Barack Obama        | +2.8%      |
+| 2012 | Mitt Romney         | Barack Obama        | +0.9%      |
+| 2016 | Donald Trump        | Hillary Clinton     | -1.2%      |
+| 2020 | Donald Trump        | Joe Biden           | -3.4%      |
+| 2024 | Donald Trump        | Kamala Harris       | -13%       |
 
-*Negative margin indicates Democratic win. 2024 margin is illustrative for case study purposes.*
+*Negative margin indicates Republican win. 2024 margin is illustrative for case study purposes.*
 
 #### County-Level Margin Shifts (2016–2024)
 
@@ -254,3 +254,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
    - Efficient dropdown population using document fragments and precomputed contest/year pairs.
 
 **📅 Last Updated**: September 23, 2025
+
