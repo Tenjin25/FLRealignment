@@ -1698,21 +1698,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Non-accessibility mode: always use red for Republican vote breakdown
     repColor = '#ef3b2c';
   }
-  let demColor = '#2563eb';
+  let demColor;
   if (isColorblind) {
     demColor = cbColorForMargin(parseFloat(marginPct), 'D');
   } else {
-    // Non-accessibility mode: match legend palette
-    if (winner === 'Democratic') {
-      if (parseFloat(marginPct) >= 40) demColor = '#08306b';
-      else if (parseFloat(marginPct) >= 30) demColor = '#08519c';
-      else if (parseFloat(marginPct) >= 20) demColor = '#3182bd';
-      else if (parseFloat(marginPct) >= 10) demColor = '#6baed6';
-      else if (parseFloat(marginPct) >= 5.5) demColor = '#9ecae1';
-      else if (parseFloat(marginPct) >= 1) demColor = '#c6dbef';
-      else if (parseFloat(marginPct) >= 0.5) demColor = '#e1f5fe';
-      else demColor = '#f7f7f7';
-    }
+    // Non-accessibility mode: always use regular blue for Democratic vote breakdown
+    demColor = '#2563eb';
   }
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${demColor}; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${repColor}; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
@@ -1737,7 +1728,7 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     competitiveness = `Tossup (${winner} win)`;
   }
-  let compColor = '#6b7280';
+  let compColor;
   if (isColorblind) {
     // Accessibility palette (fully separated)
     if (winner === 'Republican') {
@@ -1762,24 +1753,24 @@ document.addEventListener('DOMContentLoaded', function() {
       compColor = '#cccccc';
     }
   } else {
-    // Use the specified palette for competitiveness category
+    // Use the specified palette for competitiveness category (exact match)
     if (winner === 'Republican') {
-      if (actualMarginPct >= 40) compColor = '#67000d'; // Annihilation
-      else if (actualMarginPct >= 30) compColor = '#a50f15'; // Dominant
-      else if (actualMarginPct >= 20) compColor = '#cb181d'; // Stronghold
-      else if (actualMarginPct >= 10) compColor = '#ef3b2c'; // Safe
-      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a'; // Likely
-      else if (actualMarginPct >= 1) compColor = '#fcae91'; // Lean
-      else if (actualMarginPct >= 0.5) compColor = '#fee8c8'; // Tilt
+      if (actualMarginPct >= 40) compColor = '#67000d'; // Annihilation Republican
+      else if (actualMarginPct >= 30) compColor = '#a50f15'; // Dominant Republican
+      else if (actualMarginPct >= 20) compColor = '#cb181d'; // Stronghold Republican
+      else if (actualMarginPct >= 10) compColor = '#ef3b2c'; // Safe Republican
+      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a'; // Likely Republican
+      else if (actualMarginPct >= 1) compColor = '#fcae91'; // Lean Republican
+      else if (actualMarginPct >= 0.5) compColor = '#fee8c8'; // Tilt Republican
       else compColor = '#f7f7f7'; // Tossup
     } else if (winner === 'Democratic') {
-      if (actualMarginPct >= 40) compColor = '#08306b'; // Annihilation
-      else if (actualMarginPct >= 30) compColor = '#08519c'; // Dominant
-      else if (actualMarginPct >= 20) compColor = '#3182bd'; // Stronghold
-      else if (actualMarginPct >= 10) compColor = '#6baed6'; // Safe
-      else if (actualMarginPct >= 5.5) compColor = '#9ecae1'; // Likely
-      else if (actualMarginPct >= 1) compColor = '#c6dbef'; // Lean
-      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe'; // Tilt
+      if (actualMarginPct >= 40) compColor = '#08306b'; // Annihilation Democratic
+      else if (actualMarginPct >= 30) compColor = '#08519c'; // Dominant Democratic
+      else if (actualMarginPct >= 20) compColor = '#3182bd'; // Stronghold Democratic
+      else if (actualMarginPct >= 10) compColor = '#6baed6'; // Safe Democratic
+      else if (actualMarginPct >= 5.5) compColor = '#9ecae1'; // Likely Democratic
+      else if (actualMarginPct >= 1) compColor = '#c6dbef'; // Lean Democratic
+      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe'; // Tilt Democratic
       else compColor = '#f7f7f7'; // Tossup
     } else {
       compColor = '#f7f7f7'; // Tossup
