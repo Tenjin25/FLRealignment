@@ -2329,9 +2329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-        expr.push(['==', ['get', 'County'], row.county]); // keep for compatibility
-        expr.push(color);
-        expr.push(['==', ['get', 'County'], norm]); // match normalized name too
+        expr.push(['==', ['get', 'County'], norm]);
         expr.push(color);
         countiesProcessed++;
       });
