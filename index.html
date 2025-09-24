@@ -1684,7 +1684,7 @@ document.addEventListener('DOMContentLoaded', function() {
   sidebarContent += `<div class="vote-breakdown">`;
   sidebarContent += '<h3 class="sidebar-section-title">🗳️ Vote Breakdown</h3>';
   // For colorblind mode, use the correct accessibility palette for Republican vote breakdown
-  let repColor = '#dc2626';
+  let repColor = '#ef3b2c';
   if (isColorblind) {
     if (parseFloat(marginPct) >= 40) repColor = '#ff9900';
     else if (parseFloat(marginPct) >= 30) repColor = '#ffb84d';
@@ -1695,17 +1695,8 @@ document.addEventListener('DOMContentLoaded', function() {
     else if (parseFloat(marginPct) >= 0.5) repColor = '#fff2e6';
     else repColor = '#cccccc';
   } else {
-    // Non-accessibility mode: match legend palette
-    if (winner === 'Republican') {
-      if (parseFloat(marginPct) >= 40) repColor = '#67000d';
-      else if (parseFloat(marginPct) >= 30) repColor = '#a50f15';
-      else if (parseFloat(marginPct) >= 20) repColor = '#cb181d';
-      else if (parseFloat(marginPct) >= 10) repColor = '#ef3b2c';
-      else if (parseFloat(marginPct) >= 5.5) repColor = '#fb6a4a';
-      else if (parseFloat(marginPct) >= 1) repColor = '#fcae91';
-      else if (parseFloat(marginPct) >= 0.5) repColor = '#fee8c8';
-      else repColor = '#f7f7f7';
-    }
+    // Non-accessibility mode: always use red for Republican vote breakdown
+    repColor = '#ef3b2c';
   }
   let demColor = '#2563eb';
   if (isColorblind) {
