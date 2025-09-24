@@ -1748,7 +1748,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   let compColor = '#6b7280';
   if (isColorblind) {
-    // Always use yellow/orange for Republican competitiveness in colorblind mode
+    // Accessibility palette (fully separated)
     if (winner === 'Republican') {
       if (actualMarginPct >= 40) compColor = '#ff9900';
       else if (actualMarginPct >= 30) compColor = '#ffb84d';
@@ -1758,26 +1758,40 @@ document.addEventListener('DOMContentLoaded', function() {
       else if (actualMarginPct >= 1) compColor = '#ffe5cc';
       else if (actualMarginPct >= 0.5) compColor = '#fff2e6';
       else compColor = '#cccccc';
+    } else if (winner === 'Democratic') {
+      if (actualMarginPct >= 40) compColor = '#0074d9';
+      else if (actualMarginPct >= 30) compColor = '#339af0';
+      else if (actualMarginPct >= 20) compColor = '#5dade2';
+      else if (actualMarginPct >= 10) compColor = '#74c0fc';
+      else if (actualMarginPct >= 5.5) compColor = '#a5d8ff';
+      else if (actualMarginPct >= 1) compColor = '#d0ebff';
+      else if (actualMarginPct >= 0.5) compColor = '#e7f5ff';
+      else compColor = '#cccccc';
     } else {
-      compColor = cbColorForMargin(actualMarginPct, 'D');
+      compColor = '#cccccc';
     }
   } else {
-    if (competitiveness.includes('Rep')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#67000d';
-      else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
-      else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
-      else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
-      else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
-      else if (competitiveness.includes('Lean')) compColor = '#fcae91';
-      else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
-    } else if (competitiveness.includes('Dem')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#08306b';
-      else if (competitiveness.includes('Dominant')) compColor = '#08519c';
-      else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
-      else if (competitiveness.includes('Safe')) compColor = '#6baed6';
-      else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
-      else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
-      else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
+    // Default palette (original legend mapping)
+    if (winner === 'Republican') {
+      if (actualMarginPct >= 40) compColor = '#67000d';
+      else if (actualMarginPct >= 30) compColor = '#a50f15';
+      else if (actualMarginPct >= 20) compColor = '#cb181d';
+      else if (actualMarginPct >= 10) compColor = '#ef3b2c';
+      else if (actualMarginPct >= 5.5) compColor = '#fb6a4a';
+      else if (actualMarginPct >= 1) compColor = '#fcae91';
+      else if (actualMarginPct >= 0.5) compColor = '#fee8c8';
+      else compColor = '#f7f7f7';
+    } else if (winner === 'Democratic') {
+      if (actualMarginPct >= 40) compColor = '#08306b';
+      else if (actualMarginPct >= 30) compColor = '#08519c';
+      else if (actualMarginPct >= 20) compColor = '#3182bd';
+      else if (actualMarginPct >= 10) compColor = '#6baed6';
+      else if (actualMarginPct >= 5.5) compColor = '#9ecae1';
+      else if (actualMarginPct >= 1) compColor = '#c6dbef';
+      else if (actualMarginPct >= 0.5) compColor = '#e1f5fe';
+      else compColor = '#f7f7f7';
+    } else {
+      compColor = '#f7f7f7';
     }
   }
   sidebarContent += `<div class="competitiveness-section">`;
