@@ -726,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
       updateLegendColors();
       // Update map colors for accessibility mode
       if (document.body.classList.contains('colorblind-mode')) {
-        // Blue/orange for colorblind mode
+        // Blue/orange shades for colorblind mode, matching legend categories
         const expr = ['case'];
         const contestSelect = document.getElementById('contestSelect');
         const contestKey = contestSelect && contestSelect.value;
@@ -744,6 +744,26 @@ document.addEventListener('DOMContentLoaded', function() {
               .trim()
               .toUpperCase();
           }
+          function cbColorForMargin(marginPct, winner) {
+            // Accessibility palette: orange for R, blue for D, with shades
+            if (marginPct >= 40) {
+              return winner === 'R' ? '#ff9900' : '#0074d9'; // Annihilation
+            } else if (marginPct >= 30) {
+              return winner === 'R' ? '#ffb84d' : '#339af0'; // Dominant
+            } else if (marginPct >= 20) {
+              return winner === 'R' ? '#ffd699' : '#5dade2'; // Stronghold
+            } else if (marginPct >= 10) {
+              return winner === 'R' ? '#ffe5cc' : '#74c0fc'; // Safe
+            } else if (marginPct >= 5.5) {
+              return winner === 'R' ? '#fff2e6' : '#a5d8ff'; // Likely
+            } else if (marginPct >= 1) {
+              return winner === 'R' ? '#ffe5cc' : '#d0ebff'; // Lean
+            } else if (marginPct >= 0.5) {
+              return winner === 'R' ? '#fff2e6' : '#e7f5ff'; // Tilt
+            } else {
+              return '#cccccc'; // Tossup
+            }
+          }
           contestData.forEach(row => {
             const countyName = normalizeCountyName(row.county);
             const demVotes = row[`${contestType}_dem`] || 0;
@@ -753,8 +773,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const demPct = (demVotes / totalVotes) * 100;
             const repPct = (repVotes / totalVotes) * 100;
             const winner = repPct > demPct ? 'R' : 'D';
-            // Blue for Dem, Orange for Rep
-            const color = winner === 'R' ? '#ff9900' : '#0074d9';
+            const marginPct = Math.abs(repPct - demPct);
+            const color = cbColorForMargin(marginPct, winner);
             expr.push(['==', ['upcase', ['get', 'County']], countyName]);
             expr.push(color);
           });
@@ -1547,83 +1567,108 @@ document.addEventListener('DOMContentLoaded', function() {
       const winner = margin > 0 ? 'Democratic' : (margin < 0 ? 'Republican' : 'Tie');
       const winnerCandidate = margin > 0 ? demCandidate : repCandidate;
       const marginText = margin > 0 ? 'D+' + marginPct + '%' : (margin < 0 ? 'R+' + marginPct + '%' : 'Tied');
-      const winnerColor = winner === 'Republican' ? '#dc2626' : '#2563eb';
+      // Accessibility palette for winner color
+      function cbColorForMargin(marginPct, winner) {
+        if (marginPct >= 40) {
+          return winner === 'Republican' ? '#ff9900' : '#0074d9';
+        } else if (marginPct >= 30) {
+          return winner === 'Republican' ? '#ffb84d' : '#339af0';
+        } else if (marginPct >= 20) {
+          return winner === 'Republican' ? '#ffd699' : '#5dade2';
+        } else if (marginPct >= 10) {
+          return winner === 'Republican' ? '#ffe5cc' : '#74c0fc';
+        } else if (marginPct >= 5.5) {
+          return winner === 'Republican' ? '#fff2e6' : '#a5d8ff';
+        } else if (marginPct >= 1) {
+          return winner === 'Republican' ? '#ffe5cc' : '#d0ebff';
+        } else if (marginPct >= 0.5) {
+          return winner === 'Republican' ? '#fff2e6' : '#e7f5ff';
+        } else {
+          return '#cccccc';
+        }
+      }
+      const isColorblind = document.body.classList.contains('colorblind-mode');
+      const winnerColor = isColorblind ? cbColorForMargin(parseFloat(marginPct), winner === 'Republican' ? 'R' : 'D') : (winner === 'Republican' ? '#dc2626' : '#2563eb');
       // Precincts (if available)
       let precincts = '';
       if (countyData.precincts || countyData.Precincts || countyData.PRECINCTS) {
         precincts = countyData.precincts || countyData.Precincts || countyData.PRECINCTS;
       }
       // Card-style layout
-  sidebarContent += '<div class="result-summary">';
-  sidebarContent += '<h3 class="sidebar-section-title">📊 Election Results</h3>';
+      sidebarContent += '<div class="result-summary">';
+      sidebarContent += '<h3 class="sidebar-section-title">📊 Election Results</h3>';
       if (precincts) sidebarContent += `<div style="font-size:14px;"><b>Precincts:</b> ${precincts}</div>`;
       sidebarContent += `<div style="font-size:14px;margin-bottom:10px;"><b>Total Votes:</b> ${totalVotes.toLocaleString()}</div>`;
       sidebarContent += `</div>`;
     sidebarContent += `<div class="winner-section">`;
   sidebarContent += '<h3 class="sidebar-section-title">🏆 Winner</h3>';
   sidebarContent += `<p class="sidebar-winner" style="color: ${winnerColor}; font-weight: bold;">${winnerCandidate} (${winner === 'Republican' ? 'R' : 'D'})</p>`;
-    sidebarContent += `</div>`;
-    sidebarContent += `<div class="margin-section">`;
+  sidebarContent += `</div>`;
+  sidebarContent += `<div class="margin-section">`;
   sidebarContent += '<h3 class="sidebar-section-title">📈 Margin</h3>';
   sidebarContent += `<p class="sidebar-margin" style="color: ${winnerColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
-    sidebarContent += `<p class="sidebar-margin-details" style="color: #6b7280;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
-    sidebarContent += `</div>`;
-    sidebarContent += `<div class="vote-breakdown">`;
+  sidebarContent += `<p class="sidebar-margin-details" style="color: #6b7280;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
+  sidebarContent += `</div>`;
+  sidebarContent += `<div class="vote-breakdown">`;
   sidebarContent += '<h3 class="sidebar-section-title">🗳️ Vote Breakdown</h3>';
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
-    sidebarContent += `</div>`;
-      // Competitiveness
-      let competitiveness;
-      const actualMarginPct = parseFloat(marginPct);
-      if (actualMarginPct >= 40) {
-        competitiveness = winner === 'Republican' ? "Annihilation Republican" : "Annihilation Democratic";
-      } else if (actualMarginPct >= 30) {
-        competitiveness = winner === 'Republican' ? "Dominant Republican" : "Dominant Democratic";
-      } else if (actualMarginPct >= 20) {
-        competitiveness = winner === 'Republican' ? "Stronghold Republican" : "Stronghold Democratic";
-      } else if (actualMarginPct >= 10) {
-        competitiveness = winner === 'Republican' ? "Safe Republican" : "Safe Democratic";
-      } else if (actualMarginPct >= 5.5) {
-        competitiveness = winner === 'Republican' ? "Likely Republican" : "Likely Democratic";
-      } else if (actualMarginPct >= 1) {
-        competitiveness = winner === 'Republican' ? "Lean Republican" : "Lean Democratic";
-      } else if (actualMarginPct >= 0.5) {
-        competitiveness = winner === 'Republican' ? "Tilt Republican" : "Tilt Democratic";
-      } else {
-        competitiveness = `Tossup (${winner} win)`;
-      }
-      let compColor = '#6b7280';
-      if (competitiveness.includes('Rep')) {
-        if (competitiveness.includes('Annihilation')) compColor = '#67000d';
-        else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
-        else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
-        else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
-        else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
-        else if (competitiveness.includes('Lean')) compColor = '#fcae91';
-        else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
-      } else if (competitiveness.includes('Dem')) {
-        if (competitiveness.includes('Annihilation')) compColor = '#08306b';
-        else if (competitiveness.includes('Dominant')) compColor = '#08519c';
-        else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
-        else if (competitiveness.includes('Safe')) compColor = '#6baed6';
-        else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
-        else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
-        else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
-      }
-      sidebarContent += `<div class="competitiveness-section">`;
-      sidebarContent += '<h5>🎯 Competitiveness</h5>';
-      sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
-      if (actualMarginPct <= 0.5) {
-        sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
-      } else if (actualMarginPct <= 1) {
-        sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
-      }
-      sidebarContent += `</div>`;
-      contentEl.innerHTML = sidebarContent;
-      detailsDiv.style.display = 'block';
-      detailsDiv.style.display = 'block';
+  sidebarContent += `</div>`;
+  // Competitiveness
+  let competitiveness;
+  const actualMarginPct = parseFloat(marginPct);
+  if (actualMarginPct >= 40) {
+    competitiveness = winner === 'Republican' ? "Annihilation Republican" : "Annihilation Democratic";
+  } else if (actualMarginPct >= 30) {
+    competitiveness = winner === 'Republican' ? "Dominant Republican" : "Dominant Democratic";
+  } else if (actualMarginPct >= 20) {
+    competitiveness = winner === 'Republican' ? "Stronghold Republican" : "Stronghold Democratic";
+  } else if (actualMarginPct >= 10) {
+    competitiveness = winner === 'Republican' ? "Safe Republican" : "Safe Democratic";
+  } else if (actualMarginPct >= 5.5) {
+    competitiveness = winner === 'Republican' ? "Likely Republican" : "Likely Democratic";
+  } else if (actualMarginPct >= 1) {
+    competitiveness = winner === 'Republican' ? "Lean Republican" : "Lean Democratic";
+  } else if (actualMarginPct >= 0.5) {
+    competitiveness = winner === 'Republican' ? "Tilt Republican" : "Tilt Democratic";
+  } else {
+    competitiveness = `Tossup (${winner} win)`;
+  }
+  let compColor = '#6b7280';
+  if (isColorblind) {
+    compColor = cbColorForMargin(actualMarginPct, winner === 'Republican' ? 'R' : 'D');
+  } else {
+    if (competitiveness.includes('Rep')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
+      else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
+      else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
+      else if (competitiveness.includes('Safe')) compColor = '#dc2626';
+      else if (competitiveness.includes('Likely')) compColor = '#ef4444';
+      else if (competitiveness.includes('Lean')) compColor = '#f87171';
+      else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
+    } else if (competitiveness.includes('Dem')) {
+      if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
+      else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
+      else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
+      else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
+      else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
+      else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
+      else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
     }
+  }
+  sidebarContent += `<div class="competitiveness-section">`;
+  sidebarContent += '<h5>🎯 Competitiveness</h5>';
+  sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
+  if (actualMarginPct <= 0.5) {
+    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
+  } else if (actualMarginPct <= 1) {
+    sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
+  }
+  sidebarContent += `</div>`;
+  contentEl.innerHTML = sidebarContent;
+  detailsDiv.style.display = 'block';
+  detailsDiv.style.display = 'block';
+}
 
     function addCountyLayers() {
       if (!map.getLayer('county-fill')) {
@@ -1645,7 +1690,7 @@ document.addEventListener('DOMContentLoaded', function() {
           source: 'counties',
           layout: {
             'text-field': ['coalesce', ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME'], ['get', 'name']],
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-font': ['Open Sans Bold'],
             'text-size': 13,
             'text-anchor': 'center',
             'text-offset': [0, 0]
