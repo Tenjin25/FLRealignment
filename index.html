@@ -595,66 +595,64 @@ body {
     .sidebar.minimized ~ #sidebar-float-toggle {
       display: flex !important;
     }
-  #map.sidebar-minimized {
-    width: 100vw !important;
-  }
+  /* Removed empty ruleset for #map.sidebar-minimized */
     </style>
 </head>
   <body>
 <div id="map"></div>
-  <!-- Sidebar for County Details and Analysis -->
-  <div class="sidebar minimized" id="sidebar">
-    <div class="sidebar-header" id="sidebar-header">
-      <h3>📊 County Analysis</h3>
-      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
+  <!-- Sidebar for County Details and Analysis (single instance only) -->
+    <div class="sidebar minimized" id="sidebar">
+      <div class="sidebar-header" id="sidebar-header">
+        <h3>📊 County Analysis</h3>
+        <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
+      </div>
+      <div class="sidebar-content">
+        <div class="county-details" id="county-details" style="display: none;">
+          <h4 id="county-name">Select a County</h4>
+          <div id="county-info-content">
+            Click on any county to see detailed election results and analysis.
+          </div>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label for="county-search" style="font-weight:600;">Search County:</label>
+          <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
+        </div>
+        <div class="statewide-results" id="statewide-results">
+          <h4 id="statewide">🏛️ Florida Statewide</h4>
+          <div id="statewide-content">
+           <p>Select a contest to see statewide results and margin.</p>
+           <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
+          </div>
+        </div>
+        <div class="findings-section">
+          <h4>🔍 Research Findings</h4>
+          <div class="finding-card">
+            <h5>Miami-Dade County - Historic Republican Flip</h5>
+            <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
+            <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;font-size:1.15em;border:2px solid #dc2626;padding:2px 8px;border-radius:6px;">2024: R+11.45%</span></p>
+            <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
+            <p><strong>Impact:</strong> Massive 18.1-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+          </div>
+          <div class="finding-card">
+            <h5>Orange County - Shrinking Democratic Margin</h5>
+            <p><strong>Trend:</strong> Orange County remains Democratic, but the margin narrowed sharply in 2024, dropping nearly 10 points in just four years.</p>
+            <p><strong>Metro Growth:</strong> Orlando's continued expansion and demographic change still favor Democrats, but Republican gains among some suburban and Hispanic voters have eroded the lead. <span class="metric">Population: +15.1% (2010-2020)</span></p>
+            <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.59%</span> — the largest Democratic margin drop in decades for the county.</p>
+            <p><strong>Strategic Importance:</strong> The narrowing gap signals new Republican competitiveness in the I-4 corridor and raises questions about future statewide trends.</p>
+          </div>
+          <div class="finding-card">
+            <h5>Statewide Patterns & I-4 Corridor</h5>
+            <p><strong>Rural-Urban Divide:</strong> Polarization continues to grow between urban coastal counties and rural interior counties, with Republicans consolidating rural support.</p>
+            <p><strong>I-4 Corridor Shift:</strong> The Tampa-Orlando corridor remains the key battleground, but 2024 saw Republicans make major gains. <span class="metric">Hillsborough County</span> voted for both Trump and Rick Scott, <span class="metric">Seminole County</span> voted for Trump by 3.55 points, <span class="metric">Orange</span> saw a sharply reduced Democratic margin, and <span class="metric">Polk</span> and <span class="metric">Volusia</span> Counties delivered landslide wins for Trump, each by over 20 points.</p>
+            <p><strong>Registration Trends:</strong> Unaffiliated voter growth continues to create volatile election dynamics, especially in swing counties.</p>
+            <p><strong>Demographics:</strong> Hispanic population growth in Central Florida is still reshaping the map, but recent cycles show more complex partisan shifts within these communities.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-footer" style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
+        Created by Shamar Davis
+      </div>
     </div>
-    <div class="sidebar-content">
-      <div class="county-details" id="county-details" style="display: none;">
-        <h4 id="county-name">Select a County</h4>
-        <div id="county-info-content">
-          Click on any county to see detailed election results and analysis.
-        </div>
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label for="county-search" style="font-weight:600;">Search County:</label>
-        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
-      </div>
-      <div class="statewide-results" id="statewide-results">
-        <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div id="statewide-content">
-         <p>Select a contest to see statewide results and margin.</p>
-         <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
-        </div>
-      </div>
-      <div class="findings-section">
-        <h4>🔍 Research Findings</h4>
-        <div class="finding-card">
-          <h5>Miami-Dade County - Historic Republican Flip</h5>
-          <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-          <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;font-size:1.15em;border:2px solid #dc2626;padding:2px 8px;border-radius:6px;">2024: R+11.45%</span></p>
-          <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-          <p><strong>Impact:</strong> Massive 18.1-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Orange County - Shrinking Democratic Margin</h5>
-          <p><strong>Trend:</strong> Orange County remains Democratic, but the margin narrowed sharply in 2024, dropping nearly 10 points in just four years.</p>
-          <p><strong>Metro Growth:</strong> Orlando's continued expansion and demographic change still favor Democrats, but Republican gains among some suburban and Hispanic voters have eroded the lead. <span class="metric">Population: +15.1% (2010-2020)</span></p>
-          <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.59%</span> — the largest Democratic margin drop in decades for the county.</p>
-          <p><strong>Strategic Importance:</strong> The narrowing gap signals new Republican competitiveness in the I-4 corridor and raises questions about future statewide trends.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Statewide Patterns & I-4 Corridor</h5>
-          <p><strong>Rural-Urban Divide:</strong> Polarization continues to grow between urban coastal counties and rural interior counties, with Republicans consolidating rural support.</p>
-          <p><strong>I-4 Corridor Shift:</strong> The Tampa-Orlando corridor remains the key battleground, but 2024 saw Republicans make major gains. <span class="metric">Hillsborough County</span> voted for both Trump and Rick Scott, <span class="metric">Seminole County</span> voted for Trump by 3.55 points, <span class="metric">Orange</span> saw a sharply reduced Democratic margin, and <span class="metric">Polk</span> and <span class="metric">Volusia</span> Counties delivered landslide wins for Trump, each by over 20 points.</p>
-          <p><strong>Registration Trends:</strong> Unaffiliated voter growth continues to create volatile election dynamics, especially in swing counties.</p>
-          <p><strong>Demographics:</strong> Hispanic population growth in Central Florida is still reshaping the map, but recent cycles show more complex partisan shifts within these communities.</p>
-        </div>
-      </div>
-    </div>
-    <div class="sidebar-footer" style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-      Created by Shamar Davis
-    </div>
-  </div>
   <!-- Floating Sidebar Expand/Collapse Button (smaller size) -->
   <button id="sidebar-float-toggle" title="Expand Sidebar">+</button>
 
@@ -701,59 +699,7 @@ body {
         </div>
     </div>
 
-    <!-- Sidebar for County Details and Analysis -->
-  <div class="sidebar minimized" id="sidebar">
-    <div class="sidebar-header" id="sidebar-header">
-      <h3>📊 County Analysis</h3>
-      <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
-    </div>
-    <div class="sidebar-content">
-      <div class="county-details" id="county-details" style="display: none;">
-        <h4 id="county-name">Select a County</h4>
-        <div id="county-info-content">
-          Click on any county to see detailed election results and analysis.
-        </div>
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label for="county-search" style="font-weight:600;">Search County:</label>
-        <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
-      </div>
-      <div class="statewide-results" id="statewide-results">
-        <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div id="statewide-content">
-         <p>Select a contest to see statewide results and margin.</p>
-         <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
-        </div>
-      </div>
-      <div class="findings-section">
-        <h4>🔍 Research Findings</h4>
-        <div class="finding-card">
-          <h5>Miami-Dade County - Historic Republican Flip</h5>
-          <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-          <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;font-size:1.15em;border:2px solid #dc2626;padding:2px 8px;border-radius:6px;">2024: R+11.45%</span></p>
-          <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-          <p><strong>Impact:</strong> Massive 18.1-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Orange County - Shrinking Democratic Margin</h5>
-          <p><strong>Trend:</strong> Orange County remains Democratic, but the margin narrowed sharply in 2024, dropping nearly 10 points in just four years.</p>
-          <p><strong>Metro Growth:</strong> Orlando's continued expansion and demographic change still favor Democrats, but Republican gains among some suburban and Hispanic voters have eroded the lead. <span class="metric">Population: +15.1% (2010-2020)</span></p>
-          <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.59%</span> — the largest Democratic margin drop in decades for the county.</p>
-          <p><strong>Strategic Importance:</strong> The narrowing gap signals new Republican competitiveness in the I-4 corridor and raises questions about future statewide trends.</p>
-        </div>
-        <div class="finding-card">
-          <h5>Statewide Patterns & I-4 Corridor</h5>
-          <p><strong>Rural-Urban Divide:</strong> Polarization continues to grow between urban coastal counties and rural interior counties, with Republicans consolidating rural support.</p>
-          <p><strong>I-4 Corridor Shift:</strong> The Tampa-Orlando corridor remains the key battleground, but 2024 saw Republicans make major gains. <span class="metric">Hillsborough County</span> voted for both Trump and Rick Scott, <span class="metric">Seminole County</span> voted for Trump by 3.55 points, <span class="metric">Orange</span> saw a sharply reduced Democratic margin, and <span class="metric">Polk</span> and <span class="metric">Volusia</span> Counties delivered landslide wins for Trump, each by over 20 points.</p>
-          <p><strong>Registration Trends:</strong> Unaffiliated voter growth continues to create volatile election dynamics, especially in swing counties.</p>
-          <p><strong>Demographics:</strong> Hispanic population growth in Central Florida is still reshaping the map, but recent cycles show more complex partisan shifts within these communities.</p>
-        </div>
-      </div>
-    </div>
-    <div class="sidebar-footer" style="padding: 16px 0; text-align: center; color: #888; font-size: 15px; border-top: 1px solid #e5e7eb; background: #f9fafb;">
-      Created by Shamar Davis
-    </div>
-  </div>
+  <!-- Duplicate sidebar removed to fix HTML errors -->
 
     <!-- Legend -->
     <div class="legend" id="legend">
@@ -2411,47 +2357,49 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyStatewideContestToDistricts(contestType, year) {
       // For statewide contests in district views, we need to aggregate county data by district
       const contestData = electionData.filter(row => row.year == year);
-      
+
       if (contestData.length === 0) {
         return setStatus('No data found for this contest');
       }
 
-      // We need county-to-district mapping - this is a simplified approach
-      // In a full implementation, you'd need actual county-to-district mapping data
-      
-      // For now, we'll apply the statewide contest to districts using a placeholder approach
-      // Each district will show the statewide result (this could be enhanced with actual mapping)
-      
       // Calculate statewide totals for this contest
       let totalDem = 0;
       let totalRep = 0;
       let totalVotes = 0;
-      
+
       contestData.forEach(row => {
-        const demVotes = parseInt(row[`${contestType}_dem`]) || 0;
-        const repVotes = parseInt(row[`${contestType}_rep`]) || 0;
+        const demVotes = Number(row[`${contestType}_dem`]) || 0;
+        const repVotes = Number(row[`${contestType}_rep`]) || 0;
+        const rowTotalVotes = Number(row[`${contestType}_total`]);
+        if (!isNaN(rowTotalVotes) && rowTotalVotes > 0) {
+          totalVotes += rowTotalVotes;
+        } else {
+          totalVotes += demVotes + repVotes;
+        }
         totalDem += demVotes;
         totalRep += repVotes;
-        totalVotes += demVotes + repVotes;
       });
-      
+
       if (totalVotes === 0) {
         return setStatus(`No data found for ${contestType} in ${year}`);
       }
-      
+
       const demPct = (totalDem / totalVotes) * 100;
       const repPct = (totalRep / totalVotes) * 100;
       const winner = repPct > demPct ? 'R' : 'D';
       const marginPct = Math.abs(repPct - demPct);
       const color = categoryColorForMargin(marginPct, winner);
-      
+
       // Apply uniform color to all districts (showing statewide result)
-      // This is a simplified approach - ideally you'd aggregate by actual district boundaries
       const layerName = currentView === 'districts' ? 'district-fill' : 
                        currentView === 'state_house' ? 'state-house-fill' : 'state-senate-fill';
-      
-      map.setPaintProperty(layerName, 'fill-color', color);
-      
+
+      if (map.getLayer(layerName)) {
+        map.setPaintProperty(layerName, 'fill-color', color);
+      } else {
+        setStatus('District layer not found!', 5000, true);
+      }
+
       document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
