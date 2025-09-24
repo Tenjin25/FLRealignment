@@ -653,8 +653,7 @@ body {
     </style>
 </head>
   <body>
-<!-- Move CSS to <style> block in <head> -->
-<style>
+/* Colorblind mode legend overrides - must be last in style block */
 body.colorblind-mode .legend-color {
   border: 2px dashed #333 !important;
 }
@@ -662,22 +661,21 @@ body.colorblind-mode .legend-item {
   font-weight: bold;
   text-decoration: underline wavy #333;
 }
-body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #2e8b57 !important; }
-body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #4682b4 !important; }
-body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ffd700 !important; }
-body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #8b008b !important; }
-body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #ff8c00 !important; }
-body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #00ced1 !important; }
-body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #a0522d !important; }
-body.colorblind-mode .legend-color[style*="background: #f7f7f7"] { background: #333 !important; }
-body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #228b22 !important; }
-body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #ff1493 !important; }
-body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #7fff00 !important; }
-body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #ff00ff !important; }
-body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #00fa9a !important; }
-body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #ff6347 !important; }
-body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #8b0000 !important; }
-</style>
+body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #ff9900 !important; }
+body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ffb84d !important; }
+body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ffd699 !important; }
+body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffe5cc !important; }
+body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #fff2e6 !important; }
+body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffe5cc !important; }
+body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #fff2e6 !important; }
+body.colorblind-mode .legend-color[style*="background: #f7f7f7"] { background: #cccccc !important; }
+body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #3399ff !important; }
+body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #66b3ff !important; }
+body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #99ccff !important; }
+body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #b3d1ff !important; }
+body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #3366cc !important; }
+body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #003399 !important; }
+body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #001f4d !important; }
 
 <!-- Move button to valid HTML -->
 
