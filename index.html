@@ -618,13 +618,14 @@ body {
           <input type="text" id="county-search" placeholder="Type to search..." style="width:100%;padding:8px;border-radius:6px;margin-top:6px;margin-bottom:6px;border:1px solid #d1d5db;" />
         </div>
         <h4 id="statewide">🏛️ Florida Statewide</h4>
-        <div style="margin:18px 0 8px 0; border-bottom:2px solid #e5e7eb;"></div>
-         <div class="statewide-results" id="statewide-results">
-          <div id="statewide-content">
-           <p>Select a contest to see statewide results and margin.</p>
-           <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
-          </div>
-        </div>
+  <div style="margin:18px 0 8px 0; border-bottom:2px solid #e5e7eb;"></div>
+   <div class="statewide-results" id="statewide-results">
+      <h5 id="contest-name" style="margin:8px 0 0 0; font-weight:600; color:#2563eb;"></h5>
+      <div id="statewide-content">
+        <p>Select a contest to see statewide results and margin.</p>
+        <div id="statewide-temperature-bar" style="width:100%;height:24px;margin:12px 0;display:none;"></div>
+      </div>
+    </div>
         <div class="findings-section">
           <h4>🔍 Research Findings</h4>
           <div class="finding-card">
@@ -2322,7 +2323,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log(`Color expression built for ${countiesProcessed} counties`);
       
       map.setPaintProperty('county-fill', 'fill-color', expr);
-      document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year})`;
+  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year})`;
       setStatus(`Applied contest: ${formatContestName(contestType, year)} ${year}`);
     }
 
@@ -2362,7 +2363,7 @@ document.addEventListener('DOMContentLoaded', function() {
       expr.push('#e0e0e0'); // default color
       
       map.setPaintProperty('district-fill', 'fill-color', expr);
-      document.getElementById('statewide').textContent = `FL US House (${year})`;
+  document.getElementById('contest-name').textContent = `FL US House (${year})`;
       setStatus(`Applied contest: FL US House ${year}`);
     }
 
@@ -2412,7 +2413,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setStatus('District layer not found!', 5000, true);
       }
 
-      document.getElementById('statewide').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
+  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
 
