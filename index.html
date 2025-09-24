@@ -1641,7 +1641,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       const isColorblind = document.body.classList.contains('colorblind-mode');
-      const winnerColor = isColorblind ? cbColorForMargin(parseFloat(marginPct), winner === 'Republican' ? 'R' : 'D') : (winner === 'Republican' ? '#dc2626' : '#2563eb');
+      // Accessibility palette for winner color (always yellow/orange for Republican in colorblind mode)
+      let winnerColor = '#dc2626';
+      if (winner === 'Republican') {
+        if (isColorblind) {
+          if (parseFloat(marginPct) >= 40) winnerColor = '#ff9900';
+          else if (parseFloat(marginPct) >= 30) winnerColor = '#ffb84d';
+          else if (parseFloat(marginPct) >= 20) winnerColor = '#ffd699';
+          else if (parseFloat(marginPct) >= 10) winnerColor = '#ffe5cc';
+          else if (parseFloat(marginPct) >= 5.5) winnerColor = '#fff2e6';
+          else if (parseFloat(marginPct) >= 1) winnerColor = '#ffe5cc';
+          else if (parseFloat(marginPct) >= 0.5) winnerColor = '#fff2e6';
+          else winnerColor = '#cccccc';
+        }
+      } else {
+        winnerColor = isColorblind ? cbColorForMargin(parseFloat(marginPct), 'D') : '#2563eb';
+      }
       // Precincts (if available)
       let precincts = '';
       if (countyData.precincts || countyData.Precincts || countyData.PRECINCTS) {
@@ -1659,7 +1674,11 @@ document.addEventListener('DOMContentLoaded', function() {
   sidebarContent += `</div>`;
   sidebarContent += `<div class="margin-section">`;
   sidebarContent += '<h3 class="sidebar-section-title">📈 Margin</h3>';
-  sidebarContent += `<p class="sidebar-margin" style="color: ${isColorblind ? cbColorForMargin(parseFloat(marginPct), winner === 'Republican' ? 'R' : 'D') : winnerColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
+  let marginColor = winnerColor;
+  if (winner !== 'Republican') {
+    marginColor = isColorblind ? cbColorForMargin(parseFloat(marginPct), 'D') : '#2563eb';
+  }
+  sidebarContent += `<p class="sidebar-margin" style="color: ${marginColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
   sidebarContent += `<p class="sidebar-margin-details" style="color: #6b7280;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
   sidebarContent += `</div>`;
   sidebarContent += `<div class="vote-breakdown">`;
@@ -1667,8 +1686,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // For colorblind mode, use the correct accessibility palette for Republican vote breakdown
   let repColor = '#dc2626';
   if (isColorblind) {
-    // Use the same logic as legend: pick color by margin and winner
-    repColor = cbColorForMargin(parseFloat(marginPct), 'R');
+    if (parseFloat(marginPct) >= 40) repColor = '#ff9900';
+    else if (parseFloat(marginPct) >= 30) repColor = '#ffb84d';
+    else if (parseFloat(marginPct) >= 20) repColor = '#ffd699';
+    else if (parseFloat(marginPct) >= 10) repColor = '#ffe5cc';
+    else if (parseFloat(marginPct) >= 5.5) repColor = '#fff2e6';
+    else if (parseFloat(marginPct) >= 1) repColor = '#ffe5cc';
+    else if (parseFloat(marginPct) >= 0.5) repColor = '#fff2e6';
+    else repColor = '#cccccc';
   }
   let demColor = '#2563eb';
   if (isColorblind) {
@@ -1699,7 +1724,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   let compColor = '#6b7280';
   if (isColorblind) {
-    compColor = cbColorForMargin(actualMarginPct, winner === 'Republican' ? 'R' : 'D');
+    // Always use yellow/orange for Republican competitiveness in colorblind mode
+    if (winner === 'Republican') {
+      if (actualMarginPct >= 40) compColor = '#ff9900';
+      else if (actualMarginPct >= 30) compColor = '#ffb84d';
+      else if (actualMarginPct >= 20) compColor = '#ffd699';
+      else if (actualMarginPct >= 10) compColor = '#ffe5cc';
+      else if (actualMarginPct >= 5.5) compColor = '#fff2e6';
+      else if (actualMarginPct >= 1) compColor = '#ffe5cc';
+      else if (actualMarginPct >= 0.5) compColor = '#fff2e6';
+      else compColor = '#cccccc';
+    } else {
+      compColor = cbColorForMargin(actualMarginPct, 'D');
+    }
   } else {
     if (competitiveness.includes('Rep')) {
       if (competitiveness.includes('Annihilation')) compColor = '#67000d';
