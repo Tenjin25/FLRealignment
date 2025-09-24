@@ -13,17 +13,14 @@
     background: #fff !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     border-radius: 0 0 12px 12px;
-    display: none;
-  }
-  .main-controls.open {
     display: block !important;
   }
-  #main-controls-toggle {
-    display: block !important;
-    position: fixed !important;
-    top: 16px !important;
-    left: 16px !important;
+  #controls-minimize-btn {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
     z-index: 10011 !important;
+    font-size: 28px !important;
     background: #2563eb !important;
     color: #fff !important;
     border-radius: 50%;
@@ -31,10 +28,7 @@
     height: 40px;
     border: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    font-size: 24px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    display: block !important;
   }
 }
 @media (max-width: 700px) {
@@ -699,32 +693,15 @@ body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #
 </style>
 
 <!-- Move button to valid HTML -->
-<button id="main-controls-toggle" title="Show Contest Controls" style="display:none;">🗳️</button>
 
 <!-- Move JS to <script> block -->
 <script>
 // Accessibility: Color Blind Mode Toggle
-document.getElementById('accessibility-toggle').onclick = function() {
-  document.body.classList.toggle('colorblind-mode');
-};
-// Mobile contest controls toggle
 document.addEventListener('DOMContentLoaded', function() {
-  var mainControls = document.getElementById('main-controls');
-  var toggleBtn = document.getElementById('main-controls-toggle');
-  if (mainControls && toggleBtn) {
-    function updateMobileControls() {
-      if (window.innerWidth <= 700) {
-        mainControls.classList.remove('open');
-        toggleBtn.style.display = 'block';
-      } else {
-        mainControls.classList.add('open');
-        toggleBtn.style.display = 'none';
-      }
-    }
-    updateMobileControls();
-    window.addEventListener('resize', updateMobileControls);
-    toggleBtn.onclick = function() {
-      mainControls.classList.toggle('open');
+  var accBtn = document.getElementById('accessibility-toggle');
+  if (accBtn) {
+    accBtn.onclick = function() {
+      document.body.classList.toggle('colorblind-mode');
     };
   }
 });
