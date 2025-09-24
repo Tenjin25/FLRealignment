@@ -1659,13 +1659,23 @@ document.addEventListener('DOMContentLoaded', function() {
   sidebarContent += `</div>`;
   sidebarContent += `<div class="margin-section">`;
   sidebarContent += '<h3 class="sidebar-section-title">📈 Margin</h3>';
-  sidebarContent += `<p class="sidebar-margin" style="color: ${winnerColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
+  sidebarContent += `<p class="sidebar-margin" style="color: ${isColorblind ? cbColorForMargin(parseFloat(marginPct), winner === 'Republican' ? 'R' : 'D') : winnerColor}; font-weight: bold;">${winner === 'Republican' ? 'R+' : 'D+'}${marginPct}%</p>`;
   sidebarContent += `<p class="sidebar-margin-details" style="color: #6b7280;">(${Math.abs(margin).toLocaleString()} vote margin)</p>`;
   sidebarContent += `</div>`;
   sidebarContent += `<div class="vote-breakdown">`;
   sidebarContent += '<h3 class="sidebar-section-title">🗳️ Vote Breakdown</h3>';
-  sidebarContent += `<p class="sidebar-breakdown"><span style="color: #2563eb; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
-  sidebarContent += `<p class="sidebar-breakdown"><span style="color: #dc2626; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
+  // For colorblind mode, use the correct accessibility palette for Republican vote breakdown
+  let repColor = '#dc2626';
+  if (isColorblind) {
+    // Use the same logic as legend: pick color by margin and winner
+    repColor = cbColorForMargin(parseFloat(marginPct), 'R');
+  }
+  let demColor = '#2563eb';
+  if (isColorblind) {
+    demColor = cbColorForMargin(parseFloat(marginPct), 'D');
+  }
+  sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${demColor}; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
+  sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${repColor}; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
   sidebarContent += `</div>`;
   // Competitiveness
   let competitiveness;
@@ -1692,21 +1702,21 @@ document.addEventListener('DOMContentLoaded', function() {
     compColor = cbColorForMargin(actualMarginPct, winner === 'Republican' ? 'R' : 'D');
   } else {
     if (competitiveness.includes('Rep')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
-      else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
-      else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
-      else if (competitiveness.includes('Safe')) compColor = '#dc2626';
-      else if (competitiveness.includes('Likely')) compColor = '#ef4444';
-      else if (competitiveness.includes('Lean')) compColor = '#f87171';
-      else if (competitiveness.includes('Tilt')) compColor = '#fca5a5';
+      if (competitiveness.includes('Annihilation')) compColor = '#67000d';
+      else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
+      else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
+      else if (competitiveness.includes('Safe')) compColor = '#ef3b2c';
+      else if (competitiveness.includes('Likely')) compColor = '#fb6a4a';
+      else if (competitiveness.includes('Lean')) compColor = '#fcae91';
+      else if (competitiveness.includes('Tilt')) compColor = '#fee8c8';
     } else if (competitiveness.includes('Dem')) {
-      if (competitiveness.includes('Annihilation')) compColor = '#0c1d56';
-      else if (competitiveness.includes('Dominant')) compColor = '#1e3a8a';
-      else if (competitiveness.includes('Stronghold')) compColor = '#1e40af';
-      else if (competitiveness.includes('Safe')) compColor = '#3b82f6';
-      else if (competitiveness.includes('Likely')) compColor = '#60a5fa';
-      else if (competitiveness.includes('Lean')) compColor = '#93c5fd';
-      else if (competitiveness.includes('Tilt')) compColor = '#bfdbfe';
+      if (competitiveness.includes('Annihilation')) compColor = '#08306b';
+      else if (competitiveness.includes('Dominant')) compColor = '#08519c';
+      else if (competitiveness.includes('Stronghold')) compColor = '#3182bd';
+      else if (competitiveness.includes('Safe')) compColor = '#6baed6';
+      else if (competitiveness.includes('Likely')) compColor = '#9ecae1';
+      else if (competitiveness.includes('Lean')) compColor = '#c6dbef';
+      else if (competitiveness.includes('Tilt')) compColor = '#e1f5fe';
     }
   }
   sidebarContent += `<div class="competitiveness-section">`;
@@ -1780,18 +1790,8 @@ document.addEventListener('DOMContentLoaded', function() {
         map.on('mouseenter', 'county-fill', (e) => {
           map.getCanvas().style.cursor = 'pointer';
         });
-        map.on('mousemove', 'county-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || e.features[0].properties.name;
-            if (countyName) {
-              const quickInfo = getQuickCountyInfo(countyName);
-              showHoverTooltip(e.point.x, e.point.y, quickInfo);
-            }
-          }
-        });
         map.on('mouseleave', 'county-fill', () => {
           map.getCanvas().style.cursor = '';
-          hideHoverTooltip();
         });
       }
     }
@@ -1833,19 +1833,8 @@ document.addEventListener('DOMContentLoaded', function() {
           map.getCanvas().style.cursor = 'pointer';
         });
         
-        map.on('mousemove', 'district-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const districtNum = e.features[0].properties.DISTRICT;
-            if (districtNum) {
-              const quickInfo = getQuickDistrictInfo(districtNum, 'congressional');
-              showHoverTooltip(e.point.x, e.point.y, quickInfo);
-            }
-          }
-        });
-        
         map.on('mouseleave', 'district-fill', () => {
           map.getCanvas().style.cursor = '';
-          hideHoverTooltip();
         });
       }
     }
@@ -1887,19 +1876,8 @@ document.addEventListener('DOMContentLoaded', function() {
           map.getCanvas().style.cursor = 'pointer';
         });
         
-        map.on('mousemove', 'state-house-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const districtNum = e.features[0].properties.DISTRICT;
-            if (districtNum) {
-              const quickInfo = getQuickDistrictInfo(districtNum, 'house');
-              showHoverTooltip(e.point.x, e.point.y, quickInfo);
-            }
-          }
-        });
-        
         map.on('mouseleave', 'state-house-fill', () => {
           map.getCanvas().style.cursor = '';
-          hideHoverTooltip();
         });
       }
     }
@@ -1941,19 +1919,8 @@ document.addEventListener('DOMContentLoaded', function() {
           map.getCanvas().style.cursor = 'pointer';
         });
         
-        map.on('mousemove', 'state-senate-fill', (e) => {
-          if (e.features && e.features[0] && e.features[0].properties) {
-            const districtNum = e.features[0].properties.DISTRICT;
-            if (districtNum) {
-              const quickInfo = getQuickDistrictInfo(districtNum, 'senate');
-              showHoverTooltip(e.point.x, e.point.y, quickInfo);
-            }
-          }
-        });
-        
         map.on('mouseleave', 'state-senate-fill', () => {
           map.getCanvas().style.cursor = '';
-          hideHoverTooltip();
         });
       }
     }
