@@ -1777,15 +1777,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   sidebarContent += `<div class="competitiveness-section">`;
   sidebarContent += '<h5>🎯 Competitiveness</h5>';
-  // Force Lean Republican color to #fcae91 with inline style override
-  let compStyle = `color: ${compColor}; font-weight: bold; font-size: 16px;`;
-  if (competitiveness === 'Lean Republican') {
-    compStyle = 'color: #fcae91 !important; font-weight: bold; font-size: 16px;';
-  }
-  if (competitiveness.startsWith('Tossup')) {
-    compStyle = 'color: #222; background: #f7f7f7; border: 2px solid #999; border-radius: 6px; font-weight: bold; font-size: 16px; padding: 2px 8px;';
-  }
-  sidebarContent += `<p style="${compStyle}">${competitiveness}</p>`;
+  sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
   if (actualMarginPct <= 0.5) {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
   } else if (actualMarginPct <= 1) {
@@ -2044,6 +2036,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function getHistoricalTrends(countyName, isDistrict = false, districtNum = null) {
       const presidentialYears = [2024, 2020, 2016, 2012, 2008];
       const stateHouseYears = [2024, 2022, 2020, 2018, 2016]; // Recent state house elections
+      const governorYears = [2022, 2018, 2014, 2010]; // Add this line for governor years
       const trends = [];
       
       if (isDistrict && districtNum) {
