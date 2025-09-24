@@ -944,7 +944,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function populateContestSelectFromCSV(csvData) {
       const sel = document.getElementById('contestSelect');
       if (sel.dataset.populated === 'true') return; // Only populate once per data load
-      sel.innerHTML = '';
+  sel.innerHTML = '<option value="">Select a contest...</option>';
       const contestTypes = ['president', 'governor', 'us_senate', 'attorney_general', 'cfo', 'agriculture_commissioner'];
       // Precompute contest/year pairs in a single pass
       const contestYearPairs = {};
