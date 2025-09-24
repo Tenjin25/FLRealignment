@@ -205,17 +205,14 @@ body {
   transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 1;
 }
-#sidebar {
+.sidebar {
   position: absolute;
   top: 0;
   right: 0;
   height: 100vh;
   z-index: 2;
 }
-#map.sidebar-minimized {
-  left: 0;
-  width: 100vw !important;
-}
+/* Removed unused #map.sidebar-minimized selector for clarity */
 
 /* Hover Tooltip */
 .hover-tooltip {
@@ -675,9 +672,7 @@ body {
   /* Removed empty ruleset for #map.sidebar-minimized */
     </style>
 </head>
-  <body>
-<!-- Move button to valid HTML -->
-
+<body>
 <!-- Move JS to <script> block -->
 <script>
 // Accessibility: Color Blind Mode Toggle
@@ -1493,6 +1488,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
     }
 
+    // Toggles the visibility of the main controls panel, minimizing or expanding it based on its current state.
     function toggleMainControls() {
       const controls = document.getElementById('main-controls');
       const controlsContent = document.getElementById('controls-content');
@@ -1512,7 +1508,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         minimizeBtn.title = 'Expand controls';
       }
     }
-
     function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const sidebarContent = document.querySelector('.sidebar-content');
@@ -1742,6 +1737,7 @@ document.addEventListener('DOMContentLoaded', function() {
           source: 'counties', 
           paint: { 'line-color': '#333', 'line-width': 1 } 
         });
+        // County label layer (restore font and background)
         map.addLayer({
           id: 'county-label',
           type: 'symbol',
@@ -1752,6 +1748,11 @@ document.addEventListener('DOMContentLoaded', function() {
             'text-size': 13,
             'text-anchor': 'center',
             'text-offset': [0, 0]
+          },
+          paint: {
+            'text-color': '#222',
+            'text-halo-color': '#f7f7f7', // original background halo
+            'text-halo-width': 2
           }
         });
         // Add mouseleave event handler
