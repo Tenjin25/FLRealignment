@@ -99,9 +99,7 @@
       // Normalize county names for matching
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/St\.? Lucie/i, 'St Lucie')
-          .replace(/St\.? Johns/i, 'St Johns')
-          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -682,9 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const contestData = electionData.filter(row => row.year == year);
           function normalizeCountyName(name) {
             return (name || '')
-              .replace(/St\.? Lucie/i, 'St Lucie')
-              .replace(/St\.? Johns/i, 'St Johns')
-              .replace(/[^a-z0-9 ]/gi, '')
+              .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
               .replace(/\s+/g, ' ')
               .trim()
               .toUpperCase();
@@ -958,6 +954,17 @@ document.addEventListener('DOMContentLoaded', function() {
         Object.keys(yearData).forEach(officeType => {
           const contests = yearData[officeType];
           
+          // Map office type to match what the UI expects
+          const officeTypeMap = {
+            'presidential': 'president',
+            'governor': 'governor',
+            'us_senate': 'us_senate',
+            'attorney_general': 'attorney_general',
+            'cfo': 'cfo',
+            'agriculture_commissioner': 'agriculture_commissioner'
+          };
+          const mappedOfficeType = officeTypeMap[officeType] || officeType;
+          
           Object.keys(contests).forEach(contestKey => {
             const contest = contests[contestKey];
             const countyResults = contest.results || {};
@@ -975,14 +982,14 @@ document.addEventListener('DOMContentLoaded', function() {
               }
               
               // Add this office type's data to the record
-              recordsMap[key][`${officeType}_dem`] = countyData.dem_votes || 0;
-              recordsMap[key][`${officeType}_rep`] = countyData.rep_votes || 0;
-              recordsMap[key][`${officeType}_total`] = countyData.total_votes || 0;
-              recordsMap[key][`${officeType}_dem_candidate`] = countyData.dem_candidate || '';
-              recordsMap[key][`${officeType}_rep_candidate`] = countyData.rep_candidate || '';
-              recordsMap[key][`${officeType}_margin`] = countyData.margin || 0;
-              recordsMap[key][`${officeType}_margin_pct`] = countyData.margin_pct || 0;
-              recordsMap[key][`${officeType}_winner`] = countyData.winner || '';
+              recordsMap[key][`${mappedOfficeType}_dem`] = countyData.dem_votes || 0;
+              recordsMap[key][`${mappedOfficeType}_rep`] = countyData.rep_votes || 0;
+              recordsMap[key][`${mappedOfficeType}_total`] = countyData.total_votes || 0;
+              recordsMap[key][`${mappedOfficeType}_dem_candidate`] = countyData.dem_candidate || '';
+              recordsMap[key][`${mappedOfficeType}_rep_candidate`] = countyData.rep_candidate || '';
+              recordsMap[key][`${mappedOfficeType}_margin`] = countyData.margin || 0;
+              recordsMap[key][`${mappedOfficeType}_margin_pct`] = countyData.margin_pct || 0;
+              recordsMap[key][`${mappedOfficeType}_winner`] = countyData.winner || '';
             });
           });
         });
@@ -996,9 +1003,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function getCandidateName(year, office, party) {
       if (!electionData || electionData.length === 0) return party === 'Democrat' ? 'D' : 'R';
       
-      // Map office name to office type key
+      // Map office name to office type key (matching flattened data field names)
       const officeMap = {
-        'President of the United States': 'presidential',
+        'President of the United States': 'president',
         'Governor': 'governor',
         'United States Senator': 'us_senate',
         'Attorney General': 'attorney_general',
@@ -1028,7 +1035,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   const electionMap = {};
   function normalizeCountyName(name) {
     return (name || '')
-      .replace(/[^a-z0-9 ]/gi, '')
+      .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
       .replace(/\s+/g, ' ')
       .trim()
       .toUpperCase();
@@ -1053,9 +1060,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (!geojson || !geojson.features) return map;
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/St\.? Lucie/i, 'St Lucie')
-          .replace(/St\.? Johns/i, 'St Johns')
-          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -1543,9 +1548,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Normalize and find county data
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/St\.? Lucie/i, 'St Lucie')
-          .replace(/St\.? Johns/i, 'St Johns')
-          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -2525,9 +2528,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Store current results for county details using normalized county names
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/St\.? Lucie/i, 'St Lucie')
-          .replace(/St\.? Johns/i, 'St Johns')
-          .replace(/[^a-z0-9 ]/gi, '')
+          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -2561,7 +2562,7 @@ document.addEventListener('DOMContentLoaded', function() {
       function normalizeCountyName(name) {
         if (!name) return '';
         return name
-          .replace(/\./g, '')
+          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
