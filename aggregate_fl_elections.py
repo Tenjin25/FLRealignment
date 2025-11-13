@@ -134,14 +134,15 @@ def process_election_file(file_path, year):
                 party = row['PartyCode']
                 votes = int(row['CanVotes'])
                 # Presidential and Governor races have running mates in the name fields
+                # Format: CanNameLast = running mate last name, CanNameFirst = main candidate last name
                 # Other offices: use FirstName LastName
                 if 'President' in office:
-                    # Presidential: CanNameFirst has the presidential candidate
-                    last_name = str(row['CanNameFirst']).strip()
+                    # Presidential: CanNameLast has the presidential candidate's last name
+                    last_name = str(row['CanNameLast']).strip()
                     candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:
-                    # Governor: Just use last name, then lookup full name
-                    last_name = str(row['CanNameLast']).strip()
+                    # Governor: CanNameFirst has the gubernatorial candidate's last name
+                    last_name = str(row['CanNameFirst']).strip()
                     candidate = candidate_first_names.get(last_name, last_name)
                 else:
                     # Other offices (Senate, AG, CFO, Agriculture): Use FirstName LastName
