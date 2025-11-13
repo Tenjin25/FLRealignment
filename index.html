@@ -1147,22 +1147,36 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           }
         });
       });
-      // Build options array
-      const options = [];
+      // Build options with optgroups
+      const fragment = document.createDocumentFragment();
+      const officeGroups = {
+        'president': 'Presidential Elections',
+        'governor': 'Gubernatorial Elections',
+        'us_senate': 'U.S. Senate Elections',
+        'attorney_general': 'Attorney General Elections',
+        'cfo': 'Chief Financial Officer Elections',
+        'agriculture_commissioner': 'Agriculture Commissioner Elections'
+      };
+      
       contestTypes.forEach(contestType => {
         if (!contestYearPairs[contestType]) return;
         const years = Array.from(contestYearPairs[contestType]).sort();
+        
+        // Create optgroup for this contest type
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = officeGroups[contestType] || formatContestName(contestType, '');
+        
         years.forEach(year => {
           if (contestType === 'governor' && year == 2020) return;
           const opt = document.createElement('option');
           opt.value = `${contestType}_${year}`;
           opt.textContent = `${formatContestName(contestType, year)} (${year})`;
-          options.push(opt);
+          optgroup.appendChild(opt);
         });
+        
+        fragment.appendChild(optgroup);
       });
-      // Use document fragment for performance
-      const fragment = document.createDocumentFragment();
-      options.forEach(opt => fragment.appendChild(opt));
+      
       sel.appendChild(fragment);
       sel.dataset.populated = 'true';
       // Hide loading spinner
