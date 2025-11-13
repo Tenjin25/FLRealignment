@@ -2556,6 +2556,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loading counties from:', CONFIG.paths.counties);
         const counties = await loadJSON(CONFIG.paths.counties);
         console.log('Counties loaded successfully:', counties.features?.length, 'features');
+        
+        // Store counties data globally for search functionality
+        window.countiesData = counties;
+        
         map.addSource('counties', { type: 'geojson', data: counties });
         
         countyNameMap = buildCountyNameMapFromGeoJSON(counties);
