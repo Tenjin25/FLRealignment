@@ -2643,9 +2643,10 @@ document.addEventListener('DOMContentLoaded', function() {
       contestData.forEach(row => {
         const demVotes = row[`${contestType}_dem`] || 0;
         const repVotes = row[`${contestType}_rep`] || 0;
+        const totalVotes = row[`${contestType}_total`] || 0;
         statewidedemVotes += demVotes;
         statewidrepVotes += repVotes;
-        statewidTotalVotes += demVotes + repVotes;
+        statewidTotalVotes += totalVotes; // Use total which includes other parties
       });
       
       // Update statewide results display
