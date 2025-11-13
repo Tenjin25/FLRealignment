@@ -1974,11 +1974,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('sidebar-minimize-btn');
       sidebar.classList.add('minimized');
       btn.textContent = '+';
-
-      // Setup county search after map loads
-      map.on('load', function() {
-        setupCountySearch();
-      });
     });
 
     // County search functionality - Efficient search with limited suggestions
@@ -2567,6 +2562,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add initial county layers
         addCountyLayers();
+        
+        // Setup county search after counties are loaded
+        setupCountySearch();
 
         setStatus('Counties loaded');
 
