@@ -984,6 +984,7 @@ document.addEventListener('DOMContentLoaded', function() {
               // Add this office type's data to the record
               recordsMap[key][`${mappedOfficeType}_dem`] = countyData.dem_votes || 0;
               recordsMap[key][`${mappedOfficeType}_rep`] = countyData.rep_votes || 0;
+              recordsMap[key][`${mappedOfficeType}_other`] = countyData.other_votes || 0;
               recordsMap[key][`${mappedOfficeType}_total`] = countyData.total_votes || 0;
               recordsMap[key][`${mappedOfficeType}_dem_candidate`] = countyData.dem_candidate || '';
               recordsMap[key][`${mappedOfficeType}_rep_candidate`] = countyData.rep_candidate || '';
