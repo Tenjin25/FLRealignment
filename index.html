@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Flatten the new JSON structure into array format for compatibility
     function flattenElectionJSON(jsonData) {
-      const flattened = [];
+      const recordsMap = {}; // Map by "year|county" to merge office types
       const results = jsonData.results_by_year || {};
       
       Object.keys(results).forEach(year => {
@@ -964,28 +964,32 @@ document.addEventListener('DOMContentLoaded', function() {
             
             Object.keys(countyResults).forEach(countyName => {
               const countyData = countyResults[countyName];
+              const key = `${year}|${countyName}`;
               
-              // Create a flattened record
-              const record = {
-                year: parseInt(year),
-                county: countyName,
-                [`${officeType}_dem`]: countyData.dem_votes || 0,
-                [`${officeType}_rep`]: countyData.rep_votes || 0,
-                [`${officeType}_total`]: countyData.total_votes || 0,
-                [`${officeType}_dem_candidate`]: countyData.dem_candidate || '',
-                [`${officeType}_rep_candidate`]: countyData.rep_candidate || '',
-                [`${officeType}_margin`]: countyData.margin || 0,
-                [`${officeType}_margin_pct`]: countyData.margin_pct || 0,
-                [`${officeType}_winner`]: countyData.winner || ''
-              };
+              // Get or create the record for this year/county combo
+              if (!recordsMap[key]) {
+                recordsMap[key] = {
+                  year: parseInt(year),
+                  county: countyName
+                };
+              }
               
-              flattened.push(record);
+              // Add this office type's data to the record
+              recordsMap[key][`${officeType}_dem`] = countyData.dem_votes || 0;
+              recordsMap[key][`${officeType}_rep`] = countyData.rep_votes || 0;
+              recordsMap[key][`${officeType}_total`] = countyData.total_votes || 0;
+              recordsMap[key][`${officeType}_dem_candidate`] = countyData.dem_candidate || '';
+              recordsMap[key][`${officeType}_rep_candidate`] = countyData.rep_candidate || '';
+              recordsMap[key][`${officeType}_margin`] = countyData.margin || 0;
+              recordsMap[key][`${officeType}_margin_pct`] = countyData.margin_pct || 0;
+              recordsMap[key][`${officeType}_winner`] = countyData.winner || '';
             });
           });
         });
       });
       
-      return flattened;
+      // Convert map to array
+      return Object.values(recordsMap);
     }
 
     // Get candidate name from the JSON data (already includes first/last names)
@@ -1008,6 +1012,8 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Find any county record for this year/office and get the candidate name
       const record = electionData.find(r => r.year == year && r[candidateField]);
+      
+      console.log(`DEBUG getCandidateName: year=${year}, office=${office}, party=${party}, candidateField=${candidateField}, found=${record ? record[candidateField] : 'NOT FOUND'}`);
       
       if (record && record[candidateField]) {
         return record[candidateField];
