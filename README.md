@@ -317,19 +317,32 @@ This feature is available on both desktop and mobile layouts.
    - Fixed all normalization functions to preserve periods (St. Lucie, St. Johns)
    - Updated 8 different normalization functions across the codebase
    - County data now displays correctly for all counties including Miami-Dade
+   - Switched to 2020 Census TIGER/Line shapefile (tl_2020_12_county20.geojson) for county boundaries
+   - New GeoJSON includes NAME20 and NAMELSAD20 fields for proper county name handling
 
 - **County Label Improvements:**
    - County labels now prioritize NAME20 field from 2020 Census data
    - Added explicit visibility settings to ensure labels display by default
    - Labels display correctly on map load
 
-- **Search Bar Enhancement:**
-   - Replaced HTML5 datalist with custom dropdown for better UX
-   - Dynamic filtering as you type (limits to 10 results)
-   - Hover effects and visual feedback (green border flash on selection)
-   - Click outside to close, Enter key support
-   - Autocomplete disabled to prevent browser interference
-   - Matches NC Map implementation for consistency
+- **County Search Functionality:**
+   - Completely reimplemented with NC Map logic for robustness
+   - Uses NAME20 field for clean county names (without "County" suffix)
+   - Custom dropdown with dynamic filtering (limits to 10 results)
+   - Supports exact and partial matches (e.g., "Miami" finds "Miami-Dade")
+   - Visual feedback: green border flash on selection
+   - Uses turf.bbox for proper county boundary calculation
+   - Includes diagnostic logging for troubleshooting
+   - Fixed timing issue by calling setupCountySearch() after counties load
+   - Search bar now fully functional with proper zoom and details display
+
+- **Third Party Vote Display:**
+   - Statewide temperature bar now shows three segments when third parties exist
+   - Democratic (blue) / Republican (red) / Other (gray #6b7280)
+   - Breakdown row displays D/R/Other vote counts and percentages
+   - Conditional display: two segments when no third party votes
+   - Statewide totals now include all parties, not just DEM+REP
+   - Fixed percentages to match Wikipedia and official results
 
 - **Contest Dropdown Organization:**
    - Added optgroup organization by office type
@@ -341,6 +354,7 @@ This feature is available on both desktop and mobile layouts.
    - Confirmed aggregated results match raw election data perfectly
    - Verified: 2024 Presidential Alachua (Trump 52,939 / Harris 81,578)
    - Verified: 2022 Governor Miami-Dade (DeSantis 393,532 / Crist 312,972)
+   - Verified: 2024 Presidential statewide (Trump 6,110,125 / Harris 4,683,038 / Total 10,893,752)
 
 - **Bug Fixes:**
    - Fixed leftover County field references in zoomToCounty function
@@ -348,5 +362,7 @@ This feature is available on both desktop and mobile layouts.
    - Fixed Miami-Dade not showing colors on map
    - Fixed 2022 governor showing incorrect candidates (was Nuñez/Hernandez, now DeSantis/Crist)
    - Fixed 2020 and 2024 presidential showing VP names instead of presidential candidates
+   - Fixed search bar not working by storing counties globally (window.countiesData)
+   - Fixed search initialization timing issue
 
 **📅 Last Updated**: November 13, 2025
