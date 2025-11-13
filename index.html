@@ -2575,8 +2575,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
         const color = categoryColorForMargin(marginPct, winner);
-        // Match on normalized, uppercase name from GeoJSON
-        expr.push(['==', ['upcase', ['get', 'County']], countyName]);
+        // Match on normalized, uppercase name from GeoJSON (NAME20 field)
+        expr.push(['==', ['upcase', ['get', 'NAME20']], countyName]);
         expr.push(color);
         countiesProcessed++;
       });
