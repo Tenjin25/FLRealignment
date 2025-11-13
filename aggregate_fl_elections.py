@@ -138,9 +138,9 @@ def process_election_file(file_path, year):
                 # Other offices: use FirstName LastName
                 if 'President' in office:
                     # Presidential: Format changed between years
-                    # 2008: CanNameFirst has president's last name, CanNameLast has VP
-                    # 2012+: CanNameLast has president's last name, CanNameFirst has first/middle name
-                    if year == '2008':
+                    # 2008, 2020, 2024: CanNameFirst has president's last name, CanNameLast has VP
+                    # 2012, 2016: CanNameLast has president's last name, CanNameFirst has first/middle name
+                    if year in ['2008', '2020', '2024']:
                         last_name = str(row['CanNameFirst']).strip()
                     else:
                         last_name = str(row['CanNameLast']).strip()
