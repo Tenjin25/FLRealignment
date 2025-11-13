@@ -1022,8 +1022,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   const electionMap = {};
   function normalizeCountyName(name) {
     return (name || '')
-      .replace(/St\.? Lucie/i, 'St Lucie')
-      .replace(/St\.? Johns/i, 'St Johns')
       .replace(/[^a-z0-9 ]/gi, '')
       .replace(/\s+/g, ' ')
       .trim()
@@ -1772,7 +1770,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add county click event handler
         map.on('click', 'county-fill', (e) => {
           if (e.features && e.features[0] && e.features[0].properties) {
-            const countyName = e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || e.features[0].properties.name;
+            const countyName = e.features[0].properties.NAME20 || e.features[0].properties.County || e.features[0].properties.COUNTYNAME || e.features[0].properties.NAME || e.features[0].properties.name;
             if (countyName) {
               showCountyDetails(countyName);
               lastSelectedCounty = countyName;
@@ -2557,8 +2555,6 @@ document.addEventListener('DOMContentLoaded', function() {
       function normalizeCountyName(name) {
         if (!name) return '';
         return name
-          .replace(/St[\.]?\s*Lucie/i, 'St Lucie')
-          .replace(/St[\.]?\s*Johns/i, 'St Johns')
           .replace(/\./g, '')
           .replace(/\s+/g, ' ')
           .trim()
@@ -2704,4 +2700,5 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
 
