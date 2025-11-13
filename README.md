@@ -152,10 +152,30 @@ FLRealignments/
 - **Responsive design** for multiple screen sizes
 
 ### **Classification System**
-Political margins classified into 15 categories:
-- **Republican**: Annihilation (40%+) → Likely (5.5-10%)
-- **Competitive**: Tilt R (1-5.5%) → Tilt D (1-5.5%)  
-- **Democratic**: Likely (5.5-10%) → Annihilation (40%+)
+Political margins classified into 15 categories based on party performance:
+
+#### **Republican Categories** (Red Shades)
+- **Annihilation** (R+40%+): #67000d - Deepest red
+- **Dominant** (R+30-40%): #a50f15 - Very dark red
+- **Stronghold** (R+20-30%): #cb181d - Dark red
+- **Safe** (R+10-20%): #ef3b2c - Red
+- **Likely** (R+5.5-10%): #fb6a4a - Light red
+- **Lean** (R+1-5.5%): #fcae91 - Very light red
+- **Tilt** (R+0.5-1%): #fee8c8 - Pale red
+
+#### **Competitive**
+- **Tossup** (±0.5%): #f7f7f7 - Light gray
+
+#### **Democratic Categories** (Blue Shades)
+- **Tilt** (D+0.5-1%): #e1f5fe - Pale blue
+- **Lean** (D+1-5.5%): #c6dbef - Very light blue
+- **Likely** (D+5.5-10%): #9ecae1 - Light blue
+- **Safe** (D+10-20%): #6baed6 - Blue
+- **Stronghold** (D+20-30%): #3182bd - Dark blue
+- **Dominant** (D+30-40%): #08519c - Very dark blue
+- **Annihilation** (D+40%+): #08306b - Deepest blue
+
+*Full categorization details available in fl_elections_aggregated.json metadata*
 
 ## 📈 Data Processing
 

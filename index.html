@@ -1058,7 +1058,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
       geojson.features.forEach(f => {
         const p = f.properties || {};
-        const name = normalizeCountyName(p.COUNTYNAME || p.NAME || p.County || p.name || p.NAMELSAD || '');
+        const name = normalizeCountyName(p.NAME20 || p.COUNTYNAME || p.NAME || p.County || p.name || p.NAMELSAD || '');
         if (name) map[name] = name;
       });
       return map;
