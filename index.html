@@ -1760,11 +1760,12 @@ document.addEventListener('DOMContentLoaded', function() {
           type: 'symbol',
           source: 'counties',
           layout: {
-            'text-field': ['coalesce', ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME'], ['get', 'name']],
+            'text-field': ['coalesce', ['get', 'NAME20'], ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME'], ['get', 'name']],
             'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
             'text-size': 13,
             'text-anchor': 'center',
-            'text-offset': [0, 0]
+            'text-offset': [0, 0],
+            'visibility': 'visible'
           },
           paint: {
             'text-color': '#222',
@@ -1951,7 +1952,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!countiesSource) return;
         let counties = [];
         if (countiesSource._data && countiesSource._data.features) {
-          counties = countiesSource._data.features.map(f => f.properties && (f.properties.County || f.properties.COUNTYNAME || f.properties.NAME)).filter(Boolean).sort();
+          // Use NAME20 first, then fallback to other fields
+          counties = countiesSource._data.features
+            .map(f => f.properties && (f.properties.NAME20 || f.properties.County || f.properties.COUNTYNAME || f.properties.NAME))
+            .filter(Boolean)
+            .map(name => name.replace(' County', '').trim()) // Remove 'County' suffix if present
+            .sort();
+          // Remove duplicates
+          counties = [...new Set(counties)];
         }
         const searchInput = document.getElementById('county-search');
         if (searchInput && counties.length > 0) {
@@ -1963,7 +1971,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(datalist);
             searchInput.setAttribute('list', 'county-datalist');
           }
-          datalist.innerHTML = counties.map(name => `<option value="${name}"></option>`).join('');
+          datalist.innerHTML = counties.map(name => `<option value="${name}">${name} County</option>`).join('');
         }
       });
 
