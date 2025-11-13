@@ -1959,96 +1959,99 @@ document.addEventListener('DOMContentLoaded', function() {
       sidebar.classList.add('minimized');
       btn.textContent = '+';
 
-      // Populate county search dropdown/list with county names if available
-      // Wait for map and counties source to be loaded
+      // Setup county search after map loads
       map.on('load', function() {
-        const countiesSource = map.getSource('counties');
-        if (!countiesSource) return;
-        let counties = [];
-        if (countiesSource._data && countiesSource._data.features) {
-          // Use NAME20 first, then fallback to other fields
-          counties = countiesSource._data.features
-            .map(f => f.properties && (f.properties.NAME20 || f.properties.County || f.properties.COUNTYNAME || f.properties.NAME))
-            .filter(Boolean)
-            .map(name => name.replace(' County', '').trim()) // Remove 'County' suffix if present
-            .sort();
-          // Remove duplicates
-          counties = [...new Set(counties)];
-        }
-        const searchInput = document.getElementById('county-search');
-        if (searchInput && counties.length > 0) {
-          // Create custom dropdown for suggestions (hidden by default)
-          let dropdown = document.getElementById('county-dropdown');
-          if (!dropdown) {
-            dropdown = document.createElement('div');
-            dropdown.id = 'county-dropdown';
-            dropdown.style.cssText = `
-              position: absolute;
-              top: 100%;
-              left: 0;
-              right: 0;
-              background: white;
-              border: 1px solid #d1d5db;
-              border-top: none;
-              border-radius: 0 0 6px 6px;
-              max-height: 200px;
-              overflow-y: auto;
-              z-index: 1000;
-              display: none;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            `;
-            
-            // Make search container relative positioned
-            searchInput.parentNode.style.position = 'relative';
-            searchInput.parentNode.appendChild(dropdown);
-          }
-          
-          // Only show suggestions when user types
-          searchInput.addEventListener('input', function() {
-            const searchValue = this.value.trim().toLowerCase();
-            if (searchValue.length < 1) {
-              dropdown.style.display = 'none';
-              return;
-            }
-            // Match county names
-            const matches = counties.filter(county => county.toLowerCase().includes(searchValue)).slice(0, 10);
-            if (matches.length > 0) {
-              dropdown.innerHTML = matches.map(county => `
-                <div style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6;" 
-                     onmouseover="this.style.backgroundColor='#f3f4f6'" 
-                     onmouseout="this.style.backgroundColor='white'"
-                     onclick="selectCountyFromSearch('${county}')">${county} County</div>
-              `).join('');
-              dropdown.style.display = 'block';
-            } else {
-              dropdown.style.display = 'none';
-            }
-          });
-          
-          // Hide dropdown when clicking outside
-          document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-              dropdown.style.display = 'none';
-            }
-          });
-          
-          // Handle Enter key
-          searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              const val = this.value.trim();
-              if (val) {
-                dropdown.style.display = 'none';
-                handleCountySelection(val);
-              }
-            }
-          });
-        }
+        setupCountySearch();
       });
     });
 
+    // County search functionality - Efficient search with limited suggestions
+    function setupCountySearch() {
+      const countiesSource = map.getSource('counties');
+      if (!countiesSource) return;
+      
+      let counties = [];
+      if (countiesSource._data && countiesSource._data.features) {
+        // Use robust normalization for all possible name fields
+        counties = countiesSource._data.features.map(f => {
+          const p = f.properties || {};
+          return p.NAME20 || p.NAMELSAD20 || p.county_name || p.County || p.COUNTYNAME || p.NAME || p.name || '';
+        }).filter(Boolean).sort();
+      }
+      
+      const searchInput = document.getElementById('county-search');
+      if (searchInput && counties.length > 0) {
+        // Create dropdown for suggestions (hidden by default)
+        let dropdown = document.getElementById('county-dropdown');
+        if (!dropdown) {
+          dropdown = document.createElement('div');
+          dropdown.id = 'county-dropdown';
+          dropdown.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          `;
+          
+          // Make search container relative positioned
+          searchInput.parentNode.style.position = 'relative';
+          searchInput.parentNode.appendChild(dropdown);
+        }
+        
+        // Only show suggestions when user types
+        searchInput.addEventListener('input', function() {
+          const searchValue = this.value.trim().toLowerCase();
+          if (searchValue.length < 1) {
+            dropdown.style.display = 'none';
+            return;
+          }
+          // Match county names
+          const matches = counties.filter(county => county.toLowerCase().includes(searchValue)).slice(0, 10);
+          if (matches.length > 0) {
+            dropdown.innerHTML = matches.map(county => `
+              <div style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6;" 
+                   onmouseover="this.style.backgroundColor='#f3f4f6'" 
+                   onmouseout="this.style.backgroundColor='white'"
+                   onclick="selectCounty('${county}')">${county}</div>
+            `).join('');
+            dropdown.style.display = 'block';
+          } else {
+            dropdown.style.display = 'none';
+          }
+        });
+        
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+          }
+        });
+        
+        // Handle Enter key
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = this.value.trim();
+            if (val) {
+              dropdown.style.display = 'none';
+              handleCountySelection(val);
+            }
+          }
+        });
+      }
+    }
+
     // Global function to select county from dropdown
-    function selectCountyFromSearch(countyName) {
+    function selectCounty(countyName) {
       const searchInput = document.getElementById('county-search');
       const dropdown = document.getElementById('county-dropdown');
       
@@ -2073,7 +2076,7 @@ document.addEventListener('DOMContentLoaded', function() {
       showCountyDetails(countyName);
       lastSelectedCounty = countyName;
       const sidebar = document.getElementById('sidebar');
-      if (sidebar.classList.contains('minimized')) {
+      if (sidebar && sidebar.classList.contains('minimized')) {
         toggleSidebar();
       }
     }
