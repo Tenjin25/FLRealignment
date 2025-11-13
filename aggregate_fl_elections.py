@@ -146,10 +146,10 @@ def process_election_file(file_path, year):
                         last_name = str(row['CanNameLast']).strip()
                     candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:
-                    # Governor: Format also varies by year
-                    # 2010: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
-                    # 2014+: CanNameLast has governor's last name, CanNameFirst has first name
-                    if year == '2010':
+                    # Governor: Format varies by year
+                    # 2010, 2022: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
+                    # 2014, 2018: CanNameLast has governor's last name, CanNameFirst has first name
+                    if year in ['2010', '2022']:
                         last_name = str(row['CanNameFirst']).strip()
                     else:
                         last_name = str(row['CanNameLast']).strip()
