@@ -99,7 +99,7 @@
       // Normalize county names for matching
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+          .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -1035,7 +1035,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   const electionMap = {};
   function normalizeCountyName(name) {
     return (name || '')
-      .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+      .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
       .replace(/\s+/g, ' ')
       .trim()
       .toUpperCase();
@@ -1060,7 +1060,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (!geojson || !geojson.features) return map;
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+          .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -1548,7 +1548,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Normalize and find county data
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+          .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -2536,7 +2536,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Store current results for county details using normalized county names
       function normalizeCountyName(name) {
         return (name || '')
-          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+          .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
@@ -2570,7 +2570,7 @@ document.addEventListener('DOMContentLoaded', function() {
       function normalizeCountyName(name) {
         if (!name) return '';
         return name
-          .replace(/[^a-z0-9 .]/gi, '')  // Keep periods for St. names
+          .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
           .replace(/\s+/g, ' ')
           .trim()
           .toUpperCase();
