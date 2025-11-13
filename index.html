@@ -1716,6 +1716,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${demColor}; font-weight: bold;">${demCandidate} (D)</span> : ${demPct.toFixed(2)}% (${demVotes.toLocaleString()})</p>`;
   sidebarContent += `<p class="sidebar-breakdown"><span style="color: ${repColor}; font-weight: bold;">${repCandidate} (R)</span> : ${repPct.toFixed(2)}% (${repVotes.toLocaleString()})</p>`;
+  
+  // Add Other votes if they exist
+  const otherVotes = countyData[`${contestType}_other`] || 0;
+  if (otherVotes > 0) {
+    const otherPct = (otherVotes / totalVotes * 100);
+    sidebarContent += `<p class="sidebar-breakdown"><span style="color: #6b7280; font-weight: bold;">Other Candidates</span> : ${otherPct.toFixed(2)}% (${otherVotes.toLocaleString()})</p>`;
+  }
+  
   sidebarContent += `</div>`;
   // Competitiveness
   let competitiveness;
