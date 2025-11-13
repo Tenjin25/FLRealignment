@@ -1,0 +1,15 @@
+{
+  "results_by_year": {
+    "2020": {
+      "presidential": {
+        "presidential_2020_1": {
+          "results": {
+            "p1": { "precinct": "P1", "county": "Alachua", "dem_votes": 3000, "rep_votes": 2500, "total_votes": 5500 },
+            "p2": { "precinct": "P2", "county": "Broward", "dem_votes": 5000, "rep_votes": 2000, "total_votes": 7000 },
+            "p3": { "precinct": "P3", "county": "Miami-Dade", "dem_votes": 6000, "rep_votes": 4000, "total_votes": 10000 }
+          }
+        }
+      }
+    }
+  }
+}
