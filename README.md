@@ -306,20 +306,47 @@ This feature is available on both desktop and mobile layouts.
 
 ## 🆕 Recent Updates (November 13, 2025)
 
-- **Data Modernization:**
-   - Migrated from CSV to hierarchical JSON format (fl_elections_aggregated.json)
-   - Implemented proper candidate name formatting with full names (e.g., "Barack Obama", "Donald Trump")
-   - Added first name lookup dictionary for presidential and gubernatorial candidates
-   - Fixed running mate name issues (President and Governor races)
+- **Data Format Improvements:**
+   - Fixed year-specific candidate name extraction for inconsistent data formats
+   - Presidential: 2008, 2020, 2024 use CanNameFirst; 2012, 2016 use CanNameLast
+   - Governor: 2010, 2022 use CanNameFirst; 2014, 2018 use CanNameLast
+   - All years now display correct candidate names (not running mates)
 
-- **Geographic Data Update:**
-   - Updated to 2020 Census TIGER/Line county boundaries (tl_2020_12_county20.geojson)
-   - Updated property name matching to use NAME20 field
+- **County Name Normalization:**
+   - Fixed all normalization functions to preserve hyphens (Miami-Dade)
+   - Fixed all normalization functions to preserve periods (St. Lucie, St. Johns)
+   - Updated 8 different normalization functions across the codebase
+   - County data now displays correctly for all counties including Miami-Dade
 
-- **Code Improvements:**
-   - Removed legacy CSV-based candidate lookup system
-   - Added JSON flattening layer for backward compatibility
-   - Simplified getCandidateName() to pull names directly from JSON data
-   - Created aggregate_fl_elections.py for automated data processing
+- **County Label Improvements:**
+   - County labels now prioritize NAME20 field from 2020 Census data
+   - Added explicit visibility settings to ensure labels display by default
+   - Labels display correctly on map load
+
+- **Search Bar Enhancement:**
+   - Replaced HTML5 datalist with custom dropdown for better UX
+   - Dynamic filtering as you type (limits to 10 results)
+   - Hover effects and visual feedback (green border flash on selection)
+   - Click outside to close, Enter key support
+   - Autocomplete disabled to prevent browser interference
+   - Matches NC Map implementation for consistency
+
+- **Contest Dropdown Organization:**
+   - Added optgroup organization by office type
+   - Groups: Presidential, US Senate, Governor, Attorney General, CFO, Agriculture Commissioner
+   - Reordered to show federal offices (President, US Senate) before state offices
+   - Easier navigation with clear category headers
+
+- **Data Verification:**
+   - Confirmed aggregated results match raw election data perfectly
+   - Verified: 2024 Presidential Alachua (Trump 52,939 / Harris 81,578)
+   - Verified: 2022 Governor Miami-Dade (DeSantis 393,532 / Crist 312,972)
+
+- **Bug Fixes:**
+   - Fixed leftover County field references in zoomToCounty function
+   - Fixed sidebar going blank when no contest selected
+   - Fixed Miami-Dade not showing colors on map
+   - Fixed 2022 governor showing incorrect candidates (was Nuñez/Hernandez, now DeSantis/Crist)
+   - Fixed 2020 and 2024 presidential showing VP names instead of presidential candidates
 
 **📅 Last Updated**: November 13, 2025
