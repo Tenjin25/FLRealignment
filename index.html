@@ -2087,13 +2087,51 @@ document.addEventListener('DOMContentLoaded', function() {
           searchInput.style.borderColor = '#d1d5db';
         }, 1000);
       }
-      // Zoom and show details
-      zoomToCounty(countyName);
-      showCountyDetails(countyName);
-      lastSelectedCounty = countyName;
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && sidebar.classList.contains('minimized')) {
-        toggleSidebar();
+      // Find and zoom to the county using countiesData and Turf.js
+      // Prefer the authoritative source: window.countiesData if present, otherwise try map source
+      const src = (window.countiesData && window.countiesData.features) ? window.countiesData : (map.getSource && map.getSource('counties') && (map.getSource('counties')._data || map.getSource('counties').data)) || null;
+      if (countyName && src && src.features) {
+        // Normalize input for matching
+        function normalize(name) {
+          return (name || '').toString().replace(/[^a-z0-9 ]/gi, '').replace(/\s+/g, ' ').trim().toUpperCase();
+        }
+        const normTarget = normalize(countyName);
+        let found = false;
+        // First try exact match
+        src.features.forEach(f => {
+          const props = f.properties || {};
+          const rawName = props.NAME20 || props.NAMELSAD20 || props.county_name || props.County || props.COUNTYNAME || props.NAME || props.name || '';
+          const n = normalize(rawName);
+          if (n === normTarget) {
+            found = f;
+          }
+        });
+        // If no exact match, try containment (user types 'Jackson' vs 'Jackson County')
+        if (!found) {
+          src.features.forEach(f => {
+            const props = f.properties || {};
+            const rawName = props.NAME20 || props.NAMELSAD20 || props.county_name || props.County || props.COUNTYNAME || props.NAME || props.name || '';
+            const n = normalize(rawName);
+            if (n.indexOf(normTarget) !== -1 || normTarget.indexOf(n) !== -1) {
+              if (!found) found = f; // pick first sensible hit
+            }
+          });
+        }
+
+        if (found) {
+          const props = found.properties || {};
+          lastSelectedCounty = props.NAME20 || props.NAMELSAD20 || props.county_name || props.County || props.COUNTYNAME || props.NAME || props.name;
+          const bbox = turf.bbox(found);
+          console.log('[DIAGNOSTIC] Matched county for', countyName, '->', lastSelectedCounty, 'bbox:', bbox);
+          map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], { padding: 40, duration: 1000 });
+          showCountyDetails(lastSelectedCounty);
+          const sidebar = document.getElementById('sidebar');
+          if (sidebar && sidebar.classList.contains('minimized')) {
+            toggleSidebar();
+          }
+        } else {
+          console.warn('[DIAGNOSTIC] County not found:', countyName, 'normalized:', normTarget);
+        }
       }
     }
 
