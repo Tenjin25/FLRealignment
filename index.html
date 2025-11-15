@@ -1598,6 +1598,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     function showCountyDetails(countyName) {
       // --- NC Map Card-Style Sidebar ---
       const sidebar = document.getElementById('sidebar');
+      let sidebarContent = '';
       const detailsDiv = document.getElementById('county-details');
       const contentEl = document.getElementById('county-info-content');
       // sidebarContent will be declared once below
