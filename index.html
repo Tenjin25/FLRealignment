@@ -91,6 +91,19 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
+    // Sidebar toggle functionality (restore NCMap-like behavior)
+    function toggleSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+      sidebar.classList.toggle('minimized');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var sidebarBtn = document.getElementById('sidebar-minimize-btn');
+      var floatBtn = document.getElementById('sidebar-float-toggle');
+      if (sidebarBtn) sidebarBtn.onclick = toggleSidebar;
+      if (floatBtn) floatBtn.onclick = toggleSidebar;
+    });
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
       const countiesSource = map.getSource('counties');
@@ -767,17 +780,17 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="finding-card">
             <h5>Miami-Dade County - Historic Republican Flip</h5>
             <p><strong>Dramatic Shift:</strong> Once a reliable Democratic stronghold, Miami-Dade flipped Republican for the first time in decades.</p>
-            <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric">2024: R+11.45%</span></p>
+            <p><strong>Key Demographics:</strong> Growing Cuban-American and Venezuelan-American populations, plus Hispanic voter shifts. <span class="metric">2020: D+7.35%</span> → <span class="metric">2024: R+11.53%</span></p>
             <p><strong>Geography:</strong> Republican gains across both urban core and suburban areas (Kendall, Westchester, Hialeah).</p>
-            <p><strong>Impact:</strong> Massive 18.8-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
+            <p><strong>Impact:</strong> Massive 18.88-point swing represents one of the largest county-level political realignments in recent Florida history.</p>
           </div>
           <div class="finding-card">
             <h5>South Florida Regional Transformation</h5>
             <p><strong>Tri-County Swing:</strong> All three major South Florida counties swung dramatically toward Republicans from 2016 to 2024, representing a historic regional realignment:</p>
-            <ul style="margin: 8px 0; padding-left: 24px; font-size: 15px; line-height: 1.6;">
-              <li><span class="metric">Miami-Dade</span>: Flipped from <span class="metric">D+30.28% (2016)</span> to <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;border:1px solid #dc2626;">R+11.53% (2024)</span> — a stunning <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">41.81-point swing</span></li>
+            <ul style="margin: 8px 0; padding-left: 24px; font-size: 14px;">
+              <li><span class="metric">Miami-Dade</span>: Flipped from <span class="metric">D+29.86% (2016)</span> to <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;border:1px solid #dc2626;">R+11.53% (2024)</span> — a stunning <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">41.39-point swing</span></li>
               <li><span class="metric">Broward</span>: Collapsed from <span class="metric">D+35.91% (2016)</span> to <span class="metric">D+17.13% (2024)</span> — <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">18.78-point Republican gain</span></li>
-              <li><span class="metric">Palm Beach</span>: Nearly flipped from <span class="metric">D+15.81% (2016)</span> to <span class="metric">D+0.77% (2024)</span> — <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">15.04-point swing</span></li>
+              <li><span class="metric">Palm Beach</span>: Nearly flipped from <span class="metric">D+15.81% (2016)</span> to <span class="metric">D+0.77% (2024)</span> — <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">15.04-point swing</span> <span style="background:#fef9c3;color:#92400e;font-weight:bold;padding:2px 6px;border-radius:4px;">(Swing County)</span></li>
               <li><span class="metric">Monroe</span> (Florida Keys): Expanded from <span class="metric">R+7.18% (2016)</span> to <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;border:1px solid #dc2626;">R+18.48% (2024)</span> — <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">11.30-point gain</span></li>
             </ul>
             <p><strong>Regional Impact:</strong> These four counties contain over 3 million voters. The massive rightward shift turned what was once a Democratic firewall into competitive or Republican territory, fundamentally changing Florida's electoral map.</p>
@@ -787,14 +800,14 @@ document.addEventListener('DOMContentLoaded', function() {
             <h5>Orange County - Shrinking Democratic Margin</h5>
             <p><strong>Trend:</strong> Orange County remains Democratic, but the margin narrowed sharply in 2024, dropping nearly 10 points in just four years.</p>
             <p><strong>Metro Growth:</strong> Orlando's continued expansion and demographic change still favor Democrats, but Republican gains among some suburban and Hispanic voters have eroded the lead. <span class="metric">Population: +15.1% (2010-2020)</span></p>
-            <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.59%</span> — the largest Democratic margin drop in decades for the county.</p>
+            <p><strong>Electoral Pattern:</strong> <span class="metric">2020: D+23.11%</span> → <span class="metric">2024: D+13.78%</span> — the largest Democratic margin drop in decades for the county.</p>
             <p><strong>Strategic Importance:</strong> The narrowing gap signals new Republican competitiveness in the I-4 corridor and raises questions about future statewide trends.</p>
           </div>
           <div class="finding-card">
             <h5>Statewide Patterns & I-4 Corridor</h5>
             <p><strong>Rural-Urban Divide:</strong> Polarization continues to grow between urban coastal counties and rural interior counties, with Republicans consolidating rural support.</p>
             <p><strong>I-4 Corridor Shift:</strong> The Tampa-Orlando corridor has transformed from battleground to Republican-leaning. Key shifts from 2016 to 2024:</p>
-            <ul style="margin: 8px 0; padding-left: 24px; font-size: 15px; line-height: 1.6;">
+            <ul style="margin: 8px 0; padding-left: 24px; font-size: 14px;">
               <li><span class="metric">Hillsborough County</span> (Tampa): Flipped from <span class="metric">D+7.14% (2016)</span> to <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;border:1px solid #dc2626;">R+3.10% (2024)</span> — a <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">10.24-point swing</span></li>
               <li><span class="metric">Seminole County</span>: Swung from <span class="metric">R+1.64% (2016)</span> to <span class="metric" style="background:#fee2e2;color:#dc2626;font-weight:bold;border:1px solid #dc2626;">R+3.60% (2024)</span>, reversing its 2020 Democratic vote</li>
               <li><span class="metric">Orange County</span> (Orlando): Democratic margin collapsed from <span class="metric">D+25.65% (2016)</span> to <span class="metric">D+13.78% (2024)</span> — an <span style="background:#fee2e2;color:#dc2626;font-weight:bold;padding:2px 6px;border-radius:4px;">11.87-point swing</span></li>
