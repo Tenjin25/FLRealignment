@@ -2072,8 +2072,8 @@
               "winner": "REP",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Republican",
-                "code": "REP_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -2670,8 +2670,8 @@
               "winner": "REP",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Republican",
-                "code": "REP_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -4951,8 +4951,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -5679,8 +5679,8 @@
               "winner": "REP",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Republican",
-                "code": "REP_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -9771,8 +9771,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -13222,8 +13222,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -14417,8 +14417,8 @@
               "winner": "REP",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Republican",
-                "code": "REP_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -14552,8 +14552,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -14687,8 +14687,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -25749,8 +25749,8 @@
               "winner": "REP",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Republican",
-                "code": "REP_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -27683,10 +27683,10 @@
               "margin_pct": 1.0,
               "winner": "REP",
               "competitiveness": {
-                "category": "Tilt",
+                "category": "Lean",
                 "party": "Republican",
-                "code": "REP_TILT",
-                "color": "#fee8c8"
+                "code": "REP_LEAN",
+                "color": "#fcae91"
               },
               "all_parties": {
                 "REP": 3699,
@@ -27996,8 +27996,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -37273,8 +37273,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
@@ -39150,8 +39150,8 @@
               "winner": "DEM",
               "competitiveness": {
                 "category": "Tossup",
-                "party": "Democratic",
-                "code": "DEM_TOSSUP",
+                "party": "Tossup",
+                "code": "TOSSUP",
                 "color": "#f7f7f7"
               },
               "all_parties": {
