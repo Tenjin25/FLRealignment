@@ -1521,38 +1521,27 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       }
     }
     function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const sidebarContent = document.querySelector('.sidebar-content');
-  const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-  const mapElement = document.getElementById('map');
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  if (sidebar.classList.contains('minimized')) {
-    // Expand sidebar
-    sidebar.classList.remove('minimized');
-    mapElement.classList.remove('sidebar-minimized');
-    sidebarContent.style.display = 'block';
-    minimizeBtn.textContent = '−';
-    minimizeBtn.title = 'Minimize sidebar';
-    if (floatBtn) floatBtn.style.display = 'none';
-  } else {
-    // Minimize sidebar
-    sidebar.classList.add('minimized');
-    mapElement.classList.add('sidebar-minimized');
-    sidebarContent.style.display = 'none';
-    minimizeBtn.textContent = '+';
-    minimizeBtn.title = 'Expand sidebar';
-    if (floatBtn) floatBtn.style.display = 'flex';
-  }
-// Floating sidebar button click toggles sidebar open
-document.addEventListener('DOMContentLoaded', function() {
-  var floatBtn = document.getElementById('sidebar-float-toggle');
-  if (floatBtn) {
-    floatBtn.addEventListener('click', function() {
-      toggleSidebar();
-    });
-  }
-});
-}
+      const sidebar = document.getElementById('sidebar');
+      const sidebarContent = document.querySelector('.sidebar-content');
+      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      
+      if (sidebar.classList.contains('minimized')) {
+        // Expand sidebar
+        sidebar.classList.remove('minimized');
+        if (sidebarContent) sidebarContent.style.display = 'block';
+        minimizeBtn.textContent = '−';
+        minimizeBtn.title = 'Minimize sidebar';
+        if (floatBtn) floatBtn.style.display = 'none';
+      } else {
+        // Minimize sidebar
+        sidebar.classList.add('minimized');
+        if (sidebarContent) sidebarContent.style.display = 'none';
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand sidebar';
+        if (floatBtn) floatBtn.style.display = 'flex';
+      }
+    }
 
     function showCountyDetails(countyName) {
       // --- NC Map Card-Style Sidebar ---
@@ -1983,6 +1972,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('sidebar-minimize-btn');
       sidebar.classList.add('minimized');
       btn.textContent = '+';
+      
+      // Floating sidebar button click toggles sidebar open
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      if (floatBtn) {
+        floatBtn.addEventListener('click', function() {
+          toggleSidebar();
+        });
+      }
     });
 
     // County search functionality - Efficient search with limited suggestions
