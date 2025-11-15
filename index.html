@@ -2037,6 +2037,13 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (floatBtn) {
         floatBtn.addEventListener('click', function() {
           toggleSidebar();
+          // If no county is selected, show default message
+          const detailsDiv = document.getElementById('county-details');
+          const contentEl = document.getElementById('county-info-content');
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
         });
       }
     });
