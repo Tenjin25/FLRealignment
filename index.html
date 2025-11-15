@@ -117,10 +117,29 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      var sidebar = document.getElementById('sidebar');
       var sidebarBtn = document.getElementById('sidebar-minimize-btn');
-      var floatBtn = document.getElementById('sidebar-float-toggle');
-      if (sidebarBtn) sidebarBtn.onclick = toggleSidebar;
-      if (floatBtn) floatBtn.onclick = toggleSidebar;
+      var detailsDiv = document.getElementById('county-details');
+      var contentEl = document.getElementById('county-info-content');
+      // Always start minimized and set button text
+      if (sidebar) sidebar.classList.add('minimized');
+      if (sidebarBtn) {
+        sidebarBtn.textContent = '+';
+        sidebarBtn.title = 'Expand sidebar';
+        sidebarBtn.onclick = function() {
+          toggleSidebar();
+          // If no county is selected, show default message
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        };
+      }
+      // Show default message on load
+      if (detailsDiv && contentEl) {
+        contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+        detailsDiv.style.display = 'block';
+      }
     });
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
@@ -771,7 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="sidebar minimized" id="sidebar">
       <div class="sidebar-header" id="sidebar-header">
         <h3>📊 County Analysis</h3>
-        <button class="minimize-btn" onclick="toggleSidebar()" id="sidebar-minimize-btn">+</button>
+        <button class="minimize-btn" id="sidebar-minimize-btn">+</button>
       </div>
       <div class="sidebar-content">
         <div class="county-details" id="county-details" style="display: none;">
@@ -2031,6 +2050,13 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const btn = document.getElementById('sidebar-minimize-btn');
       sidebar.classList.add('minimized');
       btn.textContent = '+';
+      // Always show default message in sidebar on load
+      var detailsDiv = document.getElementById('county-details');
+      var contentEl = document.getElementById('county-info-content');
+      if (detailsDiv && contentEl) {
+        contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+        detailsDiv.style.display = 'block';
+      }
       
       // Floating sidebar button click toggles sidebar open
       const floatBtn = document.getElementById('sidebar-float-toggle');
