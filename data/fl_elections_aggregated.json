@@ -27683,10 +27683,10 @@
               "margin_pct": 1.0,
               "winner": "REP",
               "competitiveness": {
-                "category": "Tossup",
+                "category": "Lean",
                 "party": "Republican",
-                "code": "REP_TOSSUP",
-                "color": "#f7f7f7"
+                "code": "REP_LEAN",
+                "color": "#fcae91"
               },
               "all_parties": {
                 "REP": 3699,
