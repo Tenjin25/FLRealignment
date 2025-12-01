@@ -91,11 +91,12 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Sidebar toggle functionality (restore NCMap-like behavior)
+    // Sidebar toggle functionality
     function toggleSidebar() {
       var sidebar = document.getElementById('sidebar');
       var sidebarContent = document.querySelector('.sidebar-content');
       var minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      var floatBtn = document.getElementById('sidebar-float-toggle');
       if (!sidebar) return;
       if (sidebar.classList.contains('minimized')) {
         // Expand sidebar
@@ -105,22 +106,26 @@
           minimizeBtn.textContent = '−';
           minimizeBtn.title = 'Minimize sidebar';
         }
+        if (floatBtn) floatBtn.style.display = 'none';
       } else {
-        // Minimize sidebar
+        // Minimize sidebar (preserve content, just hide it)
         sidebar.classList.add('minimized');
         if (sidebarContent) sidebarContent.style.display = 'none';
         if (minimizeBtn) {
           minimizeBtn.textContent = '+';
           minimizeBtn.title = 'Expand sidebar';
         }
+        if (floatBtn) floatBtn.style.display = 'flex';
       }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       var sidebar = document.getElementById('sidebar');
       var sidebarBtn = document.getElementById('sidebar-minimize-btn');
+      var floatBtn = document.getElementById('sidebar-float-toggle');
       var detailsDiv = document.getElementById('county-details');
       var contentEl = document.getElementById('county-info-content');
+      
       // Always start minimized and set button text
       if (sidebar) sidebar.classList.add('minimized');
       if (sidebarBtn) {
@@ -128,17 +133,39 @@
         sidebarBtn.title = 'Expand sidebar';
         sidebarBtn.onclick = function() {
           toggleSidebar();
-          // If no county is selected, show default message
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+          // If no county is selected, show default message when expanding
+          if (!sidebar.classList.contains('minimized') && detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
             contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
             detailsDiv.style.display = 'block';
           }
         };
       }
+      
+      // Floating button toggles sidebar
+      if (floatBtn) {
+        floatBtn.style.display = 'flex'; // Show initially since sidebar starts minimized
+        floatBtn.onclick = function() {
+          toggleSidebar();
+          // If no county is selected, show default message when expanding
+          if (!sidebar.classList.contains('minimized') && detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        };
+      }
+      
       // Show default message on load
       if (detailsDiv && contentEl) {
         contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
         detailsDiv.style.display = 'block';
+      }
+      
+      // Status panel close button
+      const statusExit = document.getElementById('status-exit');
+      if (statusExit) {
+        statusExit.onclick = function() {
+          document.getElementById('status-panel').style.display = 'none';
+        };
       }
     });
     // Zoom to county by name using turf.js
@@ -2934,27 +2961,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
-// Floating sidebar expand button logic
-document.addEventListener('DOMContentLoaded', function() {
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  if (floatBtn) {
-    floatBtn.onclick = function() {
-      toggleSidebar();
-    };
-  }
-  // Hide float button if sidebar is open on load
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar && !sidebar.classList.contains('minimized')) {
-    floatBtn.style.display = 'none';
-  }
-  // Status panel close button
-  const statusExit = document.getElementById('status-exit');
-  if (statusExit) {
-    statusExit.onclick = function() {
-      document.getElementById('status-panel').style.display = 'none';
-    };
-  }
-});
   </script>
 </body>
 </html>
