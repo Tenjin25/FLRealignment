@@ -555,8 +555,8 @@ body {
   margin-bottom: 20px;
 }
 .findings-section h4 {
-  margin: 0 0 16px 0;
-  font-size: 16px;
+  margin: 0 0 14px 0;
+  font-size: 14px;
   font-weight: 600;
   color: #1f2937;
 }
@@ -564,23 +564,27 @@ body {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 .finding-card h5 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: #1f2937;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   border-bottom: 2px solid #3b82f6;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 .finding-card p {
-  margin: 8px 0;
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 6px 0;
+  font-size: 11px;
+  line-height: 1.4;
   color: #374151;
+}
+.finding-card ul {
+  font-size: 11px;
+  line-height: 1.4;
 }
 .metric {
   background: #dbeafe;
@@ -769,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <button class="minimize-btn" id="sidebar-minimize-btn">+</button>
       </div>
       <div class="sidebar-content">
-        <div class="county-details" id="county-details" style="display: none;">
+        <div class="county-details" id="county-details" style="display: block;">
           <h4 id="county-name">Select a County</h4>
           <div id="county-info-content">
             Click on any county to see detailed election results and analysis.
