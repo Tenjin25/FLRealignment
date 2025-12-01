@@ -223,13 +223,6 @@ body {
   transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 1;
 }
-.sidebar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  z-index: 2;
-}
 /* Removed unused #map.sidebar-minimized selector for clarity */
 
 /* Hover Tooltip */
@@ -279,6 +272,9 @@ body {
 }
 
 .sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 400px;
   height: 100vh;
   background: #fff;
@@ -286,6 +282,7 @@ body {
   border-left: 1px solid #e5e7eb;
   overflow-y: auto;
   transition: width 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 2;
 }
 .sidebar.minimized {
   width: 0 !important;
