@@ -61,7 +61,7 @@ candidate_first_names = {
     'Carter': 'Jimmy Carter',
     'Reagan': 'Ronald Reagan',
     'Mondale': 'Walter Mondale',
-    'Bush': 'George H.W. Bush',  # 1988, 1992
+    'Bush': 'George H.W. Bush',  # 1988, 1992 Presidential
     'Dukakis': 'Michael Dukakis',
     'Clinton': 'Bill Clinton',
     'Dole': 'Bob Dole',
@@ -186,14 +186,27 @@ def process_election_file(file_path, year):
                     else:
                         candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:
-                    # Governor: Format varies by year
-                    # 2010, 2022: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
-                    # 2014, 2018: CanNameLast has governor's last name, CanNameFirst has first name
-                    if year in ['2010', '2022']:
+                    # Governor: Format varies by year and office name
+                    if office == 'Governor and Lieutenant Governor':
+                        # Older format: CanNameFirst has governor's full name, CanNameLast has Lt. Gov
+                        # Extract last name from governor's full name
+                        name_parts = str(row['CanNameFirst']).strip().split()
+                        last_name = name_parts[-1] if name_parts else str(row['CanNameFirst']).strip()
+                    elif year in ['2010', '2022']:
+                        # 2010, 2022: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
                         last_name = str(row['CanNameFirst']).strip()
                     else:
+                        # 2014, 2018 and other years: CanNameLast has governor's last name
                         last_name = str(row['CanNameLast']).strip()
-                    candidate = candidate_first_names.get(last_name, last_name)
+                    
+                    # Special handling for Bush family in governor races
+                    if last_name == 'Bush':
+                        if year == '1994':
+                            candidate = 'Jeb Bush'
+                        else:
+                            candidate = candidate_first_names.get(last_name, last_name)
+                    else:
+                        candidate = candidate_first_names.get(last_name, last_name)
                 else:
                     # Other offices (Senate, AG, CFO, Agriculture): Use FirstName LastName
                     first_name = str(row['CanNameFirst']).strip()
