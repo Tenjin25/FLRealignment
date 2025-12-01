@@ -91,7 +91,39 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Sidebar toggle functionality moved to main script section below
+    // Define toggleSidebar function before DOMContentLoaded
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const sidebarContent = document.querySelector('.sidebar-content');
+      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      
+      if (sidebar && sidebar.classList.contains('minimized')) {
+        // Expand sidebar
+        sidebar.classList.remove('minimized');
+        if (sidebarContent) sidebarContent.style.display = 'block';
+        if (minimizeBtn) {
+          minimizeBtn.textContent = '−';
+          minimizeBtn.title = 'Minimize sidebar';
+        }
+        if (floatBtn) {
+          floatBtn.textContent = '−';
+          floatBtn.title = 'Minimize sidebar';
+        }
+      } else if (sidebar) {
+        // Minimize sidebar
+        sidebar.classList.add('minimized');
+        if (sidebarContent) sidebarContent.style.display = 'none';
+        if (minimizeBtn) {
+          minimizeBtn.textContent = '+';
+          minimizeBtn.title = 'Expand sidebar';
+        }
+        if (floatBtn) {
+          floatBtn.textContent = '+';
+          floatBtn.title = 'Expand sidebar';
+        }
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
       var sidebar = document.getElementById('sidebar');
@@ -1569,34 +1601,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         controlsContent.style.display = 'none';
         minimizeBtn.textContent = '+';
         minimizeBtn.title = 'Expand controls';
-      }
-    }
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const sidebarContent = document.querySelector('.sidebar-content');
-      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      
-      if (sidebar.classList.contains('minimized')) {
-        // Expand sidebar
-        sidebar.classList.remove('minimized');
-        if (sidebarContent) sidebarContent.style.display = 'block';
-        minimizeBtn.textContent = '−';
-        minimizeBtn.title = 'Minimize sidebar';
-        if (floatBtn) {
-          floatBtn.textContent = '−';
-          floatBtn.title = 'Minimize sidebar';
-        }
-      } else {
-        // Minimize sidebar
-        sidebar.classList.add('minimized');
-        if (sidebarContent) sidebarContent.style.display = 'none';
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand sidebar';
-        if (floatBtn) {
-          floatBtn.textContent = '+';
-          floatBtn.title = 'Expand sidebar';
-        }
       }
     }
 
