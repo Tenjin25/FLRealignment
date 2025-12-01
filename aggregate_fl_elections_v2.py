@@ -5,21 +5,10 @@ from collections import defaultdict
 
 # Define election files and their years
 election_files = {
-    '1978': '11071978Election.txt',
-    '1980': '11041980Election.txt',
-    '1982': '11021982Election.txt',
-    '1984': '11061984Election.txt',
-    '1986': '11041986Election.txt',
-    '1988': '11081988Election.txt',
-    '1990': '11061990Election.txt',
-    '1992': '11031992Election.txt',
-    '1994': '11081994Election.txt',
-    '1996': '11051996Election.txt',
-    '1998': '11031998Election.txt',
     '2000': '11072000Election.txt',
     '2002': '11052002Election.txt',
-    '2004': '11022004Election.txt',
-    '2006': '11072006Election.txt',
+    '2004': '11042004Election.txt',
+    '2006': '11052006Election.txt',
     '2008': '11042008Election.txt',
     '2010': '11022010Election.txt',
     '2012': '11062012Election.txt',
@@ -34,7 +23,6 @@ election_files = {
 # Office name mapping for cleaner keys (statewide offices only)
 office_mapping = {
     'President of the United States': 'presidential',
-    'President and Vice President of the United States': 'presidential',
     'United States Senator': 'us_senate',
     'Governor': 'governor',
     'Attorney General': 'attorney_general',
@@ -45,7 +33,16 @@ office_mapping = {
 # Statewide offices to include (filter out district-level races)
 statewide_offices = {
     'President of the United States',
-    'President and Vice President of the United States',
+    'United States Senator', 
+    'Governor',
+    'Attorney General',
+    'Chief Financial Officer',
+    'Commissioner of Agriculture'
+}
+
+# Statewide offices to include (filter out district-level races)
+statewide_offices = {
+    'President of the United States',
     'United States Senator', 
     'Governor',
     'Attorney General',
@@ -55,34 +52,18 @@ statewide_offices = {
 
 # First name lookup for Presidential and Governor candidates
 candidate_first_names = {
-    # Presidential candidates (1980-2024)
-    'Carter': 'Jimmy Carter',
-    'Reagan': 'Ronald Reagan',
-    'Mondale': 'Walter Mondale',
-    'Bush': 'George H.W. Bush',  # 1988, 1992
-    'Dukakis': 'Michael Dukakis',
-    'Clinton': 'Bill Clinton',
-    'Dole': 'Bob Dole',
-    'Gore': 'Al Gore',
-    'Kerry': 'John Kerry',
+    # Presidential candidates
     'Obama': 'Barack Obama',
     'McCain': 'John McCain',
     'Romney': 'Mitt Romney',
+    'Clinton': 'Hillary Clinton',
     'Trump': 'Donald Trump',
     'Biden': 'Joe Biden',
     'Harris': 'Kamala Harris',
-    # Florida Governor candidates (1978-2024)
-    'Graham': 'Bob Graham',
-    'Eckerd': 'Jack Eckerd',
-    'Martinez': 'Bob Martinez',
-    'Pajcic': 'Steve Pajcic',
-    'Chiles': 'Lawton Chiles',
-    'MacKay': 'Buddy MacKay',
-    'McBride': 'Bill McBride',
-    'Crist': 'Charlie Crist',
-    'Davis': 'Jim Davis',
+    # Florida Governor candidates
     'Scott': 'Rick Scott',
     'Sink': 'Alex Sink',
+    'Crist': 'Charlie Crist',
     'DeSantis': 'Ron DeSantis',
     'Gillum': 'Andrew Gillum',
 }
@@ -94,22 +75,22 @@ def get_competitiveness(margin_pct, winner):
     if abs_margin >= 40:
         category, code = "Annihilation", "ANNIHILATION"
         color = "#67000d" if winner == "REP" else "#08306b"
-    elif abs_margin >= 30:
+    elif abs_margin >= 30 and abs_margin <= 39.99:
         category, code = "Dominant", "DOMINANT"
         color = "#a50f15" if winner == "REP" else "#08519c"
-    elif abs_margin >= 20:
+    elif abs_margin >= 20 and abs_margin <= 29.99:
         category, code = "Stronghold", "STRONGHOLD"
         color = "#cb181d" if winner == "REP" else "#3182bd"
-    elif abs_margin >= 10:
+    elif abs_margin >= 10 and abs_margin <= 19.99:
         category, code = "Safe", "SAFE"
         color = "#ef3b2c" if winner == "REP" else "#6baed6"
-    elif abs_margin >= 5.5:
+    elif abs_margin >= 5.51 and abs_margin <= 9.99:
         category, code = "Likely", "LIKELY"
         color = "#fb6a4a" if winner == "REP" else "#9ecae1"
-    elif abs_margin >= 1:
+    elif abs_margin >= 1 and abs_margin <= 5.50:
         category, code = "Lean", "LEAN"
         color = "#fcae91" if winner == "REP" else "#c6dbef"
-    elif abs_margin >= 0.5:
+    elif abs_margin >= 0.51 and abs_margin <= 0.99:
         category, code = "Tilt", "TILT"
         color = "#fee8c8" if winner == "REP" else "#e1f5fe"
     else:
@@ -161,28 +142,13 @@ def process_election_file(file_path, year):
                 # Other offices: use FirstName LastName
                 if 'President' in office:
                     # Presidential: Format changed between years
-                    # 1980-2004: CanNameFirst has president's name (full or last name)
                     # 2008, 2020, 2024: CanNameFirst has president's last name, CanNameLast has VP
                     # 2012, 2016: CanNameLast has president's last name, CanNameFirst has first/middle name
                     if year in ['2008', '2020', '2024']:
                         last_name = str(row['CanNameFirst']).strip()
-                    elif year in ['2012', '2016']:
-                        last_name = str(row['CanNameLast']).strip()
-                    else:  # 1980-2004 and other years
-                        # Extract last name from CanNameFirst (could be full name or last name)
-                        name_parts = str(row['CanNameFirst']).strip().split()
-                        last_name = name_parts[-1] if name_parts else str(row['CanNameFirst']).strip()
-                    
-                    # Special handling for Bush family (differentiate H.W. vs W.)
-                    if last_name == 'Bush':
-                        if year in ['1988', '1992']:
-                            candidate = 'George H.W. Bush'
-                        elif year in ['2000', '2004']:
-                            candidate = 'George W. Bush'
-                        else:
-                            candidate = candidate_first_names.get(last_name, last_name)
                     else:
-                        candidate = candidate_first_names.get(last_name, last_name)
+                        last_name = str(row['CanNameLast']).strip()
+                    candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:
                     # Governor: Format varies by year
                     # 2010, 2022: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
