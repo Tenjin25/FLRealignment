@@ -91,15 +91,12 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Sidebar toggle functionality
+    // Sidebar toggle functionality (restore NCMap-like behavior)
     function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const sidebarContent = document.querySelector('.sidebar-content');
-      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      
+      var sidebar = document.getElementById('sidebar');
+      var sidebarContent = document.querySelector('.sidebar-content');
+      var minimizeBtn = document.getElementById('sidebar-minimize-btn');
       if (!sidebar) return;
-      
       if (sidebar.classList.contains('minimized')) {
         // Expand sidebar
         sidebar.classList.remove('minimized');
@@ -108,7 +105,6 @@
           minimizeBtn.textContent = '−';
           minimizeBtn.title = 'Minimize sidebar';
         }
-        if (floatBtn) floatBtn.style.display = 'none';
       } else {
         // Minimize sidebar
         sidebar.classList.add('minimized');
@@ -117,9 +113,34 @@
           minimizeBtn.textContent = '+';
           minimizeBtn.title = 'Expand sidebar';
         }
-        if (floatBtn) floatBtn.style.display = 'flex';
       }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var sidebar = document.getElementById('sidebar');
+      var sidebarBtn = document.getElementById('sidebar-minimize-btn');
+      var detailsDiv = document.getElementById('county-details');
+      var contentEl = document.getElementById('county-info-content');
+      // Always start minimized and set button text
+      if (sidebar) sidebar.classList.add('minimized');
+      if (sidebarBtn) {
+        sidebarBtn.textContent = '+';
+        sidebarBtn.title = 'Expand sidebar';
+        sidebarBtn.onclick = function() {
+          toggleSidebar();
+          // If no county is selected, show default message
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        };
+      }
+      // Show default message on load
+      if (detailsDiv && contentEl) {
+        contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+        detailsDiv.style.display = 'block';
+      }
+    });
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
       const countiesSource = map.getSource('counties');
@@ -718,17 +739,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // Accessibility palette: orange for R, blue for D, with shades
             if (marginPct >= 40) {
               return winner === 'R' ? '#ff9900' : '#0074d9'; // Annihilation
-            } else if (marginPct >= 30) {
+            } else if (marginPct >= 30 && marginPct <= 39.99) {
               return winner === 'R' ? '#ffb84d' : '#339af0'; // Dominant
-            } else if (marginPct >= 20) {
+            } else if (marginPct >= 20 && marginPct <= 29.99) {
               return winner === 'R' ? '#ffd699' : '#5dade2'; // Stronghold
-            } else if (marginPct >= 10) {
+            } else if (marginPct >= 10 && marginPct <= 19.99) {
               return winner === 'R' ? '#ffe5cc' : '#74c0fc'; // Safe
-            } else if (marginPct >= 5.5) {
+            } else if (marginPct >= 5.51 && marginPct <= 9.99) {
               return winner === 'R' ? '#fff2e6' : '#a5d8ff'; // Likely
-            } else if (marginPct >= 1) {
+            } else if (marginPct >= 1 && marginPct <= 5.5) {
               return winner === 'R' ? '#ffe5cc' : '#d0ebff'; // Lean
-            } else if (marginPct >= 0.5) {
+            } else if (marginPct >= 0.51 && marginPct <= 0.99) {
               return winner === 'R' ? '#fff2e6' : '#e7f5ff'; // Tilt
             } else {
               return '#cccccc'; // Tossup
@@ -1355,22 +1376,22 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       if (marginPct >= 40) {
         compLabel = winner === 'Republican' ? "Annihilation Republican (40%+)" : "Annihilation Democratic (40%+)";
         compColor = winner === 'Republican' ? '#450a0a' : '#0c1d56';
-      } else if (marginPct >= 30) {
+      } else if (marginPct >= 30 && marginPct <= 39.99) {
         compLabel = winner === 'Republican' ? "Dominant Republican (30-40%)" : "Dominant Democratic (30-40%)";
         compColor = winner === 'Republican' ? '#7f1d1d' : '#1e3a8a';
-      } else if (marginPct >= 20) {
+      } else if (marginPct >= 20 && marginPct <= 29.99) {
         compLabel = winner === 'Republican' ? "Stronghold Republican (20-30%)" : "Stronghold Democratic (20-30%)";
         compColor = winner === 'Republican' ? '#991b1b' : '#1e40af';
-      } else if (marginPct >= 10) {
+      } else if (marginPct >= 10 && marginPct <= 19.99) {
         compLabel = winner === 'Republican' ? "Safe Republican (10-20%)" : "Safe Democratic (10-20%)";
         compColor = winner === 'Republican' ? '#dc2626' : '#3b82f6';
-      } else if (marginPct >= 5.5) {
+      } else if (marginPct >= 5.51 && marginPct <= 9.99) {
         compLabel = winner === 'Republican' ? "Likely Republican (5.5-10%)" : "Likely Democratic (5.5-10%)";
         compColor = winner === 'Republican' ? '#ef4444' : '#60a5fa';
-      } else if (marginPct >= 1) {
+      } else if (marginPct >= 1 && marginPct <= 5.5) {
         compLabel = winner === 'Republican' ? "Lean Republican (1-5.5%)" : "Lean Democratic (1-5.5%)";
         compColor = winner === 'Republican' ? '#f87171' : '#93c5fd';
-      } else if (marginPct >= 0.5) {
+      } else if (marginPct >= 0.51 && marginPct <= 0.99) {
         compLabel = winner === 'Republican' ? "Tilt Republican (0.5-1%)" : "Tilt Democratic (0.5-1%)";
         compColor = winner === 'Republican' ? '#fca5a5' : '#bfdbfe';
       } else {
@@ -1680,17 +1701,17 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       function cbColorForMargin(marginPct, winner) {
         if (marginPct >= 40) {
           return winner === 'Republican' ? '#ff9900' : '#0074d9';
-        } else if (marginPct >= 30) {
+        } else if (marginPct >= 30 && marginPct <= 39.99) {
           return winner === 'Republican' ? '#ffb84d' : '#339af0';
-        } else if (marginPct >= 20) {
+        } else if (marginPct >= 20 && marginPct <= 29.99) {
           return winner === 'Republican' ? '#ffd699' : '#5dade2';
-        } else if (marginPct >= 10) {
+        } else if (marginPct >= 10 && marginPct <= 19.99) {
           return winner === 'Republican' ? '#ffe5cc' : '#74c0fc';
-        } else if (marginPct >= 5.5) {
+        } else if (marginPct >= 5.51 && marginPct <= 9.99) {
           return winner === 'Republican' ? '#fff2e6' : '#a5d8ff';
-        } else if (marginPct >= 1) {
+        } else if (marginPct >= 1 && marginPct <= 5.5) {
           return winner === 'Republican' ? '#ffe5cc' : '#d0ebff';
-        } else if (marginPct >= 0.5) {
+        } else if (marginPct >= 0.51 && marginPct <= 0.99) {
           return winner === 'Republican' ? '#fff2e6' : '#e7f5ff';
         } else {
           return '#cccccc';
@@ -1743,12 +1764,12 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   let repColor = '#ef3b2c';
   if (isColorblind) {
     if (parseFloat(marginPct) >= 40) repColor = '#ff9900';
-    else if (parseFloat(marginPct) >= 30) repColor = '#ffb84d';
-    else if (parseFloat(marginPct) >= 20) repColor = '#ffd699';
-    else if (parseFloat(marginPct) >= 10) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 5.5) repColor = '#fff2e6';
-    else if (parseFloat(marginPct) >= 1) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 0.5) repColor = '#fff2e6';
+    else if (parseFloat(marginPct) >= 30 && parseFloat(marginPct) <= 39.99) repColor = '#ffb84d';
+    else if (parseFloat(marginPct) >= 20 && parseFloat(marginPct) <= 29.99) repColor = '#ffd699';
+    else if (parseFloat(marginPct) >= 10 && parseFloat(marginPct) <= 19.99) repColor = '#ffe5cc';
+    else if (parseFloat(marginPct) >= 5.51 && parseFloat(marginPct) <= 9.99) repColor = '#fff2e6';
+    else if (parseFloat(marginPct) >= 1 && parseFloat(marginPct) <= 5.5) repColor = '#ffe5cc';
+    else if (parseFloat(marginPct) >= 0.51 && parseFloat(marginPct) <= 0.99) repColor = '#fff2e6';
     else repColor = '#cccccc';
   } else {
     // Non-accessibility mode: always use red for Republican vote breakdown
@@ -1777,17 +1798,17 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   const actualMarginPct = parseFloat(marginPct);
   if (actualMarginPct >= 40) {
     competitiveness = winner === 'Republican' ? "Annihilation Republican" : "Annihilation Democratic";
-  } else if (actualMarginPct >= 30) {
+  } else if (actualMarginPct >= 30 && actualMarginPct <= 39.99) {
     competitiveness = winner === 'Republican' ? "Dominant Republican" : "Dominant Democratic";
-  } else if (actualMarginPct >= 20) {
+  } else if (actualMarginPct >= 20 && actualMarginPct <= 29.99) {
     competitiveness = winner === 'Republican' ? "Stronghold Republican" : "Stronghold Democratic";
-  } else if (actualMarginPct >= 10) {
+  } else if (actualMarginPct >= 10 && actualMarginPct <= 19.99) {
     competitiveness = winner === 'Republican' ? "Safe Republican" : "Safe Democratic";
-  } else if (actualMarginPct >= 5.5) {
+  } else if (actualMarginPct >= 5.51 && actualMarginPct <= 9.99) {
     competitiveness = winner === 'Republican' ? "Likely Republican" : "Likely Democratic";
-  } else if (actualMarginPct >= 1) {
+  } else if (actualMarginPct >= 1 && actualMarginPct <= 5.5) {
     competitiveness = winner === 'Republican' ? "Lean Republican" : "Lean Democratic";
-  } else if (actualMarginPct >= 0.5) {
+  } else if (actualMarginPct >= 0.51 && actualMarginPct <= 0.99) {
     competitiveness = winner === 'Republican' ? "Tilt Republican" : "Tilt Democratic";
   } else {
     competitiveness = `Tossup (${winner} win)`;
@@ -1815,7 +1836,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   sidebarContent += `<p style="color: ${compColor}; font-weight: bold; font-size: 16px;">${competitiveness}</p>`;
   if (actualMarginPct <= 0.5) {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Extremely close!)</p>`;
-  } else if (actualMarginPct <= 1) {
+  } else if (actualMarginPct <= 0.99) {
     sidebarContent += `<p style="color: #f59e0b; font-style: italic;">(Very close!)</p>`;
   }
   sidebarContent += `</div>`;
@@ -2023,54 +2044,33 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
 
-    // Initialize sidebar on page load
+    // Sidebar minimized by default on load, expand on click
     document.addEventListener('DOMContentLoaded', function() {
       const sidebar = document.getElementById('sidebar');
-      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      const detailsDiv = document.getElementById('county-details');
-      const contentEl = document.getElementById('county-info-content');
-      
-      // Start minimized
-      if (sidebar) sidebar.classList.add('minimized');
-      if (minimizeBtn) {
-        minimizeBtn.textContent = '+';
-        minimizeBtn.title = 'Expand sidebar';
-        minimizeBtn.onclick = function() {
-          toggleSidebar();
-          // Show default message if no county selected
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
-            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-            detailsDiv.style.display = 'block';
-          }
-        };
-      }
-      
-      // Floating button toggles sidebar
-      if (floatBtn) {
-        floatBtn.style.display = 'flex'; // Show initially since sidebar starts minimized
-        floatBtn.onclick = function() {
-          toggleSidebar();
-          // Show default message if no county selected
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
-            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-            detailsDiv.style.display = 'block';
-          }
-        };
-      }
-      
-      // Show default message on load
+      const btn = document.getElementById('sidebar-minimize-btn');
+      sidebar.classList.add('minimized');
+      btn.textContent = '+';
+      // Always show default message in sidebar on load
+      var detailsDiv = document.getElementById('county-details');
+      var contentEl = document.getElementById('county-info-content');
       if (detailsDiv && contentEl) {
         contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
         detailsDiv.style.display = 'block';
       }
       
-      // Status panel close button
-      const statusExit = document.getElementById('status-exit');
-      if (statusExit) {
-        statusExit.onclick = function() {
-          document.getElementById('status-panel').style.display = 'none';
-        };
+      // Floating sidebar button click toggles sidebar open
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      if (floatBtn) {
+        floatBtn.addEventListener('click', function() {
+          toggleSidebar();
+          // If no county is selected, show default message
+          const detailsDiv = document.getElementById('county-details');
+          const contentEl = document.getElementById('county-info-content');
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        });
       }
     });
 
@@ -2437,17 +2437,17 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
             let competitiveness;
             if (marginPct >= 40) {
               competitiveness = winner === 'Republican' ? 'Annihilation Republican' : 'Annihilation Democratic';
-            } else if (marginPct >= 30) {
+            } else if (marginPct >= 30 && marginPct <= 39.99) {
               competitiveness = winner === 'Republican' ? 'Dominant Republican' : 'Dominant Democratic';
-            } else if (marginPct >= 20) {
+            } else if (marginPct >= 20 && marginPct <= 29.99) {
               competitiveness = winner === 'Republican' ? 'Stronghold Republican' : 'Stronghold Democratic';
-            } else if (marginPct >= 10) {
+            } else if (marginPct >= 10 && marginPct <= 19.99) {
               competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
-            } else if (marginPct >= 5.5) {
+            } else if (marginPct >= 5.51 && marginPct <= 9.99) {
               competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
-            } else if (marginPct >= 1) {
+            } else if (marginPct >= 1 && marginPct <= 5.5) {
               competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
-            } else if (marginPct >= 0.5) {
+            } else if (marginPct >= 0.51 && marginPct <= 0.99) {
               competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
             } else {
               competitiveness = `Tossup (${winner} win)`;
@@ -2726,23 +2726,23 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     function categoryColorForMargin(marginPct, winner) {
-      // Updated margin thresholds to match aggregation script
+      // NC map criteria: exact same thresholds and colors
       if (marginPct >= 40) {
         return winner === 'R' ? '#67000d' : '#08306b'; // Annihilation
-      } else if (marginPct >= 30) {
+      } else if (marginPct >= 30 && marginPct <= 39.99) {
         return winner === 'R' ? '#a50f15' : '#08519c'; // Dominant
-      } else if (marginPct >= 20) {
+      } else if (marginPct >= 20 && marginPct <= 29.99) {
         return winner === 'R' ? '#cb181d' : '#3182bd'; // Stronghold
-      } else if (marginPct >= 10) {
+      } else if (marginPct >= 10 && marginPct <= 19.99) {
         return winner === 'R' ? '#ef3b2c' : '#6baed6'; // Safe
-      } else if (marginPct > 5.5) {
-        return winner === 'R' ? '#fb6a4a' : '#9ecae1'; // Likely (5.51-9.99%)
-      } else if (marginPct > 0.99) {
-        return winner === 'R' ? '#fcae91' : '#c6dbef'; // Lean (1.0-5.5%)
-      } else if (marginPct >= 0.5) {
-        return winner === 'R' ? '#fee8c8' : '#e1f5fe'; // Tilt (0.5-0.99%)
+      } else if (marginPct >= 5.51 && marginPct <= 9.99) {
+        return winner === 'R' ? '#fb6a4a' : '#9ecae1'; // Likely
+      } else if (marginPct >= 1 && marginPct <= 5.5) {
+        return winner === 'R' ? '#fcae91' : '#c6dbef'; // Lean
+      } else if (marginPct >= 0.51 && marginPct <= 0.99) {
+        return winner === 'R' ? '#fee8c8' : '#e1f5fe'; // Tilt
       } else {
-        return '#f7f7f7'; // Tossup (<0.5%)
+        return '#f7f7f7'; // Tossup
       }
     }
 
@@ -2934,6 +2934,27 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
+// Floating sidebar expand button logic
+document.addEventListener('DOMContentLoaded', function() {
+  const floatBtn = document.getElementById('sidebar-float-toggle');
+  if (floatBtn) {
+    floatBtn.onclick = function() {
+      toggleSidebar();
+    };
+  }
+  // Hide float button if sidebar is open on load
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar && !sidebar.classList.contains('minimized')) {
+    floatBtn.style.display = 'none';
+  }
+  // Status panel close button
+  const statusExit = document.getElementById('status-exit');
+  if (statusExit) {
+    statusExit.onclick = function() {
+      document.getElementById('status-panel').style.display = 'none';
+    };
+  }
+});
   </script>
 </body>
 </html>
