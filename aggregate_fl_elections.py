@@ -37,6 +37,7 @@ office_mapping = {
     'President and Vice President of the United States': 'presidential',
     'United States Senator': 'us_senate',
     'Governor': 'governor',
+    'Governor and Lieutenant Governor': 'governor',
     'Attorney General': 'attorney_general',
     'Chief Financial Officer': 'cfo',
     'Commissioner of Agriculture': 'agriculture_commissioner'
@@ -48,6 +49,7 @@ statewide_offices = {
     'President and Vice President of the United States',
     'United States Senator', 
     'Governor',
+    'Governor and Lieutenant Governor',
     'Attorney General',
     'Chief Financial Officer',
     'Commissioner of Agriculture'
