@@ -71,8 +71,8 @@ This map visualizes the data behind this transformation, allowing users to explo
 
 ### **Interactive Analysis**
 - **Hybrid Interaction**: Hover for quick info, click for detailed analysis
-- **Historical Trends**: 2008-2024 election data with margin calculations
-- **Political Classification**: 15-category system (Safe R to Safe D)
+- **Historical Trends**: 1978-2024 election data with margin calculations (24 election cycles)
+- **Political Classification**: 15-category system with refined thresholds (Tilt 0.51-0.99%, Lean 1-5.5%, Likely 5.51-9.99%)
 - **Dynamic Tooltips**: Real-time data display with trend analysis
 
 ### **Advanced Features**
@@ -111,9 +111,9 @@ This map visualizes the data behind this transformation, allowing users to explo
 ### **Election Data**
 - **Source**: Florida Division of Elections
 - **Format**: Aggregated JSON with hierarchical structure (fl_elections_aggregated.json)
-- **Years**: 2008-2024 (Presidential and statewide races)
-- **Contests**: President, Governor, US Senate, Attorney General, CFO, Agriculture Commissioner
-- **Candidate Names**: Full names with proper formatting (e.g., "Barack Obama", "Rick Scott")
+- **Years**: 1978-2024 (47 years of historical data covering 24 election cycles)
+- **Contests**: President (16 elections), Governor (12 elections), US Senate, Attorney General, CFO, Agriculture Commissioner
+- **Candidate Names**: Full names with proper formatting and Bush family differentiation (George H.W. Bush, George W. Bush, Jeb Bush)
 
 ## 📁 Project Structure
 
@@ -156,23 +156,23 @@ Political margins classified into 15 categories based on party performance:
 
 #### **Republican Categories** (Red Shades)
 - **Annihilation** (R+40%+): #67000d - Deepest red
-- **Dominant** (R+30-40%): #a50f15 - Very dark red
-- **Stronghold** (R+20-30%): #cb181d - Dark red
-- **Safe** (R+10-20%): #ef3b2c - Red
-- **Likely** (R+5.5-10%): #fb6a4a - Light red
+- **Dominant** (R+30-39.99%): #a50f15 - Very dark red
+- **Stronghold** (R+20-29.99%): #cb181d - Dark red
+- **Safe** (R+10-19.99%): #ef3b2c - Red
+- **Likely** (R+5.51-9.99%): #fb6a4a - Light red
 - **Lean** (R+1-5.5%): #fcae91 - Very light red
-- **Tilt** (R+0.5-1%): #fee8c8 - Pale red
+- **Tilt** (R+0.51-0.99%): #fee8c8 - Pale red
 
 #### **Competitive**
 - **Tossup** (±0.5%): #f7f7f7 - Light gray
 
 #### **Democratic Categories** (Blue Shades)
-- **Tilt** (D+0.5-1%): #e1f5fe - Pale blue
+- **Tilt** (D+0.51-0.99%): #e1f5fe - Pale blue
 - **Lean** (D+1-5.5%): #c6dbef - Very light blue
-- **Likely** (D+5.5-10%): #9ecae1 - Light blue
-- **Safe** (D+10-20%): #6baed6 - Blue
-- **Stronghold** (D+20-30%): #3182bd - Dark blue
-- **Dominant** (D+30-40%): #08519c - Very dark blue
+- **Likely** (D+5.51-9.99%): #9ecae1 - Light blue
+- **Safe** (D+10-19.99%): #6baed6 - Blue
+- **Stronghold** (D+20-29.99%): #3182bd - Dark blue
+- **Dominant** (D+30-39.99%): #08519c - Very dark blue
 - **Annihilation** (D+40%+): #08306b - Deepest blue
 
 *Full categorization details available in fl_elections_aggregated.json metadata*
@@ -366,3 +366,48 @@ This feature is available on both desktop and mobile layouts.
    - Fixed search initialization timing issue
 
 **📅 Last Updated**: November 13, 2025
+
+## 🆕 Recent Updates (November 30, 2025)
+
+- **Historical Data Expansion:**
+   - Integrated 24 years of Florida election data (1978-2024)
+   - Added 16 presidential elections from 1980-2024
+   - Added 12 gubernatorial elections from 1978-2022
+   - Comprehensive coverage of statewide races across nearly five decades
+
+- **Candidate Name Accuracy:**
+   - Fixed presidential candidate extraction for varying data formats across years
+   - Implemented Bush family differentiation logic:
+     - George H.W. Bush (1988, 1992 presidential)
+     - George W. Bush (2000, 2004 presidential)
+     - Jeb Bush (1994, 1998 gubernatorial)
+   - Year-specific extraction patterns for different field formats (CanNameFirst vs CanNameLast)
+   - Fixed gubernatorial races showing lieutenant governor names instead of governor names
+
+- **Competitiveness Threshold Refinements:**
+   - Updated margin thresholds for cleaner breakpoints:
+     - Tilt: 0.51-0.99% (was 0.5-1%)
+     - Lean: 1-5.5% (was 1-5.5%)
+     - Likely: 5.51-9.99% (was 5.5-10%)
+     - Safe: 10-19.99% (was 10-20%)
+     - Stronghold: 20-29.99% (was 20-30%)
+     - Dominant: 30-39.99% (was 30-40%)
+   - Changed threshold logic from >= to > for 0.99% and 5.5% boundaries to handle rounding edge cases
+   - Fixed Jefferson County 2018 Senate displaying as Tossup instead of Lean R (actual margin: 0.9966%)
+   - Updated legend labels to use .99 endings for consistency
+
+- **UI/UX Improvements:**
+   - Fixed sidebar toggle button not responding to clicks
+   - Added inline onclick handler to sidebar minimize button for immediate binding
+   - Float button now always visible and changes text between + and −
+   - Reduced research findings text size to 11-12px for better density
+   - County sidebar set to display by default for immediate information access
+
+- **Data Processing Enhancements:**
+   - Updated aggregate_fl_elections.py to handle 24 election files
+   - Added office mapping for "President and Vice President of the United States"
+   - Added office mapping for "Governor and Lieutenant Governor"
+   - Implemented year-based candidate extraction logic for different data format variations
+   - Enhanced candidate lookup dictionary with historical figures (Carter, Reagan, Mondale, Dukakis, etc.)
+
+**📅 Last Updated**: November 30, 2025
