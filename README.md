@@ -397,11 +397,14 @@ This feature is available on both desktop and mobile layouts.
    - Updated legend labels to use .99 endings for consistency
 
 - **UI/UX Improvements:**
-   - Fixed sidebar toggle button not responding to clicks
-   - Added inline onclick handler to sidebar minimize button for immediate binding
+   - Fixed sidebar toggle button not responding to clicks by consolidating duplicate event handlers
+   - Resolved CSS conflict with duplicate .sidebar style blocks preventing proper positioning
+   - Fixed pointer-events issue preventing clicks on minimized sidebar button
+   - Sidebar toggle now works correctly to expand/minimize County Analysis panel
    - Float button now always visible and changes text between + and −
-   - Reduced research findings text size to 11-12px for better density
+   - Restored research findings to original font size (14-17px) with bullet points and red shading
    - County sidebar set to display by default for immediate information access
+   - Updated Lean category label to 1-5.50% for consistency with other .99/.50 endings
 
 - **Data Processing Enhancements:**
    - Updated aggregate_fl_elections.py to handle 24 election files
