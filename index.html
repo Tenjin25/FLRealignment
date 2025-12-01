@@ -106,7 +106,10 @@
           minimizeBtn.textContent = '−';
           minimizeBtn.title = 'Minimize sidebar';
         }
-        if (floatBtn) floatBtn.style.display = 'none';
+        if (floatBtn) {
+          floatBtn.textContent = '−';
+          floatBtn.title = 'Minimize Sidebar';
+        }
       } else {
         // Minimize sidebar (preserve content, just hide it)
         sidebar.classList.add('minimized');
@@ -115,7 +118,10 @@
           minimizeBtn.textContent = '+';
           minimizeBtn.title = 'Expand sidebar';
         }
-        if (floatBtn) floatBtn.style.display = 'flex';
+        if (floatBtn) {
+          floatBtn.textContent = '+';
+          floatBtn.title = 'Expand Sidebar';
+        }
       }
     }
 
@@ -143,7 +149,9 @@
       
       // Floating button toggles sidebar
       if (floatBtn) {
-        floatBtn.style.display = 'flex'; // Show initially since sidebar starts minimized
+        floatBtn.style.display = 'flex'; // Always visible now
+        floatBtn.textContent = '+'; // Start with + since sidebar starts minimized
+        floatBtn.title = 'Expand Sidebar';
         floatBtn.onclick = function() {
           toggleSidebar();
           // If no county is selected, show default message when expanding
@@ -204,8 +212,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
-/* Show floating button only when sidebar is minimized */
-#sidebar-float-toggle { display: none; }
+/* Floating sidebar button - always visible */
+#sidebar-float-toggle { display: flex !important; }
 .sidebar.minimized ~ #sidebar-float-toggle { display: flex !important; }
 html, body {
   height: 100vh;
