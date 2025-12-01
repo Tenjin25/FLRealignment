@@ -93,19 +93,24 @@
   <script>
     // Define toggleSidebar function before DOMContentLoaded
     function toggleSidebar() {
-      console.log('toggleSidebar called');
       const sidebar = document.getElementById('sidebar');
       const sidebarContent = document.querySelector('.sidebar-content');
+      const sidebarHeader = document.querySelector('.sidebar-header');
       const minimizeBtn = document.getElementById('sidebar-minimize-btn');
       const floatBtn = document.getElementById('sidebar-float-toggle');
-      
-      console.log('toggleSidebar - sidebar:', sidebar, 'minimized:', sidebar?.classList.contains('minimized'));
+      const detailsDiv = document.getElementById('county-details');
+      const contentEl = document.getElementById('county-info-content');
       
       if (sidebar && sidebar.classList.contains('minimized')) {
         // Expand sidebar
-        console.log('Expanding sidebar');
         sidebar.classList.remove('minimized');
+        if (sidebarHeader) sidebarHeader.style.display = 'flex';
         if (sidebarContent) sidebarContent.style.display = 'block';
+        if (detailsDiv) detailsDiv.style.display = 'block';
+        // Ensure there's content to show
+        if (contentEl && (!contentEl.innerHTML || contentEl.innerHTML.trim() === '')) {
+          contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+        }
         if (minimizeBtn) {
           minimizeBtn.textContent = '−';
           minimizeBtn.title = 'Minimize sidebar';
@@ -116,7 +121,6 @@
         }
       } else if (sidebar) {
         // Minimize sidebar
-        console.log('Minimizing sidebar');
         sidebar.classList.add('minimized');
         if (sidebarContent) sidebarContent.style.display = 'none';
         if (minimizeBtn) {
@@ -136,15 +140,12 @@
       var detailsDiv = document.getElementById('county-details');
       var contentEl = document.getElementById('county-info-content');
       
-      console.log('DOMContentLoaded: sidebar=', sidebar, 'sidebarBtn=', sidebarBtn);
-      
       // Always start minimized and set button text
       if (sidebar) sidebar.classList.add('minimized');
       if (sidebarBtn) {
         sidebarBtn.textContent = '+';
         sidebarBtn.title = 'Expand sidebar';
-        sidebarBtn.onclick = function(e) {
-          console.log('Sidebar button clicked!', e);
+        sidebarBtn.onclick = function() {
           toggleSidebar();
           // If no county is selected, show default message
           if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
@@ -152,9 +153,6 @@
             detailsDiv.style.display = 'block';
           }
         };
-        console.log('Sidebar button onclick set successfully');
-      } else {
-        console.error('Sidebar button not found!');
       }
       // Show default message on load
       if (detailsDiv && contentEl) {
