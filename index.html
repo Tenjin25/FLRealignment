@@ -157,11 +157,15 @@
     document.addEventListener('DOMContentLoaded', function() {
       var sidebar = document.getElementById('sidebar');
       var sidebarBtn = document.getElementById('sidebar-minimize-btn');
+      var floatBtn = document.getElementById('sidebar-float-toggle');
       var detailsDiv = document.getElementById('county-details');
       var contentEl = document.getElementById('county-info-content');
+      var statusExit = document.getElementById('status-exit');
       
       // Always start minimized and set button text
       if (sidebar) sidebar.classList.add('minimized');
+      
+      // Sidebar minimize button
       if (sidebarBtn) {
         sidebarBtn.textContent = '+';
         sidebarBtn.title = 'Expand sidebar';
@@ -174,6 +178,29 @@
           }
         };
       }
+      
+      // Floating sidebar button
+      if (floatBtn) {
+        floatBtn.onclick = function() {
+          toggleSidebar();
+        };
+        // Set initial float button text based on sidebar state
+        if (sidebar && !sidebar.classList.contains('minimized')) {
+          floatBtn.textContent = '−';
+          floatBtn.title = 'Minimize sidebar';
+        } else {
+          floatBtn.textContent = '+';
+          floatBtn.title = 'Expand sidebar';
+        }
+      }
+      
+      // Status panel close button
+      if (statusExit) {
+        statusExit.onclick = function() {
+          document.getElementById('status-panel').style.display = 'none';
+        };
+      }
+      
       // Show default message on load
       if (detailsDiv && contentEl) {
         contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
@@ -2957,31 +2984,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
-// Floating sidebar expand button logic
-document.addEventListener('DOMContentLoaded', function() {
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  const sidebar = document.getElementById('sidebar');
-  if (floatBtn) {
-    floatBtn.onclick = function() {
-      toggleSidebar();
-    };
-    // Set initial float button text based on sidebar state
-    if (sidebar && !sidebar.classList.contains('minimized')) {
-      floatBtn.textContent = '−';
-      floatBtn.title = 'Minimize sidebar';
-    } else {
-      floatBtn.textContent = '+';
-      floatBtn.title = 'Expand sidebar';
-    }
-  }
-  // Status panel close button
-  const statusExit = document.getElementById('status-exit');
-  if (statusExit) {
-    statusExit.onclick = function() {
-      document.getElementById('status-panel').style.display = 'none';
-    };
-  }
-});
   </script>
 </body>
 </html>
