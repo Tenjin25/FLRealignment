@@ -2095,35 +2095,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
 
 
     // Sidebar minimized by default on load, expand on click
-    document.addEventListener('DOMContentLoaded', function() {
-      const sidebar = document.getElementById('sidebar');
-      const btn = document.getElementById('sidebar-minimize-btn');
-      sidebar.classList.add('minimized');
-      btn.textContent = '+';
-      // Always show default message in sidebar on load
-      var detailsDiv = document.getElementById('county-details');
-      var contentEl = document.getElementById('county-info-content');
-      if (detailsDiv && contentEl) {
-        contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-        detailsDiv.style.display = 'block';
-      }
-      
-      // Floating sidebar button click toggles sidebar open
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      if (floatBtn) {
-        floatBtn.addEventListener('click', function() {
-          toggleSidebar();
-          // If no county is selected, show default message
-          const detailsDiv = document.getElementById('county-details');
-          const contentEl = document.getElementById('county-info-content');
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
-            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-            detailsDiv.style.display = 'block';
-          }
-        });
-      }
-    });
-
     // County search functionality - Efficient search with limited suggestions
     function setupCountySearch() {
       const countiesSource = map.getSource('counties');
