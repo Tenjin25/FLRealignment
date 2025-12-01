@@ -91,12 +91,15 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Sidebar toggle functionality (restore NCMap-like behavior)
+    // Sidebar toggle functionality
     function toggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      var sidebarContent = document.querySelector('.sidebar-content');
-      var minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarContent = document.querySelector('.sidebar-content');
+      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      
       if (!sidebar) return;
+      
       if (sidebar.classList.contains('minimized')) {
         // Expand sidebar
         sidebar.classList.remove('minimized');
@@ -105,6 +108,7 @@
           minimizeBtn.textContent = '−';
           minimizeBtn.title = 'Minimize sidebar';
         }
+        if (floatBtn) floatBtn.style.display = 'none';
       } else {
         // Minimize sidebar
         sidebar.classList.add('minimized');
@@ -113,34 +117,9 @@
           minimizeBtn.textContent = '+';
           minimizeBtn.title = 'Expand sidebar';
         }
+        if (floatBtn) floatBtn.style.display = 'flex';
       }
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      var sidebar = document.getElementById('sidebar');
-      var sidebarBtn = document.getElementById('sidebar-minimize-btn');
-      var detailsDiv = document.getElementById('county-details');
-      var contentEl = document.getElementById('county-info-content');
-      // Always start minimized and set button text
-      if (sidebar) sidebar.classList.add('minimized');
-      if (sidebarBtn) {
-        sidebarBtn.textContent = '+';
-        sidebarBtn.title = 'Expand sidebar';
-        sidebarBtn.onclick = function() {
-          toggleSidebar();
-          // If no county is selected, show default message
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
-            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-            detailsDiv.style.display = 'block';
-          }
-        };
-      }
-      // Show default message on load
-      if (detailsDiv && contentEl) {
-        contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-        detailsDiv.style.display = 'block';
-      }
-    });
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
       const countiesSource = map.getSource('counties');
@@ -2044,33 +2023,54 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
 
-    // Sidebar minimized by default on load, expand on click
+    // Initialize sidebar on page load
     document.addEventListener('DOMContentLoaded', function() {
       const sidebar = document.getElementById('sidebar');
-      const btn = document.getElementById('sidebar-minimize-btn');
-      sidebar.classList.add('minimized');
-      btn.textContent = '+';
-      // Always show default message in sidebar on load
-      var detailsDiv = document.getElementById('county-details');
-      var contentEl = document.getElementById('county-info-content');
+      const minimizeBtn = document.getElementById('sidebar-minimize-btn');
+      const floatBtn = document.getElementById('sidebar-float-toggle');
+      const detailsDiv = document.getElementById('county-details');
+      const contentEl = document.getElementById('county-info-content');
+      
+      // Start minimized
+      if (sidebar) sidebar.classList.add('minimized');
+      if (minimizeBtn) {
+        minimizeBtn.textContent = '+';
+        minimizeBtn.title = 'Expand sidebar';
+        minimizeBtn.onclick = function() {
+          toggleSidebar();
+          // Show default message if no county selected
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        };
+      }
+      
+      // Floating button toggles sidebar
+      if (floatBtn) {
+        floatBtn.style.display = 'flex'; // Show initially since sidebar starts minimized
+        floatBtn.onclick = function() {
+          toggleSidebar();
+          // Show default message if no county selected
+          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
+            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
+            detailsDiv.style.display = 'block';
+          }
+        };
+      }
+      
+      // Show default message on load
       if (detailsDiv && contentEl) {
         contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
         detailsDiv.style.display = 'block';
       }
       
-      // Floating sidebar button click toggles sidebar open
-      const floatBtn = document.getElementById('sidebar-float-toggle');
-      if (floatBtn) {
-        floatBtn.addEventListener('click', function() {
-          toggleSidebar();
-          // If no county is selected, show default message
-          const detailsDiv = document.getElementById('county-details');
-          const contentEl = document.getElementById('county-info-content');
-          if (detailsDiv && contentEl && (!window.lastSelectedCounty || window.lastSelectedCounty === '')) {
-            contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
-            detailsDiv.style.display = 'block';
-          }
-        });
+      // Status panel close button
+      const statusExit = document.getElementById('status-exit');
+      if (statusExit) {
+        statusExit.onclick = function() {
+          document.getElementById('status-panel').style.display = 'none';
+        };
       }
     });
 
@@ -2934,27 +2934,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     }
 
     window.onload = init;
-// Floating sidebar expand button logic
-document.addEventListener('DOMContentLoaded', function() {
-  const floatBtn = document.getElementById('sidebar-float-toggle');
-  if (floatBtn) {
-    floatBtn.onclick = function() {
-      toggleSidebar();
-    };
-  }
-  // Hide float button if sidebar is open on load
-  const sidebar = document.getElementById('sidebar');
-  if (sidebar && !sidebar.classList.contains('minimized')) {
-    floatBtn.style.display = 'none';
-  }
-  // Status panel close button
-  const statusExit = document.getElementById('status-exit');
-  if (statusExit) {
-    statusExit.onclick = function() {
-      document.getElementById('status-panel').style.display = 'none';
-    };
-  }
-});
   </script>
 </body>
 </html>
