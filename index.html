@@ -1444,7 +1444,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         compLabel = winner === 'Republican' ? "Tilt Republican (0.50-0.99%)" : "Tilt Democratic (0.50-0.99%)";
         compColor = winner === 'Republican' ? '#fca5a5' : '#bfdbfe';
       } else {
-        compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win - <0.50%)' : 'Tossup (Republican Win - <0.50)';
+        compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win - <0.50%)' : 'Tossup (Republican Win - <0.50%)';
         compColor = winner === 'Democratic' ? '#2563eb' : '#dc2626'; // Blue for Dem win, Red for Rep win
       }
       
