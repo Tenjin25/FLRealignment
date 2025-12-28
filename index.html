@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     mapboxgl.accessToken = CONFIG.mapboxToken;
 
-    const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/light-v11', center: CONFIG.center, zoom: CONFIG.zoom });
+    const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: CONFIG.center, zoom: CONFIG.zoom });
 
     let electionDataJSON = null; // New JSON structure from fl_elections_aggregated.json
     let electionData = null; // Flattened array for compatibility
