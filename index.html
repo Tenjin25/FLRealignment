@@ -2846,7 +2846,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       console.log(`Color expression built for ${countiesProcessed} counties`);
       
       map.setPaintProperty('county-fill', 'fill-color', expr);
-  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year})`;
+  document.getElementById('contest-name').textContent = `${formatContestName(contestType, year)} (${year})`;
       setStatus(`Applied contest: ${formatContestName(contestType, year)} ${year}`);
     }
 
@@ -2886,7 +2886,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       expr.push('#e0e0e0'); // default color
       
       map.setPaintProperty('district-fill', 'fill-color', expr);
-  document.getElementById('contest-name').textContent = `FL US House (${year})`;
+  document.getElementById('contest-name').textContent = `US House (${year})`;
       setStatus(`Applied contest: FL US House ${year}`);
     }
 
@@ -2936,7 +2936,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         setStatus('District layer not found!', 5000, true);
       }
 
-  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
+  document.getElementById('contest-name').textContent = `${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
 
