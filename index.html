@@ -2,40 +2,48 @@
 <html>
 <head>
   <style>
-  @media (max-width: 700px) {
+  /* Mobile Styles - Enhanced for touch and small screens */
+  @media (max-width: 768px) {
+    /* Make minimize buttons touch-friendly */
     #sidebar-minimize-btn,
     #main-controls .controls-header #controls-minimize-btn,
     #legend-minimize-btn {
       position: absolute !important;
-      top: 12px !important;
-      right: 12px !important;
+      top: 8px !important;
+      right: 8px !important;
       z-index: 10002 !important;
-      font-size: 18px !important;
-      background: #f3f4f6 !important;
-      color: #2563eb !important;
-      border-radius: 6px !important;
-      width: auto !important;
-      height: auto !important;
-      border: 1px solid #2563eb !important;
-      box-shadow: none !important;
-      padding: 4px 16px !important;
-      display: block !important;
+      font-size: 20px !important;
+      background: #2563eb !important;
+      color: #fff !important;
+      border-radius: 8px !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      border: none !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+      padding: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       font-weight: 700 !important;
       transition: background 0.2s;
+      cursor: pointer;
     }
     #main-controls .controls-header #controls-minimize-btn {
-      left: 12px !important;
+      left: 8px !important;
       right: auto !important;
     }
     .legend-header {
       position: relative !important;
-      min-height: 48px;
+      min-height: 56px;
+      padding: 12px 60px 12px 16px !important;
     }
     .legend-header h4 {
-      margin-right: 56px !important;
+      margin: 0 !important;
+      font-size: 16px !important;
     }
   }
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
+    /* Legend at bottom of screen on mobile */
     .legend {
       position: fixed !important;
       bottom: 0 !important;
@@ -44,16 +52,33 @@
       max-width: 100vw !important;
       z-index: 10005 !important;
       background: #fff !important;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.10);
-      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.15) !important;
+      border-radius: 16px 16px 0 0 !important;
       overflow-y: auto;
-      max-height: 40vh;
+      max-height: 50vh;
+      min-width: auto !important;
+    }
+    .legend.minimized {
+      max-height: 56px !important;
     }
     .legend-header {
       position: sticky;
       top: 0;
       background: #fff;
       z-index: 10006;
+      border-radius: 16px 16px 0 0;
+    }
+    .legend-content {
+      padding: 16px !important;
+    }
+    .legend-item {
+      font-size: 14px !important;
+      margin-bottom: 10px !important;
+    }
+    .legend-color {
+      width: 20px !important;
+      height: 20px !important;
+      margin-right: 12px !important;
     }
   }
     .spinner svg {
@@ -219,7 +244,7 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <meta charset='utf-8'>
     <title>Florida Political Realignment Map (1978-2024)</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes'>
     <meta property="og:title" content="FL Political Realignment Map (2008-2024)">
     <meta property="og:description" content="Interactive visualization of Florida's political trends from 1978 to 2024, showing county-level voting patterns.">
     <meta property="og:image" content="preview.png">
@@ -228,11 +253,26 @@
     <style>
 /* Show floating button only when sidebar is minimized */
 #sidebar-float-toggle { display: flex; position: fixed; top: 10px; right: 10px; z-index: 10010; }
+/* Mobile: Larger touch-friendly floating button */
+@media (max-width: 768px) {
+  #sidebar-float-toggle {
+    top: auto !important;
+    bottom: calc(50vh + 16px) !important;
+    right: 16px !important;
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 28px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+  }
+}
 html, body {
   height: 100vh;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 body {
   height: 100vh;
@@ -240,6 +280,7 @@ body {
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
+  touch-action: pan-x pan-y;
 }
 #map {
   position: absolute;
@@ -250,6 +291,7 @@ body {
   background: #f0f4f8;
   transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 1;
+  touch-action: pan-x pan-y pinch-zoom;
 }
 /* Removed unused #map.sidebar-minimized selector for clarity */
 
@@ -311,6 +353,35 @@ body {
   overflow-y: auto;
   transition: width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 2;
+}
+/* Mobile: Full-screen sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 10003 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .sidebar-header {
+    padding: 16px !important;
+    border-bottom: 2px solid #e5e7eb !important;
+  }
+  .sidebar-header h3 {
+    font-size: 18px !important;
+    padding-right: 50px;
+  }
+  .sidebar-content {
+    padding: 16px !important;
+  }
+  .sidebar-footer {
+    padding: 16px !important;
+    font-size: 14px !important;
+  }
 }
 .sidebar.minimized {
   width: 0 !important;
@@ -396,6 +467,48 @@ body {
   min-width: 380px;
   max-width: 420px;
   transition: all 0.3s ease;
+}
+/* Mobile: Full-width controls at top */
+@media (max-width: 768px) {
+  .main-controls {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 0 16px 16px !important;
+    padding: 16px !important;
+    margin: 0 !important;
+    z-index: 10004 !important;
+  }
+  .main-controls.minimized {
+    min-width: 60px !important;
+    max-width: 60px !important;
+    width: 60px !important;
+    left: 8px !important;
+    top: 8px !important;
+    right: auto !important;
+    border-radius: 12px !important;
+  }
+  .controls-header h3 {
+    font-size: 16px !important;
+    padding-right: 50px;
+  }
+  .control-group label {
+    font-size: 14px !important;
+  }
+  .control-group select {
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+  #accessibility-toggle {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+  }
 }
 .main-controls.minimized {
   min-width: 60px;
@@ -553,6 +666,19 @@ body {
   font-size: 16px;
   font-weight: 700;
 }
+/* Mobile: Better spacing for county details */
+@media (max-width: 768px) {
+  .county-details {
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+  }
+  .county-details h4 {
+    font-size: 18px !important;
+  }
+  #county-name {
+    font-size: 20px !important;
+  }
+}
 /* Sidebar Card Classes for Consistent Font Sizes */
 .sidebar-section-title {
   font-size: 14px !important;
@@ -592,6 +718,22 @@ body {
   font-size: 16px !important;
   font-weight: 700 !important;
   color: #1f2937 !important;
+}
+/* Mobile: Better layout for statewide results */
+@media (max-width: 768px) {
+  .statewide-results {
+    padding: 14px !important;
+  }
+  .statewide-results h4 {
+    font-size: 18px !important;
+  }
+  .statewide-margin {
+    padding: 12px !important;
+  }
+  #statewide-temperature-bar {
+    height: 36px !important;
+    margin: 14px 0 !important;
+  }
 }
 
 /* Statewide Results */
@@ -658,12 +800,54 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+/* Mobile: Better readability for research findings */
+@media (max-width: 768px) {
+  .findings-section h4 {
+    font-size: 18px !important;
+  }
+  .finding-card {
+    padding: 14px !important;
+    margin-bottom: 14px !important;
+  }
+  .finding-card h5 {
+    font-size: 16px !important;
+  }
+  .finding-card p,
+  .finding-card ul {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+}
 .metric {
   background: #dbeafe;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
   color: #1e40af;
+}
+
+/* Mobile: Touch-friendly inputs and buttons */
+@media (max-width: 768px) {
+  #county-search {
+    font-size: 16px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+  .minimize-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 22px !important;
+  }
+  /* Ensure all buttons and interactive elements are touch-friendly */
+  button, select, input, .mode-toggle {
+    min-height: 44px !important;
+    touch-action: manipulation;
+  }
+  /* Better tap highlight */
+  button:active, .mode-toggle:active {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
 }
 
 /* End of styles */
@@ -769,68 +953,11 @@ document.addEventListener('DOMContentLoaded', function() {
     accBtn.onclick = function() {
       document.body.classList.toggle('colorblind-mode');
       updateLegendColors();
-      // Update map colors for accessibility mode
-      if (document.body.classList.contains('colorblind-mode')) {
-        // Blue/orange shades for colorblind mode, matching legend categories
-        const expr = ['case'];
-        const contestSelect = document.getElementById('contestSelect');
-        const contestKey = contestSelect && contestSelect.value;
-        if (contestKey && electionData) {
-          const lastUnderscoreIndex = contestKey.lastIndexOf('_');
-          const contestType = contestKey.substring(0, lastUnderscoreIndex);
-          const year = contestKey.substring(lastUnderscoreIndex + 1);
-          const contestData = electionData.filter(row => row.year == year);
-          function normalizeCountyName(name) {
-            return (name || '')
-              .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
-              .replace(/\s+/g, ' ')
-              .trim()
-              .toUpperCase();
-          }
-          function cbColorForMargin(marginPct, winner) {
-            // Accessibility palette: orange/yellow for R, blue for D, with shades
-            if (marginPct >= 40) {
-              return winner === 'R' ? '#cc5500' : '#004d99'; // Annihilation
-            } else if (marginPct >= 30 && marginPct <= 39.99) {
-              return winner === 'R' ? '#ff6600' : '#0066cc'; // Dominant
-            } else if (marginPct >= 20 && marginPct <= 29.99) {
-              return winner === 'R' ? '#ff8833' : '#0080ff'; // Stronghold
-            } else if (marginPct >= 10 && marginPct <= 19.99) {
-              return winner === 'R' ? '#ffaa55' : '#3399ff'; // Safe
-            } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-              return winner === 'R' ? '#ffcc77' : '#66b3ff'; // Likely
-            } else if (marginPct >= 1 && marginPct <= 5.5) {
-              return winner === 'R' ? '#ffdd99' : '#99ccff'; // Lean
-            } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-              return winner === 'R' ? '#ffeecc' : '#b3d9ff'; // Tilt
-            } else {
-              return '#cccccc'; // Tossup
-            }
-          }
-          contestData.forEach(row => {
-            const countyName = normalizeCountyName(row.county);
-            const demVotes = row[`${contestType}_dem`] || 0;
-            const repVotes = row[`${contestType}_rep`] || 0;
-            const totalVotes = row[`${contestType}_total`] || 0;
-            if (totalVotes === 0) return;
-            const demPct = (demVotes / totalVotes) * 100;
-            const repPct = (repVotes / totalVotes) * 100;
-            const winner = repPct > demPct ? 'R' : 'D';
-            const marginPct = Math.abs(repPct - demPct);
-            const color = cbColorForMargin(marginPct, winner);
-            expr.push(['==', ['upcase', ['coalesce', ['get', 'NAME20'], ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME']]], countyName]);
-            expr.push(color);
-          });
-          expr.push('#e0e0e0'); // default color
-          if (map.getLayer('county-fill')) {
-            map.setPaintProperty('county-fill', 'fill-color', expr);
-          }
-        }
-      } else {
-        // Restore normal contest colors
-        const contestSelect = document.getElementById('contestSelect');
-        const contestKey = contestSelect && contestSelect.value;
-        if (contestKey) applyContest(contestKey);
+      // Reapply current contest with new color mode
+      const contestSelect = document.getElementById('contestSelect');
+      const contestKey = contestSelect && contestSelect.value;
+      if (contestKey) {
+        applyContest(contestKey);
       }
     };
   }
@@ -1288,21 +1415,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   var spinner = document.getElementById('contest-loading-spinner');
   if (spinner) spinner.style.display = 'none';
       sel.onchange = () => {
-        if (document.body.classList.contains('colorblind-mode')) {
-          // ...existing code for accessibility mode...
-          const expr = ['case'];
-          const contestKey = sel.value;
-          if (contestKey && electionData) {
-            // ...existing code for accessibility palette...
-            // ...existing code...
-          }
-        } else {
-          // Normal mode
-          applyContest(sel.value);
-          // Explicitly update sidebar for last selected county
-          if (typeof lastSelectedCounty !== 'undefined' && lastSelectedCounty) {
-            showCountyDetails(lastSelectedCounty);
-          }
+        // Always use applyContest - it will check for colorblind mode automatically
+        applyContest(sel.value);
+        // Explicitly update sidebar for last selected county
+        if (typeof lastSelectedCounty !== 'undefined' && lastSelectedCounty) {
+          showCountyDetails(lastSelectedCounty);
         }
       };
 
@@ -2809,6 +2926,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           .trim()
           .toUpperCase();
       }
+      // Check if accessibility mode is active
+      const isColorblindMode = document.body.classList.contains('colorblind-mode');
+      
+      // Define colorblind-friendly color function
+      function getAccessibilityColor(marginPct, winner) {
+        if (marginPct >= 40) {
+          return winner === 'R' ? '#cc5500' : '#004d99';
+        } else if (marginPct >= 30 && marginPct <= 39.99) {
+          return winner === 'R' ? '#ff6600' : '#0066cc';
+        } else if (marginPct >= 20 && marginPct <= 29.99) {
+          return winner === 'R' ? '#ff8833' : '#0080ff';
+        } else if (marginPct >= 10 && marginPct <= 19.99) {
+          return winner === 'R' ? '#ffaa55' : '#3399ff';
+        } else if (marginPct >= 5.51 && marginPct <= 9.99) {
+          return winner === 'R' ? '#ffcc77' : '#66b3ff';
+        } else if (marginPct >= 1 && marginPct <= 5.5) {
+          return winner === 'R' ? '#ffdd99' : '#99ccff';
+        } else if (marginPct >= 0.51 && marginPct <= 0.99) {
+          return winner === 'R' ? '#ffeecc' : '#b3d9ff';
+        } else {
+          return '#cccccc';
+        }
+      }
+      
       contestData.forEach(row => {
         const countyName = normalizeCountyName(row.county);
         const demVotes = row[`${contestType}_dem`] || 0;
@@ -2819,7 +2960,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
-        const color = categoryColorForMargin(marginPct, winner);
+        // Use accessibility colors if colorblind mode is active
+        const color = isColorblindMode ? getAccessibilityColor(marginPct, winner) : categoryColorForMargin(marginPct, winner);
         // Match on normalized, uppercase name from GeoJSON (NAME20 field)
         expr.push(['==', ['upcase', ['get', 'NAME20']], countyName]);
         expr.push(color);
