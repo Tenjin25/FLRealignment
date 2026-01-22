@@ -73,21 +73,24 @@
     font-weight: bold;
     text-decoration: underline wavy #333;
   }
-  body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #ff9900 !important; }
-  body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ffb84d !important; }
-  body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ffd699 !important; }
-  body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffe5cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #fff2e6 !important; }
-  body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffe5cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #fff2e6 !important; }
+  /* Republican shades - Orange/Yellow palette */
+  body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #cc5500 !important; } /* Annihilation R */
+  body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ff6600 !important; } /* Dominant R */
+  body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ff8833 !important; } /* Stronghold R */
+  body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffaa55 !important; } /* Safe R */
+  body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #ffcc77 !important; } /* Likely R */
+  body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffdd99 !important; } /* Lean R */
+  body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #ffeecc !important; } /* Tilt R */
+  /* Tossup */
   body.colorblind-mode .legend-color[style*="background: #f7f7f7"] { background: #cccccc !important; }
-  body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #3399ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #66b3ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #99ccff !important; }
-  body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #b3d1ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #3366cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #003399 !important; }
-  body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #001f4d !important; }
+  /* Democratic shades - Blue palette */
+  body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #b3d9ff !important; } /* Tilt D */
+  body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #99ccff !important; } /* Lean D */
+  body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #66b3ff !important; } /* Likely D */
+  body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #3399ff !important; } /* Safe D */
+  body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #0080ff !important; } /* Stronghold D */
+  body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #0066cc !important; } /* Dominant D */
+  body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #004d99 !important; } /* Annihilation D */
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
@@ -785,21 +788,21 @@ document.addEventListener('DOMContentLoaded', function() {
               .toUpperCase();
           }
           function cbColorForMargin(marginPct, winner) {
-            // Accessibility palette: orange for R, blue for D, with shades
+            // Accessibility palette: orange/yellow for R, blue for D, with shades
             if (marginPct >= 40) {
-              return winner === 'R' ? '#ff9900' : '#0074d9'; // Annihilation
+              return winner === 'R' ? '#cc5500' : '#004d99'; // Annihilation
             } else if (marginPct >= 30 && marginPct <= 39.99) {
-              return winner === 'R' ? '#ffb84d' : '#339af0'; // Dominant
+              return winner === 'R' ? '#ff6600' : '#0066cc'; // Dominant
             } else if (marginPct >= 20 && marginPct <= 29.99) {
-              return winner === 'R' ? '#ffd699' : '#5dade2'; // Stronghold
+              return winner === 'R' ? '#ff8833' : '#0080ff'; // Stronghold
             } else if (marginPct >= 10 && marginPct <= 19.99) {
-              return winner === 'R' ? '#ffe5cc' : '#74c0fc'; // Safe
+              return winner === 'R' ? '#ffaa55' : '#3399ff'; // Safe
             } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-              return winner === 'R' ? '#fff2e6' : '#a5d8ff'; // Likely
+              return winner === 'R' ? '#ffcc77' : '#66b3ff'; // Likely
             } else if (marginPct >= 1 && marginPct <= 5.5) {
-              return winner === 'R' ? '#ffe5cc' : '#d0ebff'; // Lean
+              return winner === 'R' ? '#ffdd99' : '#99ccff'; // Lean
             } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-              return winner === 'R' ? '#fff2e6' : '#e7f5ff'; // Tilt
+              return winner === 'R' ? '#ffeecc' : '#b3d9ff'; // Tilt
             } else {
               return '#cccccc'; // Tossup
             }
@@ -931,25 +934,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
         <div class="controls-content" id="controls-content">
-            <div class="analysis-mode">
-                <div class="mode-toggle active" id="county-mode" onclick="setAnalysisMode('county')">County Results</div>
-                <div class="mode-toggle" id="district-mode" onclick="setAnalysisMode('district')">District Analysis</div>
-            </div>
-            <div class="control-group">
-                <label>🗺️ Map View:</label>
-                <div class="view-toggle">
-                    <div class="mode-toggle active" id="counties-view" onclick="setMapView('counties')">Counties</div>
-                    <div class="mode-toggle" id="districts-view" onclick="setMapView('districts')">Congress</div>
-                </div>
-                <div class="view-toggle" style="margin-top: 8px;">
-                    <div class="mode-toggle" id="state-house-view" onclick="setMapView('state_house')">State House</div>
-                    <div class="mode-toggle" id="state-senate-view" onclick="setMapView('state_senate')">State Senate</div>
-                </div>
-                <!-- 2000 VTDs option (hidden until data is loaded) -->
-                <div class="view-toggle" style="margin-top: 8px; display: none;" id="vtds-2000-section">
-                    <div class="mode-toggle" id="vtds-2000-view" onclick="setMapView('vtds_2000')">2000 Precincts</div>
-                </div>
-            </div>
             <div class="control-group">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <label>📊 Contest Type:</label>
@@ -1730,35 +1714,35 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Accessibility palette for winner color
       function cbColorForMargin(marginPct, winner) {
         if (marginPct >= 40) {
-          return winner === 'Republican' ? '#ff9900' : '#0074d9';
+          return winner === 'Republican' ? '#cc5500' : '#004d99';
         } else if (marginPct >= 30 && marginPct <= 39.99) {
-          return winner === 'Republican' ? '#ffb84d' : '#339af0';
+          return winner === 'Republican' ? '#ff6600' : '#0066cc';
         } else if (marginPct >= 20 && marginPct <= 29.99) {
-          return winner === 'Republican' ? '#ffd699' : '#5dade2';
+          return winner === 'Republican' ? '#ff8833' : '#0080ff';
         } else if (marginPct >= 10 && marginPct <= 19.99) {
-          return winner === 'Republican' ? '#ffe5cc' : '#74c0fc';
+          return winner === 'Republican' ? '#ffaa55' : '#3399ff';
         } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-          return winner === 'Republican' ? '#fff2e6' : '#a5d8ff';
+          return winner === 'Republican' ? '#ffcc77' : '#66b3ff';
         } else if (marginPct >= 1 && marginPct <= 5.5) {
-          return winner === 'Republican' ? '#ffe5cc' : '#d0ebff';
+          return winner === 'Republican' ? '#ffdd99' : '#99ccff';
         } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-          return winner === 'Republican' ? '#fff2e6' : '#e7f5ff';
+          return winner === 'Republican' ? '#ffeecc' : '#b3d9ff';
         } else {
           return '#cccccc';
         }
       }
       const isColorblind = document.body.classList.contains('colorblind-mode');
-      // Accessibility palette for winner color (always yellow/orange for Republican in colorblind mode)
+      // Accessibility palette for winner color (always orange/yellow for Republican in colorblind mode)
       let winnerColor = '#dc2626';
       if (winner === 'Republican') {
         if (isColorblind) {
-          if (parseFloat(marginPct) >= 40) winnerColor = '#ff9900';
-          else if (parseFloat(marginPct) >= 30) winnerColor = '#ffb84d';
-          else if (parseFloat(marginPct) >= 20) winnerColor = '#ffd699';
-          else if (parseFloat(marginPct) >= 10) winnerColor = '#ffe5cc';
-          else if (parseFloat(marginPct) >= 5.5) winnerColor = '#fff2e6';
-          else if (parseFloat(marginPct) >= 1) winnerColor = '#ffe5cc';
-          else if (parseFloat(marginPct) >= 0.5) winnerColor = '#fff2e6';
+          if (parseFloat(marginPct) >= 40) winnerColor = '#cc5500';
+          else if (parseFloat(marginPct) >= 30) winnerColor = '#ff6600';
+          else if (parseFloat(marginPct) >= 20) winnerColor = '#ff8833';
+          else if (parseFloat(marginPct) >= 10) winnerColor = '#ffaa55';
+          else if (parseFloat(marginPct) >= 5.5) winnerColor = '#ffcc77';
+          else if (parseFloat(marginPct) >= 1) winnerColor = '#ffdd99';
+          else if (parseFloat(marginPct) >= 0.5) winnerColor = '#ffeecc';
           else winnerColor = '#cccccc';
         }
       } else {
@@ -1793,13 +1777,13 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   // For colorblind mode, use the correct accessibility palette for Republican vote breakdown
   let repColor = '#ef3b2c';
   if (isColorblind) {
-    if (parseFloat(marginPct) >= 40) repColor = '#ff9900';
-    else if (parseFloat(marginPct) >= 30 && parseFloat(marginPct) <= 39.99) repColor = '#ffb84d';
-    else if (parseFloat(marginPct) >= 20 && parseFloat(marginPct) <= 29.99) repColor = '#ffd699';
-    else if (parseFloat(marginPct) >= 10 && parseFloat(marginPct) <= 19.99) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 5.51 && parseFloat(marginPct) <= 9.99) repColor = '#fff2e6';
-    else if (parseFloat(marginPct) >= 1 && parseFloat(marginPct) <= 5.5) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 0.51 && parseFloat(marginPct) <= 0.99) repColor = '#fff2e6';
+    if (parseFloat(marginPct) >= 40) repColor = '#cc5500';
+    else if (parseFloat(marginPct) >= 30 && parseFloat(marginPct) <= 39.99) repColor = '#ff6600';
+    else if (parseFloat(marginPct) >= 20 && parseFloat(marginPct) <= 29.99) repColor = '#ff8833';
+    else if (parseFloat(marginPct) >= 10 && parseFloat(marginPct) <= 19.99) repColor = '#ffaa55';
+    else if (parseFloat(marginPct) >= 5.51 && parseFloat(marginPct) <= 9.99) repColor = '#ffcc77';
+    else if (parseFloat(marginPct) >= 1 && parseFloat(marginPct) <= 5.5) repColor = '#ffdd99';
+    else if (parseFloat(marginPct) >= 0.51 && parseFloat(marginPct) <= 0.99) repColor = '#ffeecc';
     else repColor = '#cccccc';
   } else {
     // Non-accessibility mode: always use red for Republican vote breakdown
