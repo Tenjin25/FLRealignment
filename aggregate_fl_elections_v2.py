@@ -216,6 +216,7 @@ def process_election_file(file_path, year):
             
             # Store county results
             county_upper = county.upper()
+            rounded_margin_pct = round(margin_pct, 2)
             results_by_office[office_key][contest_key][county_upper] = {
                 "county": county_upper,
                 "contest": office,
@@ -228,9 +229,9 @@ def process_election_file(file_path, year):
                 "total_votes": total_votes,
                 "two_party_total": two_party_total,
                 "margin": margin,
-                "margin_pct": round(margin_pct, 2),
+                "margin_pct": rounded_margin_pct,
                 "winner": winner,
-                "competitiveness": get_competitiveness(margin_pct, winner),
+                "competitiveness": get_competitiveness(rounded_margin_pct, winner),
                 "all_parties": party_votes
             }
     
