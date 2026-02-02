@@ -80,6 +80,8 @@ This map visualizes the data behind this transformation, allowing users to explo
 - **Responsive design** with collapsible sidebar
 - **Contest selection** dropdown for different election types
 - **Color-coded visualization** based on political margins
+- **County label toggle** (Aa button) to show/hide county names on the map
+- **Historical Cabinet offices** (1978-2002): Secretary of State, Treasurer, Commissioner of Education, Comptroller
 
 ## 🚀 Quick Start
 
@@ -112,8 +114,11 @@ This map visualizes the data behind this transformation, allowing users to explo
 - **Source**: Florida Division of Elections
 - **Format**: Aggregated JSON with hierarchical structure (fl_elections_aggregated.json)
 - **Years**: 1978-2024 (47 years of historical data covering 24 election cycles)
-- **Contests**: President (16 elections), Governor (12 elections), US Senate, Attorney General, CFO, Agriculture Commissioner
-- **Candidate Names**: Full names with proper formatting and Bush family differentiation (George H.W. Bush, George W. Bush, Jeb Bush)
+- **Contests**: 
+  - **Current offices**: President (16 elections), Governor (12 elections), US Senate, Attorney General, Chief Financial Officer, Agriculture Commissioner
+  - **Historical Cabinet offices** (1978-2002): Secretary of State, Treasurer, Commissioner of Education, Comptroller
+  - **Note**: Florida Cabinet reform in 2002-2003 consolidated multiple Cabinet positions into the Chief Financial Officer role
+- **Candidate Names**: Full names with middle initials where available, proper formatting, and special handling (George H.W. Bush, George W. Bush, Jeb Bush, Hillary Clinton vs Bill Clinton)
 
 ## 📁 Project Structure
 
@@ -240,7 +245,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **🔗 Live Demo**: https://tenjin25.github.io/FLRealignment/
 **📧 Contact**: [Shamard415@gmail.com]
 
-## 🆕 Recent Updates (September 23, 2025)
+## 🆕 Recent Updates (February 2, 2026)
+
+- **Historical Cabinet Offices Added:**
+   - Added support for historical Florida Cabinet positions that were eliminated in the 2002-2003 reform: Secretary of State, Treasurer, Commissioner of Education, and Comptroller
+   - These offices now appear in the contest selector with the label "(Historic: 1978-2002)"
+   - Provides comprehensive historical context for Florida's Cabinet structure before consolidation into the Chief Financial Officer role
+
+- **County Label Toggle:**
+   - Added "Aa" button to toggle county name labels on/off for cleaner map viewing
+   - Button opacity changes to indicate active state (labels visible/hidden)
+   - Improves user experience when analyzing data without visual clutter
+
+- **Candidate Name Improvements:**
+   - Enhanced candidate names to include middle initials (e.g., "Claude R. Kirk", "Frank T. Brogan")
+   - Fixed Hillary Clinton vs Bill Clinton differentiation for 2016 presidential race
+   - Improved name extraction logic for all Cabinet office candidates
+
+- **Data Quality Fixes:**
+   - Fixed Dade → Miami-Dade county name normalization for 1996 election data
+   - Corrected competitiveness thresholds from >= 1 to >= 1.0 for precise 1% boundary categorization
+   - Ensures margins of 0.99% are correctly classified as "Tilt" instead of "Lean"
 
 - **Bug Fixes:**
    - Resolved issues with counties not displaying colors and contest selector not loading correctly.
