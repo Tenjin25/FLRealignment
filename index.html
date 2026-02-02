@@ -2,40 +2,48 @@
 <html>
 <head>
   <style>
-  @media (max-width: 700px) {
+  /* Mobile Styles - Enhanced for touch and small screens */
+  @media (max-width: 768px) {
+    /* Make minimize buttons touch-friendly */
     #sidebar-minimize-btn,
     #main-controls .controls-header #controls-minimize-btn,
     #legend-minimize-btn {
       position: absolute !important;
-      top: 12px !important;
-      right: 12px !important;
+      top: 8px !important;
+      right: 8px !important;
       z-index: 10002 !important;
-      font-size: 18px !important;
-      background: #f3f4f6 !important;
-      color: #2563eb !important;
-      border-radius: 6px !important;
-      width: auto !important;
-      height: auto !important;
-      border: 1px solid #2563eb !important;
-      box-shadow: none !important;
-      padding: 4px 16px !important;
-      display: block !important;
+      font-size: 20px !important;
+      background: #2563eb !important;
+      color: #fff !important;
+      border-radius: 8px !important;
+      min-width: 44px !important;
+      min-height: 44px !important;
+      border: none !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+      padding: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       font-weight: 700 !important;
       transition: background 0.2s;
+      cursor: pointer;
     }
     #main-controls .controls-header #controls-minimize-btn {
-      left: 12px !important;
+      left: 8px !important;
       right: auto !important;
     }
     .legend-header {
       position: relative !important;
-      min-height: 48px;
+      min-height: 56px;
+      padding: 12px 60px 12px 16px !important;
     }
     .legend-header h4 {
-      margin-right: 56px !important;
+      margin: 0 !important;
+      font-size: 16px !important;
     }
   }
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
+    /* Legend at bottom of screen on mobile */
     .legend {
       position: fixed !important;
       bottom: 0 !important;
@@ -44,16 +52,33 @@
       max-width: 100vw !important;
       z-index: 10005 !important;
       background: #fff !important;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.10);
-      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.15) !important;
+      border-radius: 16px 16px 0 0 !important;
       overflow-y: auto;
-      max-height: 40vh;
+      max-height: 50vh;
+      min-width: auto !important;
+    }
+    .legend.minimized {
+      max-height: 56px !important;
     }
     .legend-header {
       position: sticky;
       top: 0;
       background: #fff;
       z-index: 10006;
+      border-radius: 16px 16px 0 0;
+    }
+    .legend-content {
+      padding: 16px !important;
+    }
+    .legend-item {
+      font-size: 14px !important;
+      margin-bottom: 10px !important;
+    }
+    .legend-color {
+      width: 20px !important;
+      height: 20px !important;
+      margin-right: 12px !important;
     }
   }
     .spinner svg {
@@ -73,21 +98,24 @@
     font-weight: bold;
     text-decoration: underline wavy #333;
   }
-  body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #ff9900 !important; }
-  body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ffb84d !important; }
-  body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ffd699 !important; }
-  body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffe5cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #fff2e6 !important; }
-  body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffe5cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #fff2e6 !important; }
+  /* Republican shades - Orange/Yellow palette */
+  body.colorblind-mode .legend-color[style*="background: #67000d"] { background: #cc5500 !important; } /* Annihilation R */
+  body.colorblind-mode .legend-color[style*="background: #a50f15"] { background: #ff6600 !important; } /* Dominant R */
+  body.colorblind-mode .legend-color[style*="background: #cb181d"] { background: #ff8833 !important; } /* Stronghold R */
+  body.colorblind-mode .legend-color[style*="background: #ef3b2c"] { background: #ffaa55 !important; } /* Safe R */
+  body.colorblind-mode .legend-color[style*="background: #fb6a4a"] { background: #ffcc77 !important; } /* Likely R */
+  body.colorblind-mode .legend-color[style*="background: #fcae91"] { background: #ffdd99 !important; } /* Lean R */
+  body.colorblind-mode .legend-color[style*="background: #fee8c8"] { background: #ffeecc !important; } /* Tilt R */
+  /* Tossup */
   body.colorblind-mode .legend-color[style*="background: #f7f7f7"] { background: #cccccc !important; }
-  body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #3399ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #66b3ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #99ccff !important; }
-  body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #b3d1ff !important; }
-  body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #3366cc !important; }
-  body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #003399 !important; }
-  body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #001f4d !important; }
+  /* Democratic shades - Blue palette */
+  body.colorblind-mode .legend-color[style*="background: #e1f5fe"] { background: #b3d9ff !important; } /* Tilt D */
+  body.colorblind-mode .legend-color[style*="background: #c6dbef"] { background: #99ccff !important; } /* Lean D */
+  body.colorblind-mode .legend-color[style*="background: #9ecae1"] { background: #66b3ff !important; } /* Likely D */
+  body.colorblind-mode .legend-color[style*="background: #6baed6"] { background: #3399ff !important; } /* Safe D */
+  body.colorblind-mode .legend-color[style*="background: #3182bd"] { background: #0080ff !important; } /* Stronghold D */
+  body.colorblind-mode .legend-color[style*="background: #08519c"] { background: #0066cc !important; } /* Dominant D */
+  body.colorblind-mode .legend-color[style*="background: #08306b"] { background: #004d99 !important; } /* Annihilation D */
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
@@ -215,21 +243,36 @@
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <meta charset='utf-8'>
-    <title>FL Political Realignment Map (2008-2024)</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
+    <title>Florida Political Realignment Map (1978-2024)</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes'>
     <meta property="og:title" content="FL Political Realignment Map (2008-2024)">
-    <meta property="og:description" content="Interactive visualization of Florida's political trends from 2008 to 2024, showing county-level voting patterns.">
+    <meta property="og:description" content="Interactive visualization of Florida's political trends from 1978 to 2024, showing county-level voting patterns.">
     <meta property="og:image" content="preview.png">
     <meta name="twitter:card" content="summary_large_image">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
 /* Show floating button only when sidebar is minimized */
 #sidebar-float-toggle { display: flex; position: fixed; top: 10px; right: 10px; z-index: 10010; }
+/* Mobile: Larger touch-friendly floating button */
+@media (max-width: 768px) {
+  #sidebar-float-toggle {
+    top: auto !important;
+    bottom: calc(50vh + 16px) !important;
+    right: 16px !important;
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 28px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+  }
+}
 html, body {
   height: 100vh;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 body {
   height: 100vh;
@@ -237,6 +280,7 @@ body {
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
+  touch-action: pan-x pan-y;
 }
 #map {
   position: absolute;
@@ -247,6 +291,7 @@ body {
   background: #f0f4f8;
   transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 1;
+  touch-action: pan-x pan-y pinch-zoom;
 }
 /* Removed unused #map.sidebar-minimized selector for clarity */
 
@@ -308,6 +353,35 @@ body {
   overflow-y: auto;
   transition: width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 2;
+}
+/* Mobile: Full-screen sidebar */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 10003 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .sidebar-header {
+    padding: 16px !important;
+    border-bottom: 2px solid #e5e7eb !important;
+  }
+  .sidebar-header h3 {
+    font-size: 18px !important;
+    padding-right: 50px;
+  }
+  .sidebar-content {
+    padding: 16px !important;
+  }
+  .sidebar-footer {
+    padding: 16px !important;
+    font-size: 14px !important;
+  }
 }
 .sidebar.minimized {
   width: 0 !important;
@@ -393,6 +467,48 @@ body {
   min-width: 380px;
   max-width: 420px;
   transition: all 0.3s ease;
+}
+/* Mobile: Full-width controls at top */
+@media (max-width: 768px) {
+  .main-controls {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 0 16px 16px !important;
+    padding: 16px !important;
+    margin: 0 !important;
+    z-index: 10004 !important;
+  }
+  .main-controls.minimized {
+    min-width: 60px !important;
+    max-width: 60px !important;
+    width: 60px !important;
+    left: 8px !important;
+    top: 8px !important;
+    right: auto !important;
+    border-radius: 12px !important;
+  }
+  .controls-header h3 {
+    font-size: 16px !important;
+    padding-right: 50px;
+  }
+  .control-group label {
+    font-size: 14px !important;
+  }
+  .control-group select {
+    padding: 12px !important;
+    font-size: 15px !important;
+  }
+  #accessibility-toggle {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+  }
 }
 .main-controls.minimized {
   min-width: 60px;
@@ -550,6 +666,19 @@ body {
   font-size: 16px;
   font-weight: 700;
 }
+/* Mobile: Better spacing for county details */
+@media (max-width: 768px) {
+  .county-details {
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+  }
+  .county-details h4 {
+    font-size: 18px !important;
+  }
+  #county-name {
+    font-size: 20px !important;
+  }
+}
 /* Sidebar Card Classes for Consistent Font Sizes */
 .sidebar-section-title {
   font-size: 14px !important;
@@ -589,6 +718,22 @@ body {
   font-size: 16px !important;
   font-weight: 700 !important;
   color: #1f2937 !important;
+}
+/* Mobile: Better layout for statewide results */
+@media (max-width: 768px) {
+  .statewide-results {
+    padding: 14px !important;
+  }
+  .statewide-results h4 {
+    font-size: 18px !important;
+  }
+  .statewide-margin {
+    padding: 12px !important;
+  }
+  #statewide-temperature-bar {
+    height: 36px !important;
+    margin: 14px 0 !important;
+  }
 }
 
 /* Statewide Results */
@@ -655,12 +800,54 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+/* Mobile: Better readability for research findings */
+@media (max-width: 768px) {
+  .findings-section h4 {
+    font-size: 18px !important;
+  }
+  .finding-card {
+    padding: 14px !important;
+    margin-bottom: 14px !important;
+  }
+  .finding-card h5 {
+    font-size: 16px !important;
+  }
+  .finding-card p,
+  .finding-card ul {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+}
 .metric {
   background: #dbeafe;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
   color: #1e40af;
+}
+
+/* Mobile: Touch-friendly inputs and buttons */
+@media (max-width: 768px) {
+  #county-search {
+    font-size: 16px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+  .minimize-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 22px !important;
+  }
+  /* Ensure all buttons and interactive elements are touch-friendly */
+  button, select, input, .mode-toggle {
+    min-height: 44px !important;
+    touch-action: manipulation;
+  }
+  /* Better tap highlight */
+  button:active, .mode-toggle:active {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
 }
 
 /* End of styles */
@@ -766,68 +953,26 @@ document.addEventListener('DOMContentLoaded', function() {
     accBtn.onclick = function() {
       document.body.classList.toggle('colorblind-mode');
       updateLegendColors();
-      // Update map colors for accessibility mode
-      if (document.body.classList.contains('colorblind-mode')) {
-        // Blue/orange shades for colorblind mode, matching legend categories
-        const expr = ['case'];
-        const contestSelect = document.getElementById('contestSelect');
-        const contestKey = contestSelect && contestSelect.value;
-        if (contestKey && electionData) {
-          const lastUnderscoreIndex = contestKey.lastIndexOf('_');
-          const contestType = contestKey.substring(0, lastUnderscoreIndex);
-          const year = contestKey.substring(lastUnderscoreIndex + 1);
-          const contestData = electionData.filter(row => row.year == year);
-          function normalizeCountyName(name) {
-            return (name || '')
-              .replace(/[^a-z0-9 .\-]/gi, '')  // Keep periods for St. names and hyphens for Miami-Dade
-              .replace(/\s+/g, ' ')
-              .trim()
-              .toUpperCase();
-          }
-          function cbColorForMargin(marginPct, winner) {
-            // Accessibility palette: orange for R, blue for D, with shades
-            if (marginPct >= 40) {
-              return winner === 'R' ? '#ff9900' : '#0074d9'; // Annihilation
-            } else if (marginPct >= 30 && marginPct <= 39.99) {
-              return winner === 'R' ? '#ffb84d' : '#339af0'; // Dominant
-            } else if (marginPct >= 20 && marginPct <= 29.99) {
-              return winner === 'R' ? '#ffd699' : '#5dade2'; // Stronghold
-            } else if (marginPct >= 10 && marginPct <= 19.99) {
-              return winner === 'R' ? '#ffe5cc' : '#74c0fc'; // Safe
-            } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-              return winner === 'R' ? '#fff2e6' : '#a5d8ff'; // Likely
-            } else if (marginPct >= 1 && marginPct <= 5.5) {
-              return winner === 'R' ? '#ffe5cc' : '#d0ebff'; // Lean
-            } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-              return winner === 'R' ? '#fff2e6' : '#e7f5ff'; // Tilt
-            } else {
-              return '#cccccc'; // Tossup
-            }
-          }
-          contestData.forEach(row => {
-            const countyName = normalizeCountyName(row.county);
-            const demVotes = row[`${contestType}_dem`] || 0;
-            const repVotes = row[`${contestType}_rep`] || 0;
-            const totalVotes = row[`${contestType}_total`] || 0;
-            if (totalVotes === 0) return;
-            const demPct = (demVotes / totalVotes) * 100;
-            const repPct = (repVotes / totalVotes) * 100;
-            const winner = repPct > demPct ? 'R' : 'D';
-            const marginPct = Math.abs(repPct - demPct);
-            const color = cbColorForMargin(marginPct, winner);
-            expr.push(['==', ['upcase', ['coalesce', ['get', 'NAME20'], ['get', 'County'], ['get', 'COUNTYNAME'], ['get', 'NAME']]], countyName]);
-            expr.push(color);
-          });
-          expr.push('#e0e0e0'); // default color
-          if (map.getLayer('county-fill')) {
-            map.setPaintProperty('county-fill', 'fill-color', expr);
-          }
-        }
-      } else {
-        // Restore normal contest colors
-        const contestSelect = document.getElementById('contestSelect');
-        const contestKey = contestSelect && contestSelect.value;
-        if (contestKey) applyContest(contestKey);
+      // Reapply current contest with new color mode
+      const contestSelect = document.getElementById('contestSelect');
+      const contestKey = contestSelect && contestSelect.value;
+      if (contestKey) {
+        applyContest(contestKey);
+      }
+    };
+  }
+  // County label toggle
+  const labelBtn = document.getElementById('label-toggle');
+  if (labelBtn) {
+    labelBtn.onclick = function() {
+      if (map.getLayer('county-label')) {
+        const visibility = map.getLayoutProperty('county-label', 'visibility');
+        map.setLayoutProperty(
+          'county-label',
+          'visibility',
+          visibility === 'visible' ? 'none' : 'visible'
+        );
+        labelBtn.style.opacity = visibility === 'visible' ? '0.5' : '1';
       }
     };
   }
@@ -925,35 +1070,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Main Controls Dropdown (Contest Selector) -->
     <div class="main-controls" id="main-controls">
         <div class="controls-header" style="display:flex;align-items:center;justify-content:space-between;">
-            <h3>🗳️ FL Political Contests</h3>
+            <h3>🗳️ Florida Election Contests</h3>
             <div style="display:flex;align-items:center;gap:8px;">
               <button class="minimize-btn" onclick="toggleMainControls()" id="controls-minimize-btn">−</button>
             </div>
         </div>
         <div class="controls-content" id="controls-content">
-            <div class="analysis-mode">
-                <div class="mode-toggle active" id="county-mode" onclick="setAnalysisMode('county')">County Results</div>
-                <div class="mode-toggle" id="district-mode" onclick="setAnalysisMode('district')">District Analysis</div>
-            </div>
-            <div class="control-group">
-                <label>🗺️ Map View:</label>
-                <div class="view-toggle">
-                    <div class="mode-toggle active" id="counties-view" onclick="setMapView('counties')">Counties</div>
-                    <div class="mode-toggle" id="districts-view" onclick="setMapView('districts')">Congress</div>
-                </div>
-                <div class="view-toggle" style="margin-top: 8px;">
-                    <div class="mode-toggle" id="state-house-view" onclick="setMapView('state_house')">State House</div>
-                    <div class="mode-toggle" id="state-senate-view" onclick="setMapView('state_senate')">State Senate</div>
-                </div>
-                <!-- 2000 VTDs option (hidden until data is loaded) -->
-                <div class="view-toggle" style="margin-top: 8px; display: none;" id="vtds-2000-section">
-                    <div class="mode-toggle" id="vtds-2000-view" onclick="setMapView('vtds_2000')">2000 Precincts</div>
-                </div>
-            </div>
             <div class="control-group">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <label>📊 Contest Type:</label>
                   <button id="accessibility-toggle" title="Accessibility: Color Blind Mode" style="background:#1f2937;color:#fff;border-radius:50%;width:32px;height:32px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.10);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;">♿</button>
+                  <button id="label-toggle" title="Toggle County Labels" style="background:#1f2937;color:#fff;border-radius:50%;width:32px;height:32px;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.10);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;">Aa</button>
                 </div>
                 <select id="contestSelect">
                     <option value="">Select a Contest...</option>
@@ -972,19 +1099,19 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="legend-content" id="legend-content">
             <div class="legend-item"><div class="legend-color" style="background: #67000d;"></div>Annihilation Republican (40%+)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #a50f15;"></div>Dominant Republican (30-39.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #cb181d;"></div>Stronghold Republican (20-29.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #ef3b2c;"></div>Safe Republican (10-19.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fb6a4a;"></div>Likely Republican (5.51-9.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fcae91;"></div>Lean Republican (1-5.50%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #fee8c8;"></div>Tilt Republican (0.51-0.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #f7f7f7; border: 1px solid #999;"></div>Tossup (<0.5%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #e1f5fe;"></div>Tilt Democratic (0.51-0.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #c6dbef;"></div>Lean Democratic (1-5.50%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #9ecae1;"></div>Likely Democratic (5.51-9.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #6baed6;"></div>Safe Democratic (10-19.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #3182bd;"></div>Stronghold Democratic (20-29.99%)</div>
-            <div class="legend-item"><div class="legend-color" style="background: #08519c;"></div>Dominant Democratic (30-39.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #a50f15;"></div>Dominant Republican (30.00-39.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #cb181d;"></div>Stronghold Republican (20.00-29.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #ef3b2c;"></div>Safe Republican (10.00-19.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #fb6a4a;"></div>Likely Republican (5.50-9.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #fcae91;"></div>Lean Republican (1.00-5.49%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #fee8c8;"></div>Tilt Republican (0.50-0.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #f7f7f7; border: 1px solid #999;"></div>Tossup (<0.50%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #e1f5fe;"></div>Tilt Democratic (0.50-0.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #c6dbef;"></div>Lean Democratic (1.00-5.49%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #9ecae1;"></div>Likely Democratic (5.50-9.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #6baed6;"></div>Safe Democratic (10.00-19.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #3182bd;"></div>Stronghold Democratic (20.00-29.99%)</div>
+            <div class="legend-item"><div class="legend-color" style="background: #08519c;"></div>Dominant Democratic (30.00-39.99%)</div>
             <div class="legend-item"><div class="legend-color" style="background: #08306b;"></div>Annihilation Democratic (40%+)</div>
         </div>
     </div>
@@ -1012,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     mapboxgl.accessToken = CONFIG.mapboxToken;
 
-    const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/light-v11', center: CONFIG.center, zoom: CONFIG.zoom });
+    const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: CONFIG.center, zoom: CONFIG.zoom });
 
     let electionDataJSON = null; // New JSON structure from fl_elections_aggregated.json
     let electionData = null; // Flattened array for compatibility
@@ -1202,6 +1329,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         'attorney_general': 'Attorney General',
         'cfo': 'Chief Financial Officer',
         'agriculture_commissioner': 'Commissioner of Agriculture',
+        // Historical Florida Cabinet positions (pre-2003)
+        'secretary_of_state': 'Secretary of State',
+        'treasurer': 'Treasurer',
+        'education_commissioner': 'Commissioner of Education',
+        'comptroller': 'Comptroller',
         'us_house': 'US House',
         'state_senate': 'State Senate',
         'state_house': 'State House',
@@ -1257,7 +1389,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         spinner.innerHTML = '<svg width="18" height="18" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.4 31.4" transform="rotate(-90 25 25)"/></svg>';
         sel.parentNode.insertBefore(spinner, sel.nextSibling);
       }
-      const contestTypes = ['president', 'us_senate', 'governor', 'attorney_general', 'cfo', 'agriculture_commissioner'];
+      const contestTypes = ['president', 'us_senate', 'governor', 'attorney_general', 'cfo', 'agriculture_commissioner', 'secretary_of_state', 'treasurer', 'education_commissioner', 'comptroller'];
       // Precompute contest/year pairs in a single pass
       const contestYearPairs = {};
       csvData.forEach(row => {
@@ -1276,7 +1408,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         'us_senate': 'U.S. Senate Elections',
         'attorney_general': 'Attorney General Elections',
         'cfo': 'Chief Financial Officer Elections',
-        'agriculture_commissioner': 'Agriculture Commissioner Elections'
+        'agriculture_commissioner': 'Agriculture Commissioner Elections',
+        'secretary_of_state': 'Secretary of State Elections (Historic: 1978-2002)',
+        'treasurer': 'Treasurer Elections (Historic: 1978-2002)',
+        'education_commissioner': 'Commissioner of Education Elections (Historic: 1978-1998)',
+        'comptroller': 'Comptroller Elections (Historic: 1978-2002)'
       };
       
       contestTypes.forEach(contestType => {
@@ -1304,21 +1440,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   var spinner = document.getElementById('contest-loading-spinner');
   if (spinner) spinner.style.display = 'none';
       sel.onchange = () => {
-        if (document.body.classList.contains('colorblind-mode')) {
-          // ...existing code for accessibility mode...
-          const expr = ['case'];
-          const contestKey = sel.value;
-          if (contestKey && electionData) {
-            // ...existing code for accessibility palette...
-            // ...existing code...
-          }
-        } else {
-          // Normal mode
-          applyContest(sel.value);
-          // Explicitly update sidebar for last selected county
-          if (typeof lastSelectedCounty !== 'undefined' && lastSelectedCounty) {
-            showCountyDetails(lastSelectedCounty);
-          }
+        // Always use applyContest - it will check for colorblind mode automatically
+        applyContest(sel.value);
+        // Explicitly update sidebar for last selected county
+        if (typeof lastSelectedCounty !== 'undefined' && lastSelectedCounty) {
+          showCountyDetails(lastSelectedCounty);
         }
       };
 
@@ -1426,25 +1552,25 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         compLabel = winner === 'Republican' ? "Annihilation Republican (40%+)" : "Annihilation Democratic (40%+)";
         compColor = winner === 'Republican' ? '#450a0a' : '#0c1d56';
       } else if (marginPct >= 30 && marginPct <= 39.99) {
-        compLabel = winner === 'Republican' ? "Dominant Republican (30-39.99%)" : "Dominant Democratic (30-39.99%)";
+        compLabel = winner === 'Republican' ? "Dominant Republican (30.00-39.99%)" : "Dominant Democratic (30.00-39.99%)";
         compColor = winner === 'Republican' ? '#7f1d1d' : '#1e3a8a';
       } else if (marginPct >= 20 && marginPct <= 29.99) {
-        compLabel = winner === 'Republican' ? "Stronghold Republican (20-29.99%)" : "Stronghold Democratic (20-29.99%)";
+        compLabel = winner === 'Republican' ? "Stronghold Republican (20.00-29.99%)" : "Stronghold Democratic (20.00-29.99%)";
         compColor = winner === 'Republican' ? '#991b1b' : '#1e40af';
       } else if (marginPct >= 10 && marginPct <= 19.99) {
-        compLabel = winner === 'Republican' ? "Safe Republican (10-19.99%)" : "Safe Democratic (10-19.99%)";
+        compLabel = winner === 'Republican' ? "Safe Republican (10.00-19.99%)" : "Safe Democratic (10.00-19.99%)";
         compColor = winner === 'Republican' ? '#dc2626' : '#3b82f6';
-      } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-        compLabel = winner === 'Republican' ? "Likely Republican (5.51-9.99%)" : "Likely Democratic (5.51-9.99%)";
+      } else if (marginPct >= 5.50 && marginPct <= 9.99) {
+        compLabel = winner === 'Republican' ? "Likely Republican (5.50-9.99%)" : "Likely Democratic (5.51-9.99%)";
         compColor = winner === 'Republican' ? '#ef4444' : '#60a5fa';
-      } else if (marginPct >= 1 && marginPct <= 5.5) {
-        compLabel = winner === 'Republican' ? "Lean Republican (1-5.50%)" : "Lean Democratic (1-5.50%)";
+      } else if (marginPct >= 1.0 && marginPct <= 5.49) {
+        compLabel = winner === 'Republican' ? "Lean Republican (1.00-5.49%)" : "Lean Democratic (1.00-5.49%)";
         compColor = winner === 'Republican' ? '#f87171' : '#93c5fd';
-      } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-        compLabel = winner === 'Republican' ? "Tilt Republican (0.51-0.99%)" : "Tilt Democratic (0.51-0.99%)";
+      } else if (marginPct >= 0.50 && marginPct < 1.0) {
+        compLabel = winner === 'Republican' ? "Tilt Republican (0.50-0.99%)" : "Tilt Democratic (0.50-0.99%)";
         compColor = winner === 'Republican' ? '#fca5a5' : '#bfdbfe';
       } else {
-        compLabel = winner === 'Democratic' ? 'Tossup (<0.5% - Democratic Win)' : 'Tossup (<0.5% - Republican Win)';
+        compLabel = winner === 'Democratic' ? 'Tossup (Democratic Win - <0.50%)' : 'Tossup (Republican Win - <0.50%)';
         compColor = winner === 'Democratic' ? '#2563eb' : '#dc2626'; // Blue for Dem win, Red for Rep win
       }
       
@@ -1730,35 +1856,35 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Accessibility palette for winner color
       function cbColorForMargin(marginPct, winner) {
         if (marginPct >= 40) {
-          return winner === 'Republican' ? '#ff9900' : '#0074d9';
+          return winner === 'Republican' ? '#cc5500' : '#004d99';
         } else if (marginPct >= 30 && marginPct <= 39.99) {
-          return winner === 'Republican' ? '#ffb84d' : '#339af0';
+          return winner === 'Republican' ? '#ff6600' : '#0066cc';
         } else if (marginPct >= 20 && marginPct <= 29.99) {
-          return winner === 'Republican' ? '#ffd699' : '#5dade2';
+          return winner === 'Republican' ? '#ff8833' : '#0080ff';
         } else if (marginPct >= 10 && marginPct <= 19.99) {
-          return winner === 'Republican' ? '#ffe5cc' : '#74c0fc';
+          return winner === 'Republican' ? '#ffaa55' : '#3399ff';
         } else if (marginPct >= 5.51 && marginPct <= 9.99) {
-          return winner === 'Republican' ? '#fff2e6' : '#a5d8ff';
-        } else if (marginPct >= 1 && marginPct <= 5.5) {
-          return winner === 'Republican' ? '#ffe5cc' : '#d0ebff';
-        } else if (marginPct >= 0.51 && marginPct <= 0.99) {
-          return winner === 'Republican' ? '#fff2e6' : '#e7f5ff';
+          return winner === 'Republican' ? '#ffcc77' : '#66b3ff';
+        } else if (marginPct >= 1.0 && marginPct <= 5.5) {
+          return winner === 'Republican' ? '#ffdd99' : '#99ccff';
+        } else if (marginPct >= 0.5 && marginPct < 1.0) {
+          return winner === 'Republican' ? '#ffeecc' : '#b3d9ff';
         } else {
           return '#cccccc';
         }
       }
       const isColorblind = document.body.classList.contains('colorblind-mode');
-      // Accessibility palette for winner color (always yellow/orange for Republican in colorblind mode)
+      // Accessibility palette for winner color (always orange/yellow for Republican in colorblind mode)
       let winnerColor = '#dc2626';
       if (winner === 'Republican') {
         if (isColorblind) {
-          if (parseFloat(marginPct) >= 40) winnerColor = '#ff9900';
-          else if (parseFloat(marginPct) >= 30) winnerColor = '#ffb84d';
-          else if (parseFloat(marginPct) >= 20) winnerColor = '#ffd699';
-          else if (parseFloat(marginPct) >= 10) winnerColor = '#ffe5cc';
-          else if (parseFloat(marginPct) >= 5.5) winnerColor = '#fff2e6';
-          else if (parseFloat(marginPct) >= 1) winnerColor = '#ffe5cc';
-          else if (parseFloat(marginPct) >= 0.5) winnerColor = '#fff2e6';
+          if (parseFloat(marginPct) >= 40) winnerColor = '#cc5500';
+          else if (parseFloat(marginPct) >= 30) winnerColor = '#ff6600';
+          else if (parseFloat(marginPct) >= 20) winnerColor = '#ff8833';
+          else if (parseFloat(marginPct) >= 10) winnerColor = '#ffaa55';
+          else if (parseFloat(marginPct) >= 5.5) winnerColor = '#ffcc77';
+          else if (parseFloat(marginPct) >= 1.0) winnerColor = '#ffdd99';
+          else if (parseFloat(marginPct) >= 0.5) winnerColor = '#ffeecc';
           else winnerColor = '#cccccc';
         }
       } else {
@@ -1793,13 +1919,13 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   // For colorblind mode, use the correct accessibility palette for Republican vote breakdown
   let repColor = '#ef3b2c';
   if (isColorblind) {
-    if (parseFloat(marginPct) >= 40) repColor = '#ff9900';
-    else if (parseFloat(marginPct) >= 30 && parseFloat(marginPct) <= 39.99) repColor = '#ffb84d';
-    else if (parseFloat(marginPct) >= 20 && parseFloat(marginPct) <= 29.99) repColor = '#ffd699';
-    else if (parseFloat(marginPct) >= 10 && parseFloat(marginPct) <= 19.99) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 5.51 && parseFloat(marginPct) <= 9.99) repColor = '#fff2e6';
-    else if (parseFloat(marginPct) >= 1 && parseFloat(marginPct) <= 5.5) repColor = '#ffe5cc';
-    else if (parseFloat(marginPct) >= 0.51 && parseFloat(marginPct) <= 0.99) repColor = '#fff2e6';
+    if (parseFloat(marginPct) >= 40) repColor = '#cc5500';
+    else if (parseFloat(marginPct) >= 30 && parseFloat(marginPct) <= 39.99) repColor = '#ff6600';
+    else if (parseFloat(marginPct) >= 20 && parseFloat(marginPct) <= 29.99) repColor = '#ff8833';
+    else if (parseFloat(marginPct) >= 10 && parseFloat(marginPct) <= 19.99) repColor = '#ffaa55';
+    else if (parseFloat(marginPct) >= 5.51 && parseFloat(marginPct) <= 9.99) repColor = '#ffcc77';
+    else if (parseFloat(marginPct) >= 1.0 && parseFloat(marginPct) <= 5.5) repColor = '#ffdd99';
+    else if (parseFloat(marginPct) >= 0.5 && parseFloat(marginPct) < 1.0) repColor = '#ffeecc';
     else repColor = '#cccccc';
   } else {
     // Non-accessibility mode: always use red for Republican vote breakdown
@@ -1836,15 +1962,18 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
     competitiveness = winner === 'Republican' ? "Safe Republican" : "Safe Democratic";
   } else if (actualMarginPct >= 5.51 && actualMarginPct <= 9.99) {
     competitiveness = winner === 'Republican' ? "Likely Republican" : "Likely Democratic";
-  } else if (actualMarginPct >= 1 && actualMarginPct <= 5.5) {
+  } else if (actualMarginPct >= 1.0 && actualMarginPct <= 5.5) {
     competitiveness = winner === 'Republican' ? "Lean Republican" : "Lean Democratic";
-  } else if (actualMarginPct >= 0.51 && actualMarginPct <= 0.99) {
+  } else if (actualMarginPct >= 0.5 && actualMarginPct < 1.0) {
     competitiveness = winner === 'Republican' ? "Tilt Republican" : "Tilt Democratic";
   } else {
-    competitiveness = `Tossup (${winner} win)`;
+    competitiveness = winner === 'Democratic' ? 'Tossup (Democratic Win)' : 'Tossup (Republican Win)';
   }
   let compColor = '#6b7280';
-  if (competitiveness.includes('Rep')) {
+  // Handle tossup cases with better colors and formatting like index (1).html
+  if (competitiveness.includes('Tossup')) {
+    compColor = winner === 'Democratic' ? '#2563eb' : '#dc2626'; // Blue for Dem win, Red for Rep win
+  } else if (competitiveness.includes('Rep')) {
     if (competitiveness.includes('Annihilation')) compColor = '#450a0a';
     else if (competitiveness.includes('Dominant')) compColor = '#7f1d1d';
     else if (competitiveness.includes('Stronghold')) compColor = '#991b1b';
@@ -1882,7 +2011,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           id: 'county-fill', 
           type: 'fill', 
           source: 'counties', 
-          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.38 } 
+          paint: { 'fill-color': '#e0e0e0', 'fill-opacity': 0.85 } 
         });
         map.addLayer({ 
           id: 'county-stroke', 
@@ -2446,15 +2575,18 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
               competitiveness = winner === 'Republican' ? 'Safe Republican' : 'Safe Democratic';
             } else if (marginPct >= 5.51 && marginPct <= 9.99) {
               competitiveness = winner === 'Republican' ? 'Likely Republican' : 'Likely Democratic';
-            } else if (marginPct >= 1 && marginPct <= 5.5) {
+            } else if (marginPct >= 1.0 && marginPct <= 5.5) {
               competitiveness = winner === 'Republican' ? 'Lean Republican' : 'Lean Democratic';
-            } else if (marginPct >= 0.51 && marginPct <= 0.99) {
+            } else if (marginPct >= 0.5 && marginPct < 1.0) {
               competitiveness = winner === 'Republican' ? 'Tilt Republican' : 'Tilt Democratic';
             } else {
-              competitiveness = `Tossup (${winner} win)`;
+              competitiveness = winner === 'Democratic' ? 'Tossup (Democratic Win)' : 'Tossup (Republican Win)';
             }
             let compColor = '#6b7280';
-            if (competitiveness.includes('Rep')) {
+            // Handle tossup cases with better colors and formatting like index (1).html
+            if (competitiveness.includes('Tossup')) {
+              compColor = winner === 'Democratic' ? '#2563eb' : '#dc2626'; // Blue for Dem win, Red for Rep win
+            } else if (competitiveness.includes('Rep')) {
               if (competitiveness.includes('Annihilation')) compColor = '#67000d';
               else if (competitiveness.includes('Dominant')) compColor = '#a50f15';
               else if (competitiveness.includes('Stronghold')) compColor = '#cb181d';
@@ -2819,6 +2951,30 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
           .trim()
           .toUpperCase();
       }
+      // Check if accessibility mode is active
+      const isColorblindMode = document.body.classList.contains('colorblind-mode');
+      
+      // Define colorblind-friendly color function
+      function getAccessibilityColor(marginPct, winner) {
+        if (marginPct >= 40) {
+          return winner === 'R' ? '#cc5500' : '#004d99';
+        } else if (marginPct >= 30 && marginPct <= 39.99) {
+          return winner === 'R' ? '#ff6600' : '#0066cc';
+        } else if (marginPct >= 20 && marginPct <= 29.99) {
+          return winner === 'R' ? '#ff8833' : '#0080ff';
+        } else if (marginPct >= 10 && marginPct <= 19.99) {
+          return winner === 'R' ? '#ffaa55' : '#3399ff';
+        } else if (marginPct >= 5.51 && marginPct <= 9.99) {
+          return winner === 'R' ? '#ffcc77' : '#66b3ff';
+        } else if (marginPct >= 1.0 && marginPct <= 5.5) {
+          return winner === 'R' ? '#ffdd99' : '#99ccff';
+        } else if (marginPct >= 0.5 && marginPct < 1.0) {
+          return winner === 'R' ? '#ffeecc' : '#b3d9ff';
+        } else {
+          return '#cccccc';
+        }
+      }
+      
       contestData.forEach(row => {
         const countyName = normalizeCountyName(row.county);
         const demVotes = row[`${contestType}_dem`] || 0;
@@ -2829,7 +2985,8 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
-        const color = categoryColorForMargin(marginPct, winner);
+        // Use accessibility colors if colorblind mode is active
+        const color = isColorblindMode ? getAccessibilityColor(marginPct, winner) : categoryColorForMargin(marginPct, winner);
         // Match on normalized, uppercase name from GeoJSON (NAME20 field)
         expr.push(['==', ['upcase', ['get', 'NAME20']], countyName]);
         expr.push(color);
@@ -2840,7 +2997,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       console.log(`Color expression built for ${countiesProcessed} counties`);
       
       map.setPaintProperty('county-fill', 'fill-color', expr);
-  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year})`;
+  document.getElementById('contest-name').textContent = `${formatContestName(contestType, year)} (${year})`;
       setStatus(`Applied contest: ${formatContestName(contestType, year)} ${year}`);
     }
 
@@ -2880,7 +3037,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       expr.push('#e0e0e0'); // default color
       
       map.setPaintProperty('district-fill', 'fill-color', expr);
-  document.getElementById('contest-name').textContent = `FL US House (${year})`;
+  document.getElementById('contest-name').textContent = `US House (${year})`;
       setStatus(`Applied contest: FL US House ${year}`);
     }
 
@@ -2930,7 +3087,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         setStatus('District layer not found!', 5000, true);
       }
 
-  document.getElementById('contest-name').textContent = `FL ${formatContestName(contestType, year)} (${year}) - Statewide Result`;
+  document.getElementById('contest-name').textContent = `${formatContestName(contestType, year)} (${year}) - Statewide Result`;
       setStatus(`Applied statewide contest: ${formatContestName(contestType, year)} ${year} (${demPct.toFixed(1)}% D, ${repPct.toFixed(1)}% R)`);
     }
 

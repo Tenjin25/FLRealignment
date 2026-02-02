@@ -76,7 +76,8 @@ def process_election_data_to_csv():
             
             # Map county names to match GeoJSON naming
             county_name_mapping = {
-                'Desoto': 'DeSoto'  # Fix capitalization mismatch
+                'Desoto': 'DeSoto',  # Fix capitalization mismatch
+                'Dade': 'Miami-Dade'  # Dade County was renamed in 1997
             }
             county = county_name_mapping.get(county, county)
             

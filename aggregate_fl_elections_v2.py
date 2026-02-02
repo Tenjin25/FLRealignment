@@ -27,7 +27,12 @@ office_mapping = {
     'Governor': 'governor',
     'Attorney General': 'attorney_general',
     'Chief Financial Officer': 'cfo',
-    'Commissioner of Agriculture': 'agriculture_commissioner'
+    'Commissioner of Agriculture': 'agriculture_commissioner',
+    # Historical Florida Cabinet positions (pre-2003 reform)
+    'Secretary of State': 'secretary_of_state',
+    'Treasurer': 'treasurer',
+    'Commissioner of Education': 'education_commissioner',
+    'Comptroller': 'comptroller'
 }
 
 # Statewide offices to include (filter out district-level races)
@@ -37,17 +42,12 @@ statewide_offices = {
     'Governor',
     'Attorney General',
     'Chief Financial Officer',
-    'Commissioner of Agriculture'
-}
-
-# Statewide offices to include (filter out district-level races)
-statewide_offices = {
-    'President of the United States',
-    'United States Senator', 
-    'Governor',
-    'Attorney General',
-    'Chief Financial Officer',
-    'Commissioner of Agriculture'
+    'Commissioner of Agriculture',
+    # Historical Florida Cabinet positions
+    'Secretary of State',
+    'Treasurer',
+    'Commissioner of Education',
+    'Comptroller'
 }
 
 # First name lookup for Presidential and Governor candidates
@@ -87,10 +87,10 @@ def get_competitiveness(margin_pct, winner):
     elif abs_margin >= 5.51 and abs_margin <= 9.99:
         category, code = "Likely", "LIKELY"
         color = "#fb6a4a" if winner == "REP" else "#9ecae1"
-    elif abs_margin >= 1 and abs_margin <= 5.50:
+    elif abs_margin >= 1.0 and abs_margin <= 5.50:
         category, code = "Lean", "LEAN"
         color = "#fcae91" if winner == "REP" else "#c6dbef"
-    elif abs_margin >= 0.51 and abs_margin <= 0.99:
+    elif abs_margin >= 0.5 and abs_margin < 1.0:
         category, code = "Tilt", "TILT"
         color = "#fee8c8" if winner == "REP" else "#e1f5fe"
     else:
@@ -105,6 +105,14 @@ def get_competitiveness(margin_pct, winner):
         "code": f"{winner}_{code}" if winner in ["REP", "DEM"] else code,
         "color": color
     }
+
+def normalize_county_name(county_name):
+    """Normalize county names to handle historical naming"""
+    county = county_name.strip()
+    # Dade County was renamed to Miami-Dade in 1997
+    if county == 'Dade':
+        return 'Miami-Dade'
+    return county
 
 def normalize_office_name(office):
     """Normalize office names for consistent keys"""
@@ -127,8 +135,9 @@ def process_election_file(file_path, year):
         office_df = df[df['OfficeDesc'] == office]
         office_key = normalize_office_name(office)
         
-        for county in office_df['CountyName'].unique():
-            county_df = office_df[office_df['CountyName'] == county]
+        for county_raw in office_df['CountyName'].unique():
+            county = normalize_county_name(county_raw)
+            county_df = office_df[office_df['CountyName'] == county_raw]
             
             # Aggregate votes by party
             party_votes = {}

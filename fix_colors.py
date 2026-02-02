@@ -38,7 +38,7 @@ def get_correct_category(margin_pct):
             return 'REP_SAFE', 'Safe', 'Republican'
         elif abs_margin >= 5.5:
             return 'REP_LIKELY', 'Likely', 'Republican'
-        elif abs_margin >= 1:
+        elif abs_margin >= 1.0:
             return 'REP_LEAN', 'Lean', 'Republican'
         elif abs_margin >= 0.5:
             return 'REP_TILT', 'Tilt', 'Republican'
@@ -55,7 +55,7 @@ def get_correct_category(margin_pct):
             return 'DEM_SAFE', 'Safe', 'Democratic'
         elif abs_margin >= 5.5:
             return 'DEM_LIKELY', 'Likely', 'Democratic'
-        elif abs_margin >= 1:
+        elif abs_margin >= 1.0:
             return 'DEM_LEAN', 'Lean', 'Democratic'
         elif abs_margin >= 0.5:
             return 'DEM_TILT', 'Tilt', 'Democratic'
