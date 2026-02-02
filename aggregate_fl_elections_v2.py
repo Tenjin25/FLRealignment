@@ -84,10 +84,10 @@ def get_competitiveness(margin_pct, winner):
     elif abs_margin >= 10 and abs_margin <= 19.99:
         category, code = "Safe", "SAFE"
         color = "#ef3b2c" if winner == "REP" else "#6baed6"
-    elif abs_margin >= 5.51 and abs_margin <= 9.99:
+    elif abs_margin >= 5.50 and abs_margin <= 9.99:
         category, code = "Likely", "LIKELY"
         color = "#fb6a4a" if winner == "REP" else "#9ecae1"
-    elif abs_margin >= 1.0 and abs_margin <= 5.50:
+    elif abs_margin >= 1.0 and abs_margin < 5.50:
         category, code = "Lean", "LEAN"
         color = "#fcae91" if winner == "REP" else "#c6dbef"
     elif abs_margin >= 0.5 and abs_margin < 1.0:
