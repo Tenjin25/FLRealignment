@@ -202,6 +202,12 @@ def process_election_file(file_path, year):
                             candidate = 'George W. Bush'
                         else:
                             candidate = candidate_first_names.get(last_name, last_name)
+                    # Special handling for Clinton family (Bill vs Hillary)
+                    elif last_name == 'Clinton':
+                        if year == '2016':
+                            candidate = 'Hillary Clinton'
+                        else:
+                            candidate = 'Bill Clinton'
                     else:
                         candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:

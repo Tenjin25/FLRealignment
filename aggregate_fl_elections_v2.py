@@ -157,7 +157,12 @@ def process_election_file(file_path, year):
                         last_name = str(row['CanNameFirst']).strip()
                     else:
                         last_name = str(row['CanNameLast']).strip()
-                    candidate = candidate_first_names.get(last_name, last_name)
+                    
+                    # Special handling for Clinton family (Bill vs Hillary)
+                    if last_name == 'Clinton' and year == '2016':
+                        candidate = 'Hillary Clinton'
+                    else:
+                        candidate = candidate_first_names.get(last_name, last_name)
                 elif 'Governor' in office:
                     # Governor: Format varies by year
                     # 2010, 2022: CanNameFirst has governor's last name, CanNameLast has Lt. Gov
