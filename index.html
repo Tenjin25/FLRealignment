@@ -1238,6 +1238,7 @@ document.addEventListener('DOMContentLoaded', function() {
               recordsMap[key][`${mappedOfficeType}_margin`] = countyData.margin || 0;
               recordsMap[key][`${mappedOfficeType}_margin_pct`] = countyData.margin_pct || 0;
               recordsMap[key][`${mappedOfficeType}_winner`] = countyData.winner || '';
+              recordsMap[key][`${mappedOfficeType}_color`] = countyData.competitiveness?.color || '';
             });
           });
         });
@@ -2989,8 +2990,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         const repPct = (repVotes / totalVotes) * 100;
         const winner = repPct > demPct ? 'R' : 'D';
         const marginPct = Math.abs(repPct - demPct);
-        // Use accessibility colors if colorblind mode is active
-        const color = isColorblindMode ? getAccessibilityColor(marginPct, winner) : categoryColorForMargin(marginPct, winner);
+        // Prefer color from JSON data, fall back to calculated color
+        let color = row[`${contestType}_color`];
+        if (!color) {
+          color = isColorblindMode ? getAccessibilityColor(marginPct, winner) : categoryColorForMargin(marginPct, winner);
+        }
         // Match on normalized, uppercase name from GeoJSON (NAME20 field)
         expr.push(['==', ['upcase', ['get', 'NAME20']], countyName]);
         expr.push(color);
