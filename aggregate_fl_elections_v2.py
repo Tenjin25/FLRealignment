@@ -5,9 +5,20 @@ from collections import defaultdict
 
 # Define election files and their years
 election_files = {
+    '1978': '11071978Election.txt',
+    '1980': '11041980Election.txt',
+    '1982': '11021982Election.txt',
+    '1984': '11061984Election.txt',
+    '1986': '11041986Election.txt',
+    '1988': '11081988Election.txt',
+    '1990': '11061990Election.txt',
+    '1992': '11031992Election.txt',
+    '1994': '11081994Election.txt',
+    '1996': '11051996Election.txt',
+    '1998': '11031998Election.txt',
     '2000': '11072000Election.txt',
     '2002': '11052002Election.txt',
-    '2004': '11042004Election.txt',
+    '2004': '11022004Election.txt',
     '2006': '11052006Election.txt',
     '2008': '11042008Election.txt',
     '2010': '11022010Election.txt',
