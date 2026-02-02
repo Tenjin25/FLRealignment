@@ -407,10 +407,19 @@ This feature is available on both desktop and mobile layouts.
    - Updated Lean category label to 1-5.50% for consistency with other .99/.50 endings
 
 - **Data Processing Enhancements:**
-   - Updated aggregate_fl_elections.py to handle 24 election files
+   - Updated aggregate_fl_elections.py to handle 24 election files (1978-2024)
+   - Added historical Florida Cabinet positions: Secretary of State, Treasurer, Commissioner of Education, Comptroller (1978-2002)
    - Added office mapping for "President and Vice President of the United States"
    - Added office mapping for "Governor and Lieutenant Governor"
    - Implemented year-based candidate extraction logic for different data format variations
    - Enhanced candidate lookup dictionary with historical figures (Carter, Reagan, Mondale, Dukakis, etc.)
+   - Fixed Dade → Miami-Dade county name normalization for 1996 election data
+   - Fixed competitiveness thresholds: changed from >= 1 to >= 1.0 so 0.99% margins correctly categorize as "Tilt" instead of "Lean"
 
-**📅 Last Updated**: November 30, 2025
+- **Map Interface Improvements:**
+   - Added county label toggle button (Aa) to show/hide county names on map
+   - Button dims when labels are hidden, full opacity when visible
+   - Historical Cabinet offices now appear in dropdown with (Historic: 1978-2002) labels
+   - Updated all competitiveness logic to use corrected 1.0% threshold
+
+**📅 Last Updated**: February 1, 2026
