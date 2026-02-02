@@ -171,7 +171,12 @@ def process_election_file(file_path, year):
                         last_name = str(row['CanNameFirst']).strip()
                     else:
                         last_name = str(row['CanNameLast']).strip()
-                    candidate = candidate_first_names.get(last_name, last_name)
+                    
+                    # Special handling for Bush family in governor races
+                    if last_name == 'Bush' and year in ['1994', '1998', '2002']:
+                        candidate = 'Jeb Bush'
+                    else:
+                        candidate = candidate_first_names.get(last_name, last_name)
                 else:
                     # Other offices (Senate, AG, CFO, Agriculture): Use FirstName MiddleName LastName
                     first_name = str(row['CanNameFirst']).strip()

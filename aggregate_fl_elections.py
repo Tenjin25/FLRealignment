@@ -226,7 +226,7 @@ def process_election_file(file_path, year):
                     
                     # Special handling for Bush family in governor races
                     if last_name == 'Bush':
-                        if year == '1994':
+                        if year in ['1994', '1998', '2002']:
                             candidate = 'Jeb Bush'
                         else:
                             candidate = candidate_first_names.get(last_name, last_name)
