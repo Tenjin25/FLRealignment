@@ -260,12 +260,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Candidate Name Improvements:**
    - Enhanced candidate names to include middle initials (e.g., "Claude R. Kirk", "Frank T. Brogan")
    - Fixed Hillary Clinton vs Bill Clinton differentiation for 2016 presidential race
+   - Fixed Jeb Bush name for 1998 and 2002 governor races
    - Improved name extraction logic for all Cabinet office candidates
 
 - **Data Quality Fixes:**
    - Fixed Dade → Miami-Dade county name normalization for 1996 election data
    - Corrected competitiveness thresholds from >= 1 to >= 1.0 for precise 1% boundary categorization
-   - Ensures margins of 0.99% are correctly classified as "Tilt" instead of "Lean"
+   - Aligned 5.50% threshold boundary: "Likely" starts at exactly 5.50%, "Lean" goes from 1.00% to 5.49%
+   - Fixed frontend `categoryColorForMargin()` function to match backend thresholds (5.5% and 1.0% boundaries)
+   - Ensures margins of 0.99% are correctly classified as "Tilt" with proper pale red/blue color (#fee8c8/#e1f5fe)
+   - Eliminates discrepancies where 0.99% margins were incorrectly shown with "Lean" colors
 
 - **Bug Fixes:**
    - Resolved issues with counties not displaying colors and contest selector not loading correctly.
