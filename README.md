@@ -83,7 +83,25 @@ This map visualizes the data behind this transformation, allowing users to explo
 - **County label toggle** (Aa button) to show/hide county names on the map
 - **Historical Cabinet offices** (1978-2002): Secretary of State, Treasurer, Commissioner of Education, Comptroller
 
-## 🚀 Quick Start
+## � Screenshots
+
+### Interactive Map View
+![Florida Counties Map](Screenshots/counties-view.png)
+*County-level visualization showing 2024 presidential election results with hover tooltips*
+
+### District Analysis
+![Congressional Districts](Screenshots/congressional-view.png)
+*Congressional district visualization with detailed sidebar analysis*
+
+### Historical Data
+![Historical Trends](Screenshots/historical-trends.png)
+*Exploring historical Cabinet offices from 1978-2002*
+
+### Detailed County Analysis
+![County Breakdown](Screenshots/county-breakdown.png)
+*Detailed vote breakdown with candidate names and competitiveness ratings*
+
+## �🚀 Quick Start
 
 1. **Clone the repository**
    ```bash
