@@ -2872,11 +2872,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         return winner === 'R' ? '#cb181d' : '#3182bd'; // Stronghold
       } else if (marginPct >= 10 && marginPct <= 19.99) {
         return winner === 'R' ? '#ef3b2c' : '#6baed6'; // Safe
-      } else if (marginPct > 5.5 && marginPct <= 9.99) {
+      } else if (marginPct >= 5.5 && marginPct <= 9.99) {
         return winner === 'R' ? '#fb6a4a' : '#9ecae1'; // Likely
-      } else if (marginPct > 0.99 && marginPct <= 5.5) {
+      } else if (marginPct >= 1.0 && marginPct < 5.5) {
         return winner === 'R' ? '#fcae91' : '#c6dbef'; // Lean
-      } else if (marginPct >= 0.5 && marginPct <= 0.99) {
+      } else if (marginPct >= 0.5 && marginPct < 1.0) {
         return winner === 'R' ? '#fee8c8' : '#e1f5fe'; // Tilt
       } else {
         return '#f7f7f7'; // Tossup
