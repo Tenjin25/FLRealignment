@@ -168,10 +168,14 @@ def process_election_file(file_path, year):
                         last_name = str(row['CanNameLast']).strip()
                     candidate = candidate_first_names.get(last_name, last_name)
                 else:
-                    # Other offices (Senate, AG, CFO, Agriculture): Use FirstName LastName
+                    # Other offices (Senate, AG, CFO, Agriculture): Use FirstName MiddleName LastName
                     first_name = str(row['CanNameFirst']).strip()
                     last_name = str(row['CanNameLast']).strip()
-                    candidate = f"{first_name} {last_name}"
+                    middle_name = str(row['CanNameMiddle']).strip() if 'CanNameMiddle' in row and pd.notna(row['CanNameMiddle']) else ""
+                    if middle_name:
+                        candidate = f"{first_name} {middle_name} {last_name}"
+                    else:
+                        candidate = f"{first_name} {last_name}"
                 
                 if party in party_votes:
                     party_votes[party] += votes
