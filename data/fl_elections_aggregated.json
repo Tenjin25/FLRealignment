@@ -135831,10 +135831,10 @@
               "margin_pct": 1.0,
               "winner": "REP",
               "competitiveness": {
-                "category": "Tilt",
+                "category": "Lean",
                 "party": "Republican",
-                "code": "REP_TILT",
-                "color": "#fee8c8"
+                "code": "REP_LEAN",
+                "color": "#fcae91"
               },
               "all_parties": {
                 "REP": 3699,
