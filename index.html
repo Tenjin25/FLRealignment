@@ -1852,14 +1852,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       // Candidate names
   let demCandidate = getCandidateName(year, formatContestName(contestType, year), 'Democrat');
   let repCandidate = getCandidateName(year, formatContestName(contestType, year), 'Republican');
-      // Margin: prefer JSON-provided margin_pct if available, fallback to computed from totals
+      // Margin
       const margin = demVotes - repVotes;
-      const jsonMarginPctRaw = Number(countyData[`${contestType}_margin_pct`]);
-      const computedMarginPct = Math.abs(margin) / totalVotes * 100;
-      const marginPctValue = Number.isFinite(jsonMarginPctRaw) && jsonMarginPctRaw > 0
-        ? Math.abs(jsonMarginPctRaw)
-        : computedMarginPct;
-      const marginPct = marginPctValue.toFixed(2);
+      const marginPct = (Math.abs(margin) / totalVotes * 100).toFixed(2);
       const winner = margin > 0 ? 'Democratic' : (margin < 0 ? 'Republican' : 'Tie');
       const winnerCandidate = margin > 0 ? demCandidate : repCandidate;
       const marginText = margin > 0 ? 'D+' + marginPct + '%' : (margin < 0 ? 'R+' + marginPct + '%' : 'Tied');
@@ -1961,7 +1956,7 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   sidebarContent += `</div>`;
   // Competitiveness
   let competitiveness;
-  const actualMarginPct = marginPctValue;
+  const actualMarginPct = parseFloat(marginPct);
   if (actualMarginPct >= 40) {
     competitiveness = winner === 'Republican' ? "Annihilation Republican" : "Annihilation Democratic";
   } else if (actualMarginPct >= 30 && actualMarginPct <= 39.99) {
@@ -3108,5 +3103,6 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   </script>
 </body>
 </html>
+
 
 
