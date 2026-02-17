@@ -128,10 +128,30 @@
       const floatBtn = document.getElementById('sidebar-float-toggle');
       const detailsDiv = document.getElementById('county-details');
       const contentEl = document.getElementById('county-info-content');
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
       
       if (sidebar && sidebar.classList.contains('minimized')) {
         // Expand sidebar
         sidebar.classList.remove('minimized');
+        if (isMobile) {
+          document.body.classList.add('mobile-sidebar-open');
+          const controls = document.getElementById('main-controls');
+          const controlsContent = document.getElementById('controls-content');
+          const controlsBtn = document.getElementById('controls-minimize-btn');
+          const legend = document.getElementById('legend');
+          const legendContent = document.getElementById('legend-content');
+          const legendBtn = document.getElementById('legend-minimize-btn');
+          if (controls && !controls.classList.contains('minimized')) {
+            controls.classList.add('minimized');
+            if (controlsContent) controlsContent.style.display = 'none';
+            if (controlsBtn) controlsBtn.textContent = '+';
+          }
+          if (legend && !legend.classList.contains('minimized')) {
+            legend.classList.add('minimized');
+            if (legendContent) legendContent.style.display = 'none';
+            if (legendBtn) legendBtn.textContent = '+';
+          }
+        }
         if (sidebarHeader) sidebarHeader.style.display = 'flex';
         if (sidebarContent) sidebarContent.style.display = 'block';
         if (detailsDiv) detailsDiv.style.display = 'block';
@@ -150,6 +170,7 @@
       } else if (sidebar) {
         // Minimize sidebar
         sidebar.classList.add('minimized');
+        document.body.classList.remove('mobile-sidebar-open');
         if (sidebarContent) sidebarContent.style.display = 'none';
         if (minimizeBtn) {
           minimizeBtn.textContent = '+';
@@ -159,6 +180,9 @@
           floatBtn.textContent = '+';
           floatBtn.title = 'Expand sidebar';
         }
+      }
+      if (typeof map !== 'undefined' && map && typeof map.resize === 'function') {
+        setTimeout(() => map.resize(), 50);
       }
     }
 
@@ -214,6 +238,33 @@
         contentEl.innerHTML = '<p>Select a contest or county to see results.</p>';
         detailsDiv.style.display = 'block';
       }
+
+      // Mobile-first defaults: keep the map visible by minimizing overlays on initial load.
+      if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+        var controls = document.getElementById('main-controls');
+        var controlsContent = document.getElementById('controls-content');
+        var controlsBtn = document.getElementById('controls-minimize-btn');
+        if (controls && !controls.classList.contains('minimized')) {
+          controls.classList.add('minimized');
+          if (controlsContent) controlsContent.style.display = 'none';
+          if (controlsBtn) {
+            controlsBtn.textContent = '+';
+            controlsBtn.title = 'Expand controls';
+          }
+        }
+
+        var legend = document.getElementById('legend');
+        var legendContent = document.getElementById('legend-content');
+        var legendBtn = document.getElementById('legend-minimize-btn');
+        if (legend && !legend.classList.contains('minimized')) {
+          legend.classList.add('minimized');
+          if (legendContent) legendContent.style.display = 'none';
+          if (legendBtn) {
+            legendBtn.textContent = '+';
+            legendBtn.title = 'Expand legend';
+          }
+        }
+      }
     });
     // Zoom to county by name using turf.js
     function zoomToCounty(countyName) {
@@ -239,6 +290,21 @@
       map.fitBounds(bbox, { padding: 40, maxZoom: 10 });
     }
   </script>
+  <script>
+    (function() {
+      function setAppHeight() {
+        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--app-height', `${Math.round(viewportHeight)}px`);
+      }
+      window.addEventListener('resize', setAppHeight, { passive: true });
+      window.addEventListener('orientationchange', function() { setTimeout(setAppHeight, 150); }, { passive: true });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setAppHeight, { passive: true });
+      }
+      document.addEventListener('DOMContentLoaded', setAppHeight);
+      setAppHeight();
+    })();
+  </script>
   <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -251,14 +317,26 @@
     <meta name="twitter:card" content="summary_large_image">
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet'>
     <style>
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --app-height: 100vh;
+}
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
 /* Show floating button only when sidebar is minimized */
 #sidebar-float-toggle { display: flex; position: fixed; top: 10px; right: 10px; z-index: 10010; }
 /* Mobile: Larger touch-friendly floating button */
 @media (max-width: 768px) {
   #sidebar-float-toggle {
     top: auto !important;
-    bottom: calc(50vh + 16px) !important;
-    right: 16px !important;
+    bottom: calc(var(--safe-bottom) + min(38vh, 320px) + 20px) !important;
+    right: calc(var(--safe-right) + 12px) !important;
     width: 56px !important;
     height: 56px !important;
     font-size: 28px !important;
@@ -267,7 +345,7 @@
   }
 }
 html, body {
-  height: 100vh;
+  height: var(--app-height);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -275,7 +353,7 @@ html, body {
   -webkit-touch-callout: none;
 }
 body {
-  height: 100vh;
+  min-height: var(--app-height);
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -287,7 +365,7 @@ body {
   top: 0;
   left: 0;
   width: 100vw !important;
-  height: 100vh;
+  height: var(--app-height);
   background: #f0f4f8;
   transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
   z-index: 1;
@@ -358,14 +436,16 @@ body {
 @media (max-width: 768px) {
   .sidebar {
     position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    top: calc(var(--safe-top) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    left: calc(var(--safe-left) + 8px) !important;
+    width: auto !important;
+    height: auto !important;
+    bottom: calc(var(--safe-bottom) + 8px) !important;
     z-index: 10003 !important;
-    box-shadow: none !important;
-    border: none !important;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.2) !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 14px !important;
   }
   .sidebar-header {
     padding: 16px !important;
@@ -472,23 +552,25 @@ body {
 @media (max-width: 768px) {
   .main-controls {
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100vw !important;
-    min-width: 100vw !important;
-    max-width: 100vw !important;
-    border-radius: 0 0 16px 16px !important;
+    top: calc(var(--safe-top) + 8px) !important;
+    left: calc(var(--safe-left) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    border-radius: 14px !important;
     padding: 16px !important;
     margin: 0 !important;
     z-index: 10004 !important;
+    max-height: min(46vh, 360px) !important;
+    overflow-y: auto !important;
   }
   .main-controls.minimized {
     min-width: 60px !important;
     max-width: 60px !important;
     width: 60px !important;
-    left: 8px !important;
-    top: 8px !important;
+    left: calc(var(--safe-left) + 8px) !important;
+    top: calc(var(--safe-top) + 8px) !important;
     right: auto !important;
     border-radius: 12px !important;
   }
@@ -618,6 +700,21 @@ body {
   z-index: 1000;
   min-width: 250px;
   border: 1px solid #e5e7eb;
+}
+@media (max-width: 768px) {
+  .legend {
+    left: calc(var(--safe-left) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    bottom: calc(var(--safe-bottom) + 8px) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: min(38vh, 320px) !important;
+    border-radius: 14px !important;
+  }
+  .legend.minimized {
+    max-height: 58px !important;
+  }
 }
 .legend.minimized .legend-content {
   display: none;
@@ -850,6 +947,52 @@ body {
   }
 }
 
+/* Final mobile layout overrides (applied after legacy rules) */
+@media (max-width: 768px) {
+  .main-controls {
+    left: calc(var(--safe-left) + 8px) !important;
+    right: auto !important;
+    width: min(92vw, 520px) !important;
+    max-height: min(42vh, 320px) !important;
+  }
+  .main-controls.minimized {
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    padding: 10px !important;
+  }
+  .legend {
+    left: calc(var(--safe-left) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    max-height: min(34vh, 280px) !important;
+  }
+  .legend.minimized {
+    max-height: 56px !important;
+  }
+  .sidebar {
+    top: calc(var(--safe-top) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    bottom: calc(var(--safe-bottom) + 8px) !important;
+    left: calc(var(--safe-left) + 8px) !important;
+  }
+  .sidebar.minimized {
+    display: none !important;
+  }
+  .sidebar-content {
+    padding-bottom: calc(var(--safe-bottom) + 14px) !important;
+  }
+  #sidebar-float-toggle {
+    width: 52px !important;
+    height: 52px !important;
+    bottom: calc(var(--safe-bottom) + min(34vh, 280px) + 14px) !important;
+    right: calc(var(--safe-right) + 10px) !important;
+    font-size: 26px !important;
+  }
+  .status-panel {
+    bottom: calc(var(--safe-bottom) + min(34vh, 280px) + 12px) !important;
+  }
+}
+
 /* End of styles */
 
 .metric {
@@ -874,6 +1017,20 @@ body {
   border: 1px solid #e5e7eb;
   z-index: 1000;
   max-width: 300px;
+}
+@media (max-width: 768px) {
+  .status-panel {
+    left: calc(var(--safe-left) + 8px) !important;
+    right: calc(var(--safe-right) + 8px) !important;
+    bottom: calc(var(--safe-bottom) + min(38vh, 320px) + 16px) !important;
+    top: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    font-size: 14px !important;
+  }
+  .hover-tooltip {
+    display: none !important;
+  }
 }
     .sidebar.minimized .sidebar-footer {
       display: none !important;
@@ -902,6 +1059,50 @@ body {
     }
     .sidebar.minimized ~ #sidebar-float-toggle {
       display: flex !important;
+    }
+    @media (max-width: 768px) {
+      .main-controls {
+        z-index: 10008 !important;
+        left: calc(var(--safe-left) + 8px) !important;
+        right: auto !important;
+        width: min(88vw, 420px) !important;
+        max-height: min(36vh, 280px) !important;
+      }
+      .main-controls.minimized {
+        top: calc(var(--safe-top) + 8px) !important;
+        left: calc(var(--safe-left) + 8px) !important;
+      }
+      .legend {
+        z-index: 10007 !important;
+        left: calc(var(--safe-left) + 8px) !important;
+        right: calc(var(--safe-right) + 8px) !important;
+        bottom: calc(var(--safe-bottom) + 8px) !important;
+        max-height: min(28vh, 220px) !important;
+      }
+      .legend.minimized {
+        max-height: 56px !important;
+      }
+      .sidebar {
+        z-index: 10020 !important;
+      }
+      .sidebar.minimized {
+        display: none !important;
+      }
+      #sidebar-float-toggle {
+        z-index: 10030 !important;
+        right: calc(var(--safe-right) + 10px) !important;
+        bottom: calc(var(--safe-bottom) + min(28vh, 220px) + 14px) !important;
+      }
+      .status-panel {
+        z-index: 10009 !important;
+        bottom: calc(var(--safe-bottom) + min(28vh, 220px) + 10px) !important;
+      }
+      body.mobile-sidebar-open .main-controls,
+      body.mobile-sidebar-open .legend,
+      body.mobile-sidebar-open .status-panel {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
     }
   /* Removed empty ruleset for #map.sidebar-minimized */
     </style>
@@ -1140,6 +1341,11 @@ document.addEventListener('DOMContentLoaded', function() {
     mapboxgl.accessToken = CONFIG.mapboxToken;
 
     const map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: CONFIG.center, zoom: CONFIG.zoom });
+    window.addEventListener('resize', () => map.resize(), { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(() => map.resize(), 120), { passive: true });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => map.resize(), { passive: true });
+    }
 
     let electionDataJSON = null; // New JSON structure from fl_elections_aggregated.json
     let electionData = null; // Flattened array for compatibility
@@ -1735,6 +1941,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const legend = document.getElementById('legend');
       const legendContent = document.getElementById('legend-content');
       const minimizeBtn = document.getElementById('legend-minimize-btn');
+      const sidebar = document.getElementById('sidebar');
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+      if (isMobile && sidebar && !sidebar.classList.contains('minimized')) {
+        toggleSidebar();
+      }
       
       if (legend.classList.contains('minimized')) {
         // Expand legend
@@ -1749,6 +1960,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         minimizeBtn.textContent = '+';
         minimizeBtn.title = 'Expand legend';
       }
+      if (typeof map !== 'undefined' && map && typeof map.resize === 'function') {
+        setTimeout(() => map.resize(), 50);
+      }
     }
 
     // Toggles the visibility of the main controls panel, minimizing or expanding it based on its current state.
@@ -1756,6 +1970,11 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
       const controls = document.getElementById('main-controls');
       const controlsContent = document.getElementById('controls-content');
       const minimizeBtn = document.getElementById('controls-minimize-btn');
+      const sidebar = document.getElementById('sidebar');
+      const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+      if (isMobile && sidebar && !sidebar.classList.contains('minimized')) {
+        toggleSidebar();
+      }
       
       if (controls.classList.contains('minimized')) {
         // Expand controls
@@ -1769,6 +1988,9 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
         controlsContent.style.display = 'none';
         minimizeBtn.textContent = '+';
         minimizeBtn.title = 'Expand controls';
+      }
+      if (typeof map !== 'undefined' && map && typeof map.resize === 'function') {
+        setTimeout(() => map.resize(), 50);
       }
     }
 
@@ -3103,6 +3325,3 @@ function mergeGeoElectionData(boundaryGeoJSON, electionData, countyKey='County',
   </script>
 </body>
 </html>
-
-
-
